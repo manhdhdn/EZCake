@@ -29,7 +29,16 @@ builder.Services.AddSwaggerGen(options =>
 
 // Add Database
 builder.Services.AddDbContext<EZCakeContext>(option =>
-option.UseSqlServer(builder.Configuration.GetConnectionString("EZCake")));
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        option.UseSqlServer(builder.Configuration.GetConnectionString("EZCake"));
+    }
+    else
+    {
+        option.UseSqlServer(builder.Configuration.GetConnectionString("huumanhbmtdn_EZCake"));
+    }
+}));
 
 // Add Firebase authen and author
 builder.Services.AddSingleton(FirebaseApp.Create(new AppOptions()
