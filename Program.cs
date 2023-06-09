@@ -38,7 +38,7 @@ builder.Services.AddDbContext<EZCakeContext>(option =>
     {
         option.UseSqlServer(builder.Configuration.GetConnectionString("huumanhbmtdn_EZCake"));
     }
-});
+}));
 
 // Add Firebase authen and author
 builder.Services.AddSingleton(FirebaseApp.Create(new AppOptions()
