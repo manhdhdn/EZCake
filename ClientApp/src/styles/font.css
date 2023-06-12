@@ -1,0 +1,16 @@
+@font-face {
+    font-family: 'Monument Extended';
+    src: url('../../public/assets/fonts/MonumentExtended-Regular.otf');
+}
+
+@font-face {
+    font-family: 'SF Mono';
+    src: url('../../public/assets/fonts/SFMono-Regular.otf');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'SF Mono';
+    src: url('../../public/assets/fonts/SFMono-Bold.otf');
+    font-weight: 700;
+}
