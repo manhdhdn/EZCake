@@ -1,4 +1,4 @@
-import GuestHome from "./pages/GuestHome";
+import Home from "pages/Home";
 import NotFound from "./pages/NotFound";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
@@ -6,7 +6,7 @@ import SignIn from "./pages/SignIn";
 const AppRoutes = [
   {
     index: true,
-    element: <GuestHome />,
+    element: <Home />,
   },
   {
     path: "*",

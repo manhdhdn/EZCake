@@ -31,7 +31,7 @@ const Slo = (props) => {
             className="common-pointer bg-red-500 border border-orange-50 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] mt-[60px] py-3.5 rounded-[5px] text-center text-lg text-orange-50"
             id="block1"
             onClick={() => {
-              handleSectionNavigation("block1");
+              handleSectionNavigation("block3");
             }}
           >
             sign in
