@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 
 import { useNavigate } from "react-router-dom";
+import { UserAuth } from "apis/auth/AuthContext";
 
-import { Button, Img } from "components";
+import { Button, Img, Text } from "components";
 
 const Navbar = (props) => {
   const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const navigate = useNavigate();
+  const { logout } = UserAuth();
 
   useEffect(() => {
     var user = localStorage.getItem("user");
@@ -24,6 +27,14 @@ const Navbar = (props) => {
   const handleSignUpBtxClick = () => {
     navigate("/signup");
   }
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   return (
     <>
@@ -54,8 +65,39 @@ const Navbar = (props) => {
               </>
             ) : (
               <>
-                <Img className="h-[51px] md:ml-[0] ml-[1101px] w-[51px]" src="images/img_user.svg" alt="user" />
-                <Img className="h-[51px] ml-5 md:ml-[0] w-[51px]" src="images/img_cart.svg" alt="cart" />
+                <div className="relative">
+                  <Img className="h-[51px] ml-5 md:ml-[0] ml-[1101px] w-[51px]" src="images/img_user.svg" alt="user" onClick={toggleDropdown} />
+
+                  {isOpen && (
+                    <div id='dropdown' className="absolute right-0 z-10 bg-orange-50 font-monumentextended items-center justify-start w-auto">
+                      <ul>
+                        <li className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 md:px-2 sm:px-1 w-full" onClick={toggleDropdown}>
+                          <div className="flex flex-col items-center justify-start">
+                            <Text className="font-extrabold text-[12px] sm:text-sm md:text-sm text-center text-orange-50">
+                              YOUR PROFILE
+                            </Text>
+                          </div>
+                        </li>
+                        <li className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 md:px-2 sm:px-1 w-full" onClick={toggleDropdown}>
+                          <div className="flex flex-col items-center justify-start">
+                            <Text className="font-extrabold text-[12px] sm:text-sm md:text-sm text-center text-orange-50">
+                              YOUR ORDER
+                            </Text>
+                          </div>
+                        </li>
+                        <li className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 md:px-2 sm:px-1 w-full" onClick={toggleDropdown}>
+                          <div className="flex flex-col items-center justify-start">
+                            <Text className="font-extrabold text-[12px] sm:text-sm md:text-sm text-center text-orange-50">
+                              x CANCEL x
+                            </Text>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <Img className="h-[51px] ml-0 md:ml-[0] w-[51px]" src="images/img_cart.svg" alt="cart" />
               </>
             )}
           </div>
