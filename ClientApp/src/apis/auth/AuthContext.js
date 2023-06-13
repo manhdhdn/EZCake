@@ -43,7 +43,11 @@ export const AuthContextProvider = ({ children }) => {
 
   useEffect(() => {
     onIdTokenChanged(auth, (currentUser) => {
-      localStorage.setItem("user", JSON.stringify(currentUser));
+      if (!currentUser) {
+        localStorage.removeItem("user");
+      } else {
+        localStorage.setItem("user", JSON.stringify(currentUser));
+      }
     });
   }, []);
 

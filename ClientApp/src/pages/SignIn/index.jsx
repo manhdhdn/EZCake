@@ -23,6 +23,8 @@ const SignIn = () => {
     } catch (error) {
       console.log(error);
     }
+
+    navigate("/");
   }
 
   return (
@@ -87,7 +89,7 @@ const SignIn = () => {
                       >
                         Don’t have an account?{" "}
                       </Text>
-                      <a className="ml-[5px] text-center text-red-500 text-sm underline">
+                      <a href="/" className="ml-[5px] text-center text-red-500 text-sm underline">
                         <Text
                           className="common-pointer"
                           size="txtSFMonoRegular14"
@@ -97,9 +99,7 @@ const SignIn = () => {
                         </Text>
                       </a>
                     </div>
-                    <a
-                      href="#"
-                      className="mt-[19px] text-center text-red-500 text-sm"
+                    <a href="/" className="mt-[19px] text-center text-red-500 text-sm"
                     >
                       <Text size="txtSFMonoRegular14">Reset Password</Text>
                     </a>

@@ -33,7 +33,12 @@ const Navbar = (props) => {
   };
 
   const handleLogout = async () => {
-    await logout();
+    try {
+      await logout();
+      setUserLoggedIn(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -82,6 +87,13 @@ const Navbar = (props) => {
                           <div className="flex flex-col items-center justify-start">
                             <Text className="font-extrabold text-[12px] sm:text-sm md:text-sm text-center text-orange-50">
                               YOUR ORDER
+                            </Text>
+                          </div>
+                        </li>
+                        <li className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 md:px-2 sm:px-1 w-full" onClick={handleLogout}>
+                          <div className="flex flex-col items-center justify-start">
+                            <Text className="font-extrabold text-[12px] sm:text-sm md:text-sm text-center text-orange-50">
+                              SIGNOUT
                             </Text>
                           </div>
                         </li>

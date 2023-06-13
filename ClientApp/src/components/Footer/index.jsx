@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Button, Img, Input, Line, Text } from "components";
+import { Button, Img, Line, Text } from "components";
 
 const Footer = (props) => {
   return (
