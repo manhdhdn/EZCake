@@ -20,22 +20,32 @@ namespace EZCake.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Account>>> GetAccounts()
         {
-          if (_context.Accounts == null)
-          {
-              return NotFound();
-          }
+            if (_context.Accounts == null)
+            {
+                return NotFound();
+            }
             return await _context.Accounts.ToListAsync();
         }
 
         // GET: api/Accounts/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Account>> GetAccount(Guid id)
+        [HttpGet("id")]
+        public async Task<ActionResult<Account>> GetAccount(Guid? id, string? email)
         {
-          if (_context.Accounts == null)
-          {
-              return NotFound();
-          }
-            var account = await _context.Accounts.FindAsync(id);
+            if (_context.Accounts == null)
+            {
+                return NotFound();
+            }
+            var account = new Account();
+
+            if (id != null)
+            {
+                account = await _context.Accounts.FindAsync(id);
+            }
+
+            if (email != null)
+            {
+                account = await _context.Accounts.Include(a => a.AccountShippings).ThenInclude(acs => acs.ShippingInformation).SingleOrDefaultAsync(a => a.Email == email);
+            }
 
             if (account == null)
             {
@@ -81,10 +91,10 @@ namespace EZCake.Controllers
         [HttpPost]
         public async Task<ActionResult<Account>> PostAccount(Account account)
         {
-          if (_context.Accounts == null)
-          {
-              return Problem("Entity set 'EZCakeContext.Accounts'  is null.");
-          }
+            if (_context.Accounts == null)
+            {
+                return Problem("Entity set 'EZCakeContext.Accounts'  is null.");
+            }
             _context.Accounts.Add(account);
             try
             {

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Button, Img, Input, Line, Text } from "components";
+import { Button, Img, Line, Text } from "components";
 
 const Footer = (props) => {
   return (
@@ -9,14 +9,22 @@ const Footer = (props) => {
         <div className="flex flex-col items-center justify-center mb-[69px] w-full">
           <div className="flex flex-col items-center justify-center w-full">
             <Line className="bg-red-500 h-px w-full" />
-            <div className="flex md:flex-col flex-row md:gap-10 items-center justify-between md:ml-[0] ml-[90px] mr-[71px] mt-16 w-[89%] md:w-full">
-              <Img
-                className="h-[204px] md:h-auto object-cover"
-                src="images/img_logosmall.png"
-                alt="logobig"
-              />
+            <div className="flex md:flex-col flex-row md:gap-10 items-center justify-between md:ml-[0] ml-[90px] mr-[90px] mt-16 w-[85%] md:w-full">
               <div className="flex flex-col gap-5 items-center justify-start">
-                <ul className="flex flex-col items-start justify-start w-[93%] md:w-full common-column-list">
+                <Img
+                  className="h-auto w-auto"
+                  src="images/img_logosmall.png"
+                  alt="logobig"
+                />
+                <Text
+                  className="text-center text-red-500 text-sm"
+                  size="txtSFMonoRegular14"
+                >
+                  Phone number: 0328328752
+                </Text>
+              </div>
+              <div className="flex flex-col gap-5 ml-[35px] items-center justify-start">
+                <ul className="flex flex-col items-start justify-start w-[100%] md:w-full common-column-list">
                   <li>
                     <div className="flex md:flex-col flex-row md:gap-5 items-start justify-start">
                       <Text
@@ -111,19 +119,12 @@ const Footer = (props) => {
                   </li>
                 </ul>
                 <Line className="bg-red-500 h-px w-full" />
+                <Text className="text-red-500 text-sm" size="txtSFMonoRegular14">
+                  Copyright © 2023 Ez Cupcake | All Rights Reserved
+                </Text>
               </div>
             </div>
-            <div className="flex md:flex-col flex-row md:gap-10 gap-[369px] items-start justify-start md:ml-[0] ml-[109px] mr-[331px] mt-2 w-[70%] md:w-full">
-              <Text
-                className="text-center text-red-500 text-sm"
-                size="txtSFMonoRegular14"
-              >
-                Phone number: 0328328752
-              </Text>
-              <Text className="text-red-500 text-sm" size="txtSFMonoRegular14">
-                Copyright © 2023 Ez Cupcake | All Rights Reserved
-              </Text>
-            </div>
+
           </div>
         </div>
       </footer>
