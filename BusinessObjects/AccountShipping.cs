@@ -12,10 +12,10 @@ namespace EZCake.BusinessObjects
 
         public Guid Id { get; set; }
         public Guid AccountId { get; set; }
-        public Guid ShippingInfomationId { get; set; }
+        public Guid ShippingInformationId { get; set; }
 
-        public virtual Account? Account { get; set; }
-        public virtual ShippingInformation? ShippingInfomation { get; set; }
+        //public virtual Account? Account { get; set; }
+        public virtual ShippingInformation? ShippingInformation { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
     }
 }

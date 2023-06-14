@@ -1,25 +1,37 @@
 import React, { useState } from 'react'
 
 import { useNavigate, Link } from "react-router-dom";
+import { useSnackbar } from "notistack";
 import { UserAuth } from "apis/auth/AuthContext";
+import AccountApi from 'apis/services/Account';
 
 import { Button, Input, Text } from "components";
+import { Backdrop, CircularProgress } from '@mui/material';
 
 const SignInForm = (props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [open, setOpen] = useState(false);
 
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
     const { login } = UserAuth();
 
     const handleSignInBtxClick = async () => {
+        setOpen(true);
+
         try {
             await login(email, password);
-        } catch (error) {
-            console.log(error);
-        }
+            let userInfo = await AccountApi.getAccount({ email: email });
 
-        navigate("/");
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+            enqueueSnackbar("Login successful", { variant: "success" });
+            navigate("/");
+        } catch (error) {
+            enqueueSnackbar("Invalid email or password", { variant: "error" });
+            setOpen(false);
+        }
     }
 
     return (
@@ -72,6 +84,12 @@ const SignInForm = (props) => {
                     </Link>
                 </div>
             </div>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={open}
+            >
+                <CircularProgress color="success" />
+            </Backdrop>
         </div>
     )
 }
