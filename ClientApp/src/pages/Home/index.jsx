@@ -15,7 +15,7 @@ const GuestHome = () => {
       <div className="bg-orange-50 flex flex-col items-center justify-start mx-auto w-full">
         <div className="flex flex-col items-start justify-start w-full">
           <Navbar className="bg-orange-50 flex flex-row font-sfmono items-center justify-start p-[27px] sm:px-5 shadow-bs w-full" />
-          <Header className="md:h-[1708px] h-[665px] md:px-5 relative w-full" />
+          <Header className="md:h-[1708px] h-[665px] md:px-5 relative w-full mt-navbar" />
           <Line className="bg-red-500 h-px w-full" />
           <BestSeller className="flex md:flex-col flex-row font-monumentextended md:gap-10 items-center justify-between max-w-[1244px] mt-[123px] mx-auto md:px-5 w-full" />
           <Line className="bg-red-500 h-px mt-[123px] w-full" />

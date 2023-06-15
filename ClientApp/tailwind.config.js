@@ -21,6 +21,9 @@ module.exports = {
         deep_orange: { 500: "#ff5b27" },
         pink: { 400: "#e6436d" },
       },
+      spacing: {
+        'navbar': '118px',
+      },
       fontFamily: { monumentextended: ['Monument Extended', 'sans-serif'], sfmono: ['SF Mono', 'sans-serif'] },
       boxShadow: { bs: "0px 0px  1px 4px #ffffff02" },
     },

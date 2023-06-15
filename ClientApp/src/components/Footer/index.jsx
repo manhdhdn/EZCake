@@ -1,5 +1,6 @@
 import React from "react";
 
+import { Link } from "react-router-dom";
 import { Button, Img, Line, Text } from "components";
 
 const Footer = (props) => {
@@ -61,12 +62,15 @@ const Footer = (props) => {
                       >
                         Our Story
                       </Text>
-                      <Text
-                        className="mb-0.5 md:ml-[0] ml-[253px] text-base text-red-500"
-                        size="txtSFMonoRegular16"
-                      >
-                        Terms Of Service
-                      </Text>
+                      <Link to="/terms-of-service">
+                        <Text
+                          className="mb-0.5 md:ml-[0] ml-[253px] text-base text-red-500"
+                          size="txtSFMonoRegular16"
+                        >
+                          Terms Of Service
+                        </Text>
+                      </Link>
+
                     </div>
                   </li>
                   <li>
