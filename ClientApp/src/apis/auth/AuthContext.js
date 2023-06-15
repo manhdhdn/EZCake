@@ -45,6 +45,7 @@ export const AuthContextProvider = ({ children }) => {
     onIdTokenChanged(auth, (currentUser) => {
       if (!currentUser) {
         localStorage.removeItem("user");
+        localStorage.removeItem("userInfo");
       } else {
         localStorage.setItem("user", JSON.stringify(currentUser));
       }

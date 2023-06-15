@@ -23,6 +23,8 @@ const SignUpForm = (props) => {
   const { createUser } = UserAuth();
 
   const handleSignUpBtxClick = async () => {
+    setOpen(true);
+
     if (password === confirmPassword) {
       try {
         let accountId = v4();
