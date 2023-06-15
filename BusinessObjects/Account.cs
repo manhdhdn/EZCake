@@ -7,13 +7,15 @@ namespace EZCake.BusinessObjects
     {
         public Account()
         {
-            AccountShippings = new HashSet<AccountShipping>();
+            ShippingInformations = new HashSet<ShippingInformation>();
         }
 
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
         public string Email { get; set; } = null!;
+        public bool? Gender { get; set; }
+        public bool? Role { get; set; }
 
-        public virtual ICollection<AccountShipping> AccountShippings { get; set; }
+        public virtual ICollection<ShippingInformation> ShippingInformations { get; set; }
     }
 }

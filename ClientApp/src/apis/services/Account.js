@@ -39,8 +39,6 @@ const AccountApi = {
     },
 
     createAccount: async (params) => {
-        console.log(API_CONFIG.api.headers)
-
         const response = await fetch(
             `${API_CONFIG.endpoints.account}`,
             {

@@ -4,7 +4,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { UserAuth } from 'apis/auth/AuthContext';
 import AccountApi from 'apis/services/Account';
 import ShippingInformationApi from 'apis/services/ShippingInformation';
-import AccountShippingApi from 'apis/services/AccountShipping';
 import { v4 } from 'uuid';
 import { useSnackbar } from 'notistack';
 
@@ -23,6 +22,8 @@ const SignUpForm = (props) => {
   const { createUser } = UserAuth();
 
   const handleSignUpBtxClick = async () => {
+    setOpen(true);
+
     if (password === confirmPassword) {
       try {
         let accountId = v4();
@@ -38,29 +39,19 @@ const SignUpForm = (props) => {
             id: shippingInformationId,
             name,
             prioritisation: true,
+            accountId: accountId
           })
 
           if (status === 201) {
-            status = await AccountShippingApi.createAccountShipping({
-              id: v4(),
-              accountId,
-              shippingInformationId
-            })
+            await createUser(email, password);
 
-            if (status === 201) {
-              await createUser(email, password);
-              let userInfo = await AccountApi.getAccount({ email: email });
-
-              localStorage.setItem('userInfo', JSON.stringify(userInfo));
-
-              enqueueSnackbar("Account created", { variant: "success" });
-              navigate("/");
-            }
+            enqueueSnackbar("Account created", { variant: "success" });
+            navigate("/");
           }
         }
       } catch (error) {
-        enqueueSnackbar("Account could not be created", { variant: "error" });
         setOpen(false);
+        enqueueSnackbar("Account could not be created", { variant: "error" });
       }
     }
   }
@@ -81,7 +72,7 @@ const SignUpForm = (props) => {
             <Input
               name="group39695"
               placeholder="full name"
-              className="italic leading-[normal] p-0 placeholder:text-red-500_87 sm:px-5 text-left text-lg text-red-500_87 w-full"
+              className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
               wrapClassName="bg-orange-50 border border-red-500 border-solid pb-[15px] pl-[21px] pr-[35px] pt-3 rounded-[5px] w-[98%]"
               type="text"
               autoComplete="fullname"
@@ -90,7 +81,7 @@ const SignUpForm = (props) => {
             <Input
               name="group39696"
               placeholder="email"
-              className="italic leading-[normal] p-0 placeholder:text-red-500_87 sm:px-5 text-left text-lg text-red-500_87 w-full"
+              className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
               wrapClassName="bg-orange-50 border border-red-500 border-solid mt-5 pl-5 pr-[35px] py-[13px] rounded-[5px] w-[98%]"
               type="email"
               autoComplete="email"
@@ -99,7 +90,7 @@ const SignUpForm = (props) => {
             <Input
               name="group39697"
               placeholder="password"
-              className="italic leading-[normal] p-0 placeholder:text-red-500_87 sm:pr-5 text-left text-lg text-red-500_87 w-full"
+              className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
               wrapClassName="bg-orange-50 border border-red-500 border-solid mt-5 pl-5 pr-[35px] py-[13px] rounded-[5px] w-[98%]"
               type="password"
               autoComplete="password"
@@ -108,7 +99,7 @@ const SignUpForm = (props) => {
             <Input
               name="group39699"
               placeholder="confirm your password"
-              className="italic leading-[normal] p-0 placeholder:text-red-500_87 sm:pl-5 text-left text-lg text-red-500_87 w-full"
+              className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
               wrapClassName="bg-orange-50 border border-red-500 border-solid mt-5 pl-5 pr-[35px] py-[13px] rounded-[5px] w-[98%]"
               type="password"
               autoComplete="password"
