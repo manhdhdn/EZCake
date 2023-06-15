@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
+
+import { handleSectionNavigation } from "utils";
 
 import { Img, Line } from "components";
 import Navbar from "components/Navbar";
@@ -7,6 +9,10 @@ import Chat from "components/Chat";
 import ProfileForm from "components/ProfileForm";
 
 const Profile = () => {
+    useEffect(() => {
+        handleSectionNavigation("first");
+    })
+
     return (
         <>
             <div className="bg-orange-50 flex flex-col font-sfmono items-center justify-start mx-auto w-full">
@@ -16,7 +22,7 @@ const Profile = () => {
                     <Line className="absolute bg-red-500 h-px inset-x-[0] mx-auto top-[0] w-full" />
                     <Chat />
                 </div>
-                <Line className="bg-red-500 h-px w-full" />
+                <Line id="first" className="bg-red-500 h-px w-full" />
                 <ProfileForm className="flex flex-col items-center justify-start max-w-[1014px] mt-14 mx-auto md:px-5 w-full" />
                 <Footer className="bg-orange-50 flex items-center justify-center mt-[100px] md:px-5 w-full" />
             </div>

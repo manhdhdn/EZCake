@@ -23,7 +23,7 @@ namespace EZCake.Controllers
 
         // GET: api/ShippingInformations
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ShippingInformation>>> GetShippingInformations(bool? prioritisation)
+        public async Task<ActionResult<IEnumerable<ShippingInformation>>> GetShippingInformations(Guid? accountId)
         {
             if (_context.ShippingInformations == null)
             {
@@ -32,9 +32,9 @@ namespace EZCake.Controllers
 
             var shippingInformation = _context.ShippingInformations.AsQueryable();
 
-            if (prioritisation != null)
+            if (accountId != null)
             {
-                shippingInformation = shippingInformation.Where(spi => spi.Prioritisation == prioritisation);
+                shippingInformation = shippingInformation.Where(spi => spi.AccountId == accountId);
             }
 
             return await shippingInformation.ToListAsync();

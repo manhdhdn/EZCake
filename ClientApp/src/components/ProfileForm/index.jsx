@@ -1,16 +1,39 @@
 import React, { useState, useEffect } from 'react'
 
+import { useSnackbar } from 'notistack';
+import ShippingInformationApi from 'apis/services/ShippingInformation';
+import AccountApi from 'apis/services/Account';
+
+import { Backdrop, CircularProgress } from '@mui/material';
 import { Button, Img, Input, Text } from "components";
 
 const ProfileForm = (props) => {
+    const [id, setId] = useState("");
+    const [accountId, setAccountId] = useState("");
     const [fullName, setFullName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [email, setEmail] = useState("");
     const [address, setAddress] = useState("");
     const [gender, setGender] = useState(true);
+    const [open, setOpen] = useState(false);
+
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
-        let shippingInformation = "";
+        let user = JSON.parse(localStorage.getItem("userInfo"));
+
+        setAccountId(user.id);
+        setEmail(user.email);
+        setGender(user.gender);
+
+        user.shippingInformations.forEach(element => {
+            if (element.prioritisation) {
+                setId(element.id);
+                setFullName(element.name);
+                setPhoneNumber(element.phoneNumber);
+                setAddress(element.address);
+            }
+        });
     }, []);
 
     const handleButtonGenderLeftClick = () => {
@@ -19,6 +42,39 @@ const ProfileForm = (props) => {
 
     const handleButtonGenderRightClick = () => {
         setGender(false);
+    }
+
+    const handleBtxSaveClick = async () => {
+        setOpen(true);
+
+        try {
+            let status = await ShippingInformationApi.updateShippingInformation(id, {
+                id,
+                name: fullName,
+                phoneNumber,
+                address,
+                prioritisation: true,
+                accountId
+            })
+
+            if (status === 204) {
+                let status = await AccountApi.updateAccount(accountId, {
+                    id: accountId,
+                    name: fullName,
+                    email,
+                    gender,
+                    role: null
+                })
+
+                if (status === 204) {
+                    setOpen(false);
+                    enqueueSnackbar("Account updated", { variant: "success" });
+                }
+            }
+        } catch (error) {
+            setOpen(false);
+            enqueueSnackbar("Account could not be updated", { variant: "error" });
+        }
     }
 
     return (
@@ -37,7 +93,7 @@ const ProfileForm = (props) => {
                     <Input
                         name="group39839"
                         placeholder=""
-                        className="leading-[normal] p-0 placeholder:text-red-500 sm:pr-5 text-left text-lg text-red-500 w-full"
+                        className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
                         wrapClassName="bg-orange-50 border border-red-500 border-solid pb-[17px] pl-5 pt-5 rounded-[5px] w-full"
                         defaultValue={fullName}
                         onChange={(value) => setFullName(value)}
@@ -49,7 +105,7 @@ const ProfileForm = (props) => {
                         <Input
                             name="mobileNo"
                             placeholder=""
-                            className="leading-[normal] p-0 placeholder:text-red-500 sm:pr-5 text-left text-lg text-red-500 w-full"
+                            className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
                             wrapClassName="bg-orange-50 border border-red-500 border-solid md:flex-1 pl-5 pr-[35px] py-[18px] rounded-[5px] md:w-full"
                             type="number"
                             defaultValue={phoneNumber}
@@ -68,10 +124,10 @@ const ProfileForm = (props) => {
                     <Text className="text-red-500 text-sm">Email:</Text>
                     <Input
                         name="group39843"
-                        placeholder=""
-                        className="leading-[normal] p-0 placeholder:text-red-500 sm:pr-5 text-left text-lg text-red-500 w-full"
+                        className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
                         wrapClassName="bg-orange-50 border border-red-500 border-solid pb-[17px] pl-5 pt-5 rounded-[5px] w-full"
                         type="email"
+                        disabled
                         defaultValue={email}
                         onChange={(value) => setEmail(value)}
                     ></Input>
@@ -81,7 +137,7 @@ const ProfileForm = (props) => {
                     <Input
                         name="group39844"
                         placeholder=""
-                        className="leading-[normal] p-0 placeholder:text-red-500 sm:pr-5 text-left text-lg text-red-500 w-full"
+                        className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
                         wrapClassName="bg-orange-50 border border-red-500 border-solid pb-[27px] pl-5 pt-[27px] rounded-[5px] w-full"
                         type="address"
                         defaultValue={address}
@@ -89,9 +145,18 @@ const ProfileForm = (props) => {
                     ></Input>
                 </div>
             </div>
-            <Button className="bg-orange-50 border border-red-500 border-solid cursor-pointer leading-[normal] min-w-[193px] mt-[60px] py-3.5 rounded-[5px] text-center text-lg text-red-500">
+            <Button
+                className="bg-orange-50 border border-red-500 border-solid cursor-pointer leading-[normal] min-w-[193px] mt-[60px] py-3.5 rounded-[5px] text-center text-lg text-red-500"
+                onClick={handleBtxSaveClick}
+            >
                 save
             </Button>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={open}
+            >
+                <CircularProgress color="success" />
+            </Backdrop>
         </div>
     )
 }

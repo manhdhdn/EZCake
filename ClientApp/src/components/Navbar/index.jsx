@@ -52,8 +52,10 @@ const Navbar = (props) => {
     try {
       await logout();
       setUserLoggedIn(false);
+
+      navigate("/");
     } catch (error) {
-      console.log(error);
+      
     }
   };
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Line } from "components";
 import BestSeller from "components/BestSeller";
@@ -10,6 +10,10 @@ import Slo from "components/Slo";
 import HomeComment from "components/HomeComment";
 
 const GuestHome = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, []);
+
   return (
     <>
       <div className="bg-orange-50 flex flex-col items-center justify-start mx-auto w-full">

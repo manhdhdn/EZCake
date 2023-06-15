@@ -12,6 +12,6 @@ namespace EZCake.BusinessObjects
         public bool Prioritisation { get; set; }
 
         public Guid AccountId { get; set; }
-        public virtual Account? Account { get; set; }
+        //public virtual Account? Account { get; set; }
     }
 }

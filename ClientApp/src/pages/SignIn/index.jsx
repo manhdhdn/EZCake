@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Line } from "components";
 import SignHeader from "components/SignHeader";
@@ -8,6 +8,10 @@ import Chat from "components/Chat";
 import Footer from "components/Footer";
 
 const SignIn = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, []);
+
   return (
     <>
       <div className="bg-orange-50 flex flex-col font-monumentextended items-center justify-start mx-auto w-full">

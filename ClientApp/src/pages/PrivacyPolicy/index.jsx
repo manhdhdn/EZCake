@@ -7,13 +7,7 @@ import Chat from "components/Chat";
 
 const PrivacyPolicy = () => {
   useEffect(() => {
-    requestAnimationFrame(() => {
-      try {
-        window.scrollTo({ top: 0, behavior: "smooth" })
-      } catch (error) {
-
-      }
-    })
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }, []);
 
   return (
