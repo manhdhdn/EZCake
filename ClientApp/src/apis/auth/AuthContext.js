@@ -10,6 +10,7 @@ import {
 } from "firebase/auth";
 import { createContext, useContext, useEffect } from "react";
 import { auth } from "./firebase";
+import AccountApi from "apis/services/Account";
 
 const UserContext = createContext();
 
@@ -42,12 +43,16 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    onIdTokenChanged(auth, (currentUser) => {
+    onIdTokenChanged(auth, async (currentUser) => {
       if (!currentUser) {
         localStorage.removeItem("user");
         localStorage.removeItem("userInfo");
       } else {
         localStorage.setItem("user", JSON.stringify(currentUser));
+
+        let email = currentUser.email;
+        let userInfo = await AccountApi.getAccount({ email: email });
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
       }
     });
   }, []);

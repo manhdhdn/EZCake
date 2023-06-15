@@ -103,7 +103,8 @@ const Navbar = (props) => {
                   >
                     <ul>
                       <li
-                        className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 md:px-2 sm:px-1 w-full"
+                        className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 px-8 md:px-4 sm:px-2 w-full"
+                        onClick={() => navigate("/profile")}
                       >
                         <div className="flex flex-col items-center justify-start">
                           <Text className="font-extrabold text-[12px] sm:text-sm md:text-sm text-center text-orange-50">
@@ -112,7 +113,7 @@ const Navbar = (props) => {
                         </div>
                       </li>
                       <li
-                        className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 md:px-2 sm:px-1 w-full"
+                        className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 px-8 md:px-8 sm:px-4 w-full"
                       >
                         <div className="flex flex-col items-center justify-start">
                           <Text className="font-extrabold text-[12px] sm:text-sm md:text-sm text-center text-orange-50">
@@ -121,7 +122,7 @@ const Navbar = (props) => {
                         </div>
                       </li>
                       <li
-                        className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 md:px-2 sm:px-1 w-full"
+                        className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 px-8 md:px-8 sm:px-4 w-full"
                         onClick={handleLogout}
                       >
                         <div className="flex flex-col items-center justify-start">
@@ -131,7 +132,7 @@ const Navbar = (props) => {
                         </div>
                       </li>
                       <li
-                        className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 md:px-2 sm:px-1 w-full"
+                        className="bg-red-500 border border-orange-50 border-solid flex flex-col items-center justify-start p-4 px-8 md:px-8 sm:px-4 w-full"
                         onClick={toggleDropdown}
                       >
                         <div className="flex flex-col items-center justify-start">

@@ -40,24 +40,14 @@ const SignUpForm = (props) => {
             id: shippingInformationId,
             name,
             prioritisation: true,
+            accountId: accountId
           })
 
           if (status === 201) {
-            status = await AccountShippingApi.createAccountShipping({
-              id: v4(),
-              accountId,
-              shippingInformationId
-            })
+            await createUser(email, password);
 
-            if (status === 201) {
-              await createUser(email, password);
-              let userInfo = await AccountApi.getAccount({ email: email });
-
-              localStorage.setItem('userInfo', JSON.stringify(userInfo));
-
-              enqueueSnackbar("Account created", { variant: "success" });
-              navigate("/");
-            }
+            enqueueSnackbar("Account created", { variant: "success" });
+            navigate("/");
           }
         }
       } catch (error) {

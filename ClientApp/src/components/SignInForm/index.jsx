@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { UserAuth } from "apis/auth/AuthContext";
-import AccountApi from 'apis/services/Account';
 
 import { Button, Input, Text } from "components";
 import { Backdrop, CircularProgress } from '@mui/material';
@@ -22,9 +21,6 @@ const SignInForm = (props) => {
 
         try {
             await login(email, password);
-            let userInfo = await AccountApi.getAccount({ email: email });
-
-            localStorage.setItem('userInfo', JSON.stringify(userInfo));
 
             enqueueSnackbar("Login successful", { variant: "success" });
             navigate("/");

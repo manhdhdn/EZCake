@@ -23,23 +23,31 @@ namespace EZCake.Controllers
 
         // GET: api/ShippingInformations
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ShippingInformation>>> GetShippingInformations()
+        public async Task<ActionResult<IEnumerable<ShippingInformation>>> GetShippingInformations(bool? prioritisation)
         {
-          if (_context.ShippingInformations == null)
-          {
-              return NotFound();
-          }
-            return await _context.ShippingInformations.ToListAsync();
+            if (_context.ShippingInformations == null)
+            {
+                return NotFound();
+            }
+
+            var shippingInformation = _context.ShippingInformations.AsQueryable();
+
+            if (prioritisation != null)
+            {
+                shippingInformation = shippingInformation.Where(spi => spi.Prioritisation == prioritisation);
+            }
+
+            return await shippingInformation.ToListAsync();
         }
 
         // GET: api/ShippingInformations/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ShippingInformation>> GetShippingInformation(Guid id)
         {
-          if (_context.ShippingInformations == null)
-          {
-              return NotFound();
-          }
+            if (_context.ShippingInformations == null)
+            {
+                return NotFound();
+            }
             var shippingInformation = await _context.ShippingInformations.FindAsync(id);
 
             if (shippingInformation == null)
@@ -86,10 +94,10 @@ namespace EZCake.Controllers
         [HttpPost]
         public async Task<ActionResult<ShippingInformation>> PostShippingInformation(ShippingInformation shippingInformation)
         {
-          if (_context.ShippingInformations == null)
-          {
-              return Problem("Entity set 'EZCakeContext.ShippingInformations'  is null.");
-          }
+            if (_context.ShippingInformations == null)
+            {
+                return Problem("Entity set 'EZCakeContext.ShippingInformations'  is null.");
+            }
             _context.ShippingInformations.Add(shippingInformation);
             try
             {

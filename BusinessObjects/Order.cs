@@ -8,10 +8,10 @@ namespace EZCake.BusinessObjects
         public Guid Id { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime? ShippedDate { get; set; }
-        public Guid AccountShippingId { get; set; }
+        public Guid ShippingInformationId { get; set; }
         public string Status { get; set; } = null!;
 
-        public virtual AccountShipping? AccountShipping { get; set; }
+        public virtual ShippingInformation? ShippingInformation { get; set; }
         public virtual OrderDetail? OrderDetail { get; set; }
     }
 }

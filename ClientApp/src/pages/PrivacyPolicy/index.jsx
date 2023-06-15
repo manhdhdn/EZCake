@@ -1,18 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 
-import { Button, Img, Line, Text } from "components";
+import { Text } from "components";
 import Footer from "components/Footer";
 import Navbar from "components/Navbar";
+import Chat from "components/Chat";
 
 const PrivacyPolicy = () => {
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      try {
+        window.scrollTo({ top: 0, behavior: "smooth" })
+      } catch (error) {
+
+      }
+    })
+  }, []);
+
   return (
     <>
       <div className="bg-orange-50 flex flex-col items-center justify-start mx-auto w-full">
         <div className="flex flex-col justify-start w-full">
-          <div className="bg-orange-50 flex flex-row items-center justify-start p-[27px] sm:px-5 shadow-bs w-full">
-            <Navbar className="flex md:flex-col flex-row md:gap-5 items-center justify-start mb-0.5 ml-[43px] md:px-5 w-[94%]" />
-          </div>
-          <Line className="bg-red-500 h-px w-full" />
+          <Navbar className="bg-orange-50 flex flex-row font-sfmono items-center justify-start p-[27px] sm:px-5 shadow-bs w-full" />
+          <div className="h-px mt-navbar" />
           <Text className="font-monumentextended md:ml-[0] ml-[162px] mt-[75px] sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
             PRIVACY POLICY
           </Text>
@@ -53,9 +62,7 @@ const PrivacyPolicy = () => {
                 Device Information and Ordering Information.
               </>
             </Text>
-            <Button className="bg-orange-50 border-2 border-red-500 border-solid flex h-[51px] items-center justify-center mb-[84px] md:mt-0 mt-[206px] p-2 rounded-[18px] w-[51px]">
-              <Img src="images/img_vector.svg" alt="vector" />
-            </Button>
+            <Chat />
           </div>
           <Text className="font-bold font-sfmono md:ml-[0] ml-[162px] mt-[39px] text-[22px] sm:text-lg text-red-500 md:text-xl">
             USE OF YOUR PERSONAL INFORMATION
