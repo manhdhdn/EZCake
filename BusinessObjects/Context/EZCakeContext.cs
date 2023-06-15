@@ -18,7 +18,6 @@ namespace EZCake.BusinessObjects.Context
         }
 
         public virtual DbSet<Account> Accounts { get; set; } = null!;
-        public virtual DbSet<AccountShipping> AccountShippings { get; set; } = null!;
         public virtual DbSet<Cake> Cakes { get; set; } = null!;
         public virtual DbSet<CakeIngredient> CakeIngredients { get; set; } = null!;
         public virtual DbSet<CakeReview> CakeReviews { get; set; } = null!;
