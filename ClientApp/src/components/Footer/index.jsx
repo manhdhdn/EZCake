@@ -53,12 +53,14 @@ const Footer = (props) => {
                     >
                       Cuscake
                     </Text>
-                    <Text
-                      className="md:ml-[0] ml-[301px] md:mt-0 mt-0.5 text-base text-red-500"
-                      size="txtSFMonoRegular16"
-                    >
-                      Our Story
-                    </Text>
+                    <Link to="/our-story">
+                      <Text
+                        className="md:ml-[0] ml-[301px] md:mt-0 mt-0.5 text-base text-red-500"
+                        size="txtSFMonoRegular16"
+                      >
+                        Our Story
+                      </Text>
+                    </Link>
                     <Link to="/terms-of-service">
                       <Text
                         className="mb-0.5 md:ml-[0] ml-[253px] text-base text-red-500"
@@ -67,7 +69,6 @@ const Footer = (props) => {
                         Terms Of Service
                       </Text>
                     </Link>
-
                   </div>
                   <div className="flex md:flex-col flex-row md:gap-5 items-center justify-start mt-3">
                     <Text
@@ -76,12 +77,14 @@ const Footer = (props) => {
                     >
                       Ez Zone
                     </Text>
-                    <Text
-                      className="md:ml-[0] ml-[301px] text-base text-red-500"
-                      size="txtSFMonoRegular16"
-                    >
-                      Contact
-                    </Text>
+                    <Link to="/contact">
+                      <Text
+                        className="md:ml-[0] ml-[301px] text-base text-red-500"
+                        size="txtSFMonoRegular16"
+                      >
+                        Contact
+                      </Text>
+                    </Link>
                     <Link to="/privacy-policy">
                       <Text
                         className="md:ml-[0] ml-[273px] text-base text-red-500"
@@ -110,7 +113,7 @@ const Footer = (props) => {
                       <Img src="images/img_facebook.svg" alt="facebook" />
                     </Button>
                     <Button className="bg-gray-900 flex h-9 items-center justify-center p-[7px] rounded-lg w-9">
-                      <Img src="images/img_music.svg" alt="tiktok" />
+                      <Img src="images/img_tiktok.svg" alt="tiktok" />
                     </Button>
                   </div>
                 </ul>
