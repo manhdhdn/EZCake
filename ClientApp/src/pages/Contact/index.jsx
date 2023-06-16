@@ -10,13 +10,16 @@ const Contact = () => {
     const [second, setSecond] = useState(false);
     const [third, setThird] = useState(false);
     const [fourth, setFourth] = useState(false);
+    const timeout = 150;
 
     useEffect(() => {
-        window.scrollTo({ top: 0, behavior: "smooth" })
+        // window.scrollTo({ top: 0, behavior: "smooth" })
     }, []);
 
     const handleFirst = () => {
-        setFirst(!first);
+        setTimeout(() => {
+            setFirst(!first);
+        }, timeout);
         setSecond(false);
         setThird(false);
         setFourth(false);
@@ -24,7 +27,9 @@ const Contact = () => {
 
     const handleSecond = () => {
         setFirst(false);
-        setSecond(!second);
+        setTimeout(() => {
+            setSecond(!second);
+        }, timeout);
         setThird(false);
         setFourth(false);
     }
@@ -32,7 +37,9 @@ const Contact = () => {
     const handleThird = () => {
         setFirst(false);
         setSecond(false);
-        setThird(!third);
+        setTimeout(() => {
+            setThird(!third);
+        }, timeout);
         setFourth(false);
     }
 
@@ -40,7 +47,9 @@ const Contact = () => {
         setFirst(false);
         setSecond(false);
         setThird(false);
-        setFourth(!fourth);
+        setTimeout(() => {
+            setFourth(!fourth);
+        }, timeout);
     }
 
     return (
@@ -92,50 +101,45 @@ const Contact = () => {
                             <Text className="font-extrabold font-monumentextended sm:text-[35px] md:text-[37px] text-[39px] text-red-500 text-left w-full">
                                 FREQUENTLY ASKED QUESTIONS
                             </Text>
-                            <Text className="font-bold text-lg text-red-500 mt-10 ml-[17px]" onClick={handleFirst}>Does your shop accept custom cupcake orders?</Text>
-                            {first && (
-                                <div className="flex flex-row gap-2 justify-start mb-2 w-full">
-                                    <Text className="font-sfmono text-lg text-red-500 text-left ml-[25px]">
-                                        •
-                                    </Text>
-                                    <Text className="font-sfmono text-red-500 text-left mt-1">
-                                        Of course! Our shop accepts to order cupcakes according to your requirements. Whether you want a screaming skull cupcake or a dancing cat and dog cupcake, we can do it all! We guarantee that the cupcakes will be so adorable that you'll want to kiss them before you eat them!
-                                    </Text>
-                                </div>
-                            )}
+                            <Text className="font-bold text-lg text-red-500 mt-10 ml-[17px] z-10  cursor-pointer" onClick={handleFirst}>Does your shop accept custom cupcake orders?</Text>
+                            <div className={`flex flex-row gap-2 justify-start mb-2 w-full ${first ? "h-[115px] opacity-100" : "h-0 opacity-0"} transition-all`} >
+                                <Text className="font-sfmono text-lg text-red-500 text-left ml-[25px]">
+                                    •
+                                </Text>
+                                <Text className="font-sfmono text-red-500 text-left mt-1">
+                                    Of course! Our shop accepts to order cupcakes according to your requirements. Whether you want a screaming skull cupcake or a dancing cat and dog cupcake, we can do it all! We guarantee that the cupcakes will be so adorable that you'll want to kiss them before you eat them!
+                                </Text>
+                            </div>
                             <Img src="images/img_line.svg" alt="line" />
-                            <Text className="font-bold text-lg text-red-500 mt-4 ml-[17px]" onClick={handleSecond}>Do you provide delivery service?</Text>
-                            {second && (
-                                <div className="flex flex-row gap-2 justify-start mb-2 w-full">
-                                    <Text className="font-sfmono text-lg text-red-500 text-left ml-[25px]">
-                                        •
-                                    </Text>
-                                    <Text className="font-sfmono text-red-500 text-left mt-1">
-                                        Of course! We provide delivery service for your orders. Just tell us your shipping address and we'll make sure your amazing cupcakes arrive safely and quickly. So you don't have to worry about shipping, just sit back and wait to enjoy the delicious cupcakes you ordered!                                    </Text>
-                                </div>
-                            )}
+                            <Text className="font-bold text-lg text-red-500 mt-4 ml-[17px] z-10  cursor-pointer" onClick={handleSecond}>Do you provide delivery service?</Text>
+                            <div className={`flex flex-row gap-2 justify-start mb-2 w-full ${second ? "h-[115px] opacity-100" : "h-0 opacity-0"} transition-all`} >
+                                <Text className="font-sfmono text-lg text-red-500 text-left ml-[25px]">
+                                    •
+                                </Text>
+                                <Text className="font-sfmono text-red-500 text-left mt-1">
+                                    Of course! We provide delivery service for your orders. Just tell us your shipping address and we'll make sure your amazing cupcakes arrive safely and quickly. So you don't have to worry about shipping, just sit back and wait to enjoy the delicious cupcakes you ordered!
+                                </Text>
+                            </div>
                             <Img src="images/img_line.svg" alt="line" />
-                            <Text className="font-bold text-lg text-red-500 mt-4 ml-[17px]" onClick={handleThird}>Do you have gluten-free/sugar-free cupcakes?</Text>
-                            {third && (
-                                <div className="flex flex-row gap-2 justify-start mb-2 w-full" >
-                                    <Text className="font-sfmono text-lg text-red-500 text-left ml-[25px]">
-                                        •
-                                    </Text>
-                                    <Text className="font-sfmono text-red-500 text-left mt-1">
-                                        Of course, we have! We don't want anyone to miss out on delicious food just because of a nutritional restriction. So we offer gluten-free and sugar-free cupcakes. They are great party touches and will make you feel like you're flying in the clouds! Give it a try and you'll discover that gluten-free and sugar-free cupcakes can be just as sweet and delicious!                                    </Text>
-                                </div>
-                            )}
+                            <Text className="font-bold text-lg text-red-500 mt-4 ml-[17px] z-10  cursor-pointer" onClick={handleThird}>Do you have gluten-free/sugar-free cupcakes?</Text>
+                            <div className={`flex flex-row gap-2 justify-start mb-2 w-full ${third ? "h-[155px] opacity-100" : "h-0 opacity-0"} transition-all`} >
+                                <Text className="font-sfmono text-lg text-red-500 text-left ml-[25px]">
+                                    •
+                                </Text>
+                                <Text className="font-sfmono text-red-500 text-left mt-1">
+                                    Of course, we have! We don't want anyone to miss out on delicious food just because of a nutritional restriction. So we offer gluten-free and sugar-free cupcakes. They are great party touches and will make you feel like you're flying in the clouds! Give it a try and you'll discover that gluten-free and sugar-free cupcakes can be just as sweet and delicious!
+                                </Text>
+                            </div>
                             <Img src="images/img_line.svg" alt="line" />
-                            <Text className="font-bold text-lg text-red-500 mt-4 ml-[17px]" onClick={handleFourth}>Do you accept cupcake orders for weddings, birthdays or other events?</Text>
-                            {fourth && (
-                                <div className="flex flex-row gap-2 justify-start mb-2 w-full" >
-                                    <Text className="font-sfmono text-lg text-red-500 text-left ml-[25px]">
-                                        •
-                                    </Text>
-                                    <Text className="font-sfmono text-red-500 text-left mt-1">
-                                        Sure! We'd love to take cupcake orders for special occasions like weddings, birthdays, or any other event you're hosting. We can create cupcakes that are beautiful, stylish and fit the theme of the event. Tell us your requirements for taste, color and design, and we will delight you and your guests. Each cupcake will be a sweet highlight of your special day!                                    </Text>
-                                </div>
-                            )}
+                            <Text className="font-bold text-lg text-red-500 mt-4 ml-[17px] z-10  cursor-pointer" onClick={handleFourth}>Do you accept cupcake orders for weddings, birthdays or other events?</Text>
+                            <div className={`flex flex-row gap-2 justify-start mb-2 w-full ${fourth ? "h-[155px] opacity-100" : "h-0 opacity-0"} transition-all`} >
+                                <Text className="font-sfmono text-lg text-red-500 text-left ml-[25px]">
+                                    •
+                                </Text>
+                                <Text className="font-sfmono text-red-500 text-left mt-1">
+                                    Sure! We'd love to take cupcake orders for special occasions like weddings, birthdays, or any other event you're hosting. We can create cupcakes that are beautiful, stylish and fit the theme of the event. Tell us your requirements for taste, color and design, and we will delight you and your guests. Each cupcake will be a sweet highlight of your special day!
+                                </Text>
+                            </div>
                             <Img src="images/img_line.svg" alt="line" />
                         </div>
                         <Img
