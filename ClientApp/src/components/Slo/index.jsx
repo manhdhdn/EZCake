@@ -1,10 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+
+import { useNavigate } from "react-router-dom";
 
 import { Button, Text } from "components";
 
 import { handleSectionNavigation } from "utils";
 
 const Slo = (props) => {
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let user = localStorage.getItem("user");
+
+    if (user) {
+      setUserLoggedIn(true);
+    }
+  }, []);
+
   return (
     <>
       <div className={props.className}>
@@ -27,15 +41,15 @@ const Slo = (props) => {
             creative space to create cakes that your loved one is sure to fall
             in love with!
           </Text>
-          <Button
-            className="common-pointer bg-red-500 border border-orange-50 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] mt-[60px] py-3.5 rounded-[5px] text-center text-lg text-orange-50"
-            id="block1"
-            onClick={() => {
-              handleSectionNavigation("block3");
-            }}
-          >
-            sign in
-          </Button>
+          {!userLoggedIn && (
+            <Button
+              className="common-pointer bg-red-500 border border-orange-50 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] mt-[60px] py-3.5 rounded-[5px] text-center text-lg text-orange-50"
+              id="block1"
+              onClick={() => navigate("/signin")}
+            >
+              sign in
+            </Button>
+          )}
         </div>
       </div>
     </>

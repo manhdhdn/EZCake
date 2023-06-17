@@ -47,12 +47,14 @@ const Footer = (props) => {
                     </Text>
                   </div>
                   <div className="flex md:flex-col flex-row md:gap-5 items-start justify-start mt-4">
-                    <Text
-                      className="text-base text-red-500"
-                      size="txtSFMonoRegular16"
-                    >
-                      Cuscake
-                    </Text>
+                    <Link to="/cuscake">
+                      <Text
+                        className="text-base text-red-500"
+                        size="txtSFMonoRegular16"
+                      >
+                        Cuscake
+                      </Text>
+                    </Link>
                     <Link to="/our-story">
                       <Text
                         className="md:ml-[0] ml-[301px] md:mt-0 mt-0.5 text-base text-red-500"

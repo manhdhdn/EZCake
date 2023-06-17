@@ -23,24 +23,32 @@ namespace EZCake.Controllers
 
         // GET: api/Cakes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cake>>> GetCakes()
+        public async Task<ActionResult<IEnumerable<Cake>>> GetCakes(bool? bestSeller)
         {
-          if (_context.Cakes == null)
-          {
-              return NotFound();
-          }
-            return await _context.Cakes.ToListAsync();
+            if (_context.Cakes == null)
+            {
+                return NotFound();
+            }
+
+            var cakes = _context.Cakes.AsQueryable();
+
+            if (bestSeller == true)
+            {
+                cakes = cakes.OrderByDescending(c => c.Sold).Take(3);
+            }
+
+            return await cakes.ToListAsync();
         }
 
         // GET: api/Cakes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Cake>> GetCake(Guid id)
         {
-          if (_context.Cakes == null)
-          {
-              return NotFound();
-          }
-            var cake = await _context.Cakes.FindAsync(id);
+            if (_context.Cakes == null)
+            {
+                return NotFound();
+            }
+            var cake = await _context.Cakes.Include(c => c.CakeIngredients).ThenInclude(ci => ci.Ingredient).Include(c => c.CakeReviews).SingleOrDefaultAsync(c => c.Id == id);
 
             if (cake == null)
             {
@@ -86,10 +94,10 @@ namespace EZCake.Controllers
         [HttpPost]
         public async Task<ActionResult<Cake>> PostCake(Cake cake)
         {
-          if (_context.Cakes == null)
-          {
-              return Problem("Entity set 'EZCakeContext.Cakes'  is null.");
-          }
+            if (_context.Cakes == null)
+            {
+                return Problem("Entity set 'EZCakeContext.Cakes'  is null.");
+            }
             _context.Cakes.Add(cake);
             try
             {

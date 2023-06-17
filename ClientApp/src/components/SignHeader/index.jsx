@@ -13,7 +13,6 @@ const SignHeader = (props) => {
                     alt="logosmall"
                 />
             </Link>
-
         </div>
     )
 }

@@ -15,6 +15,7 @@ namespace EZCake.BusinessObjects
         public Guid Id { get; set; }
         public string? Name { get; set; }
         public int Sold { get; set; }
+        public string? Image { get; set; }
 
         public virtual ICollection<CakeIngredient> CakeIngredients { get; set; }
         public virtual ICollection<CakeReview> CakeReviews { get; set; }

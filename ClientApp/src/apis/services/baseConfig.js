@@ -7,13 +7,13 @@ const API_CONFIG = {
     },
     endpoints: {
         account: "api/accounts",
-        accountShipping: "api/accountShippings",
         shippingInformation: "api/shippingInformations",
+        cake: "api/cakes",
     },
     context: [
         "/api/accounts",
-        "/api/accountShippings",
-        "/api/shippingInformations"
+        "/api/shippingInformations",
+        "/api/cakes",
     ]
 };
 
