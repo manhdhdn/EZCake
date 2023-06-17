@@ -2,35 +2,57 @@ import React, { useEffect, useState } from "react";
 
 import CakeApi from "apis/services/Cake";
 
-import { Backdrop, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { Button, Img, Text } from "components";
-import { element } from "prop-types";
 
 const BestSeller = (props) => {
   const [cakeInfo, setCakeInfo] = useState(null);
+  const [textAnimaion, setTextAnimation] = useState("");
+  const [imageAnimation, setImageAnimation] = useState("");
 
   useEffect(() => {
     let cakeInfos = [];
     let count = 0;
 
     const loadCake = async () => {
-      let cakes = await CakeApi.getCakes({ bestSeller: true });
+      try {
+        let cakes = await CakeApi.getCakes({ bestSeller: true });
 
-      cakes.forEach(async element => {
-        let cakeInfo = await CakeApi.getCake(element.id);
+        cakes.forEach(async element => {
+          let cakeInfo = await CakeApi.getCake(element.id);
 
-        cakeInfos.push(cakeInfo);
-      });
+          cakeInfos.push(cakeInfo);
+        });
+      } catch (error) {
+
+      }
     };
 
     loadCake();
 
     const interalId = setInterval(() => {
-      if (count == 3) {
+      if (count === 3) {
         count = 0;
       }
 
       setCakeInfo(cakeInfos[count]);
+
+      setTimeout(() => {
+        setTextAnimation("opacity-1");
+        setImageAnimation(`-rotate-12 opacity-1`);
+        setTimeout(() => {
+          setImageAnimation(`rotate-12 opacity-1`);
+        }, 500);
+        setTimeout(() => {
+          setImageAnimation(`opacity-1`);
+        }, 1000);
+      }, 150);
+
+      setTimeout(() => {
+        setTextAnimation("mr-[500px] opacity-0");
+        setImageAnimation("opacity-0");
+      }, 2600);
+
       count++;
     }, 3000);
 
@@ -45,10 +67,16 @@ const BestSeller = (props) => {
         <>
           <div className="flex flex-col items-center justify-start w-1/4 md:w-full">
             <Text
+              className={`sm:text-[21px] md:text-[23px] text-[25px] text-center text-red-500 w-full transition-all duration-300 ${textAnimaion}`}
+              size="txtMonumentExtendedRegular25"
+            >
+              {cakeInfo.name.toUpperCase()}
+            </Text>
+            <Text
               className="sm:text-[21px] md:text-[23px] text-[25px] text-center text-red-500 w-full"
               size="txtMonumentExtendedRegular25"
             >
-              {cakeInfo.name.toUpperCase()} CUPCAKE
+              CUPCAKE
             </Text>
             <Text
               className="italic mt-2 text-center text-lg text-red-500"
@@ -120,7 +148,7 @@ const BestSeller = (props) => {
           </div>
           <div className="md:h-[675px] h-[754px] relative w-[69%] md:w-full">
             <Img
-              className="absolute h-[675px] inset-[0] justify-center m-auto object-cover w-[92%]"
+              className={`absolute h-[675px] inset-[0] justify-center m-auto object-cover w-[92%] transition-all duration-500 ${imageAnimation}`}
               src={cakeInfo.image}
               alt="bestSeller"
             />
@@ -129,12 +157,9 @@ const BestSeller = (props) => {
       )}
 
       {!cakeInfo && (
-        <Backdrop
-          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={true}
-        >
+        <div className="flex flex-col items-center w-full">
           <CircularProgress color="success" />
-        </Backdrop>
+        </div>
       )}
     </div>
   );
