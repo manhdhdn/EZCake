@@ -92,7 +92,7 @@ const Navbar = (props) => {
               <div className="relative" ref={dropdownRef}>
                 <Img
                   id="user"
-                  className="h-[51px] ml-5 md:ml-[0] ml-[1101px] w-[51px]"
+                  className="h-[51px] ml-5 md:ml-[0] ml-[1101px] w-[51px] cursor-pointer"
                   src="images/img_user.svg"
                   alt="user"
                   onClick={toggleDropdown}
@@ -150,7 +150,7 @@ const Navbar = (props) => {
 
               <div className="relative">
                 <Img
-                  className="h-[51px] ml-0 md:ml-[0] w-[51px]"
+                  className="h-[51px] ml-0 md:ml-[0] w-[51px] cursor-pointer"
                   src="images/img_cart.svg"
                   alt="cart"
                 />

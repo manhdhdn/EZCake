@@ -9,7 +9,7 @@ namespace EZCake.BusinessObjects
         {
             CakeIngredients = new HashSet<CakeIngredient>();
             CakeReviews = new HashSet<CakeReview>();
-            OrderDetails = new HashSet<OrderDetail>();
+            //OrderDetails = new HashSet<OrderDetail>();
         }
 
         public Guid Id { get; set; }
@@ -19,6 +19,6 @@ namespace EZCake.BusinessObjects
 
         public virtual ICollection<CakeIngredient> CakeIngredients { get; set; }
         public virtual ICollection<CakeReview> CakeReviews { get; set; }
-        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        //public virtual ICollection<OrderDetail> OrderDetails { get; set; }
     }
 }

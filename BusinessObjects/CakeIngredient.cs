@@ -10,6 +10,6 @@ namespace EZCake.BusinessObjects
         public Guid IngredientId { get; set; }
 
         //public virtual Cake? Cake { get; set; } 
-        public virtual IngredientType? Ingredient { get; set; }
+        public virtual Ingredient? Ingredient { get; set; }
     }
 }

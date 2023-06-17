@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 import { Button, Text } from "components";
 
-import { handleSectionNavigation } from "utils";
-
 const Slo = (props) => {
   const [userLoggedIn, setUserLoggedIn] = useState(false);
 
@@ -21,7 +19,7 @@ const Slo = (props) => {
 
   return (
     <>
-      <div className={props.className}>
+      <div id="ezzone" className={props.className}>
         <div className="flex flex-col items-center justify-start mb-0.5 w-[45%] md:w-full">
           <Text
             className="sm:text-[39px] md:text-[45px] text-[53px] text-center text-orange-50"
