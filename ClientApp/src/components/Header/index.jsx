@@ -34,7 +34,7 @@ const Header = (props) => {
               so that you can satisfy your passion for creativity and love.
             </Text>
             <Button
-              className="bg-orange-50 border border-indigo-900 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] mt-[60px] py-3.5 rounded-[5px] text-center text-indigo-900 text-lg"
+              className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] mt-[60px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
               onClick={() => navigate("/cuscake")}
             >
               CUSCAKE now!

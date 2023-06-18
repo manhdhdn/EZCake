@@ -12,6 +12,8 @@ const CuscakeForm = (props) => {
     const [flavors, setFlavors] = useState(null);
     const [toppings, setToppings] = useState(null);
     const [number, setNumber] = useState(1);
+    const [choosedCake, setChoosedCake] = useState(0);
+    const [hoverCake, setHoverCake] = useState(-1);
     const [flour, setFlour] = useState("");
     const [flavor, setFlavor] = useState("");
     const [topping, setTopping] = useState("");
@@ -79,8 +81,44 @@ const CuscakeForm = (props) => {
         setTopping(id);
     }
 
+    const handleChoosedCake = (id) => {
+        setChoosedCake(id);
+    }
+
+    const handleCakeIconEnter = (id) => {
+        if (choosedCake !== id) {
+            setHoverCake(id);
+        }
+    }
+
+    const handleCakeIconLeave = (id) => {
+        if (choosedCake !== id) {
+            setHoverCake(-1);
+        }
+    }
+
     const handleBtxPayClick = () => {
 
+    }
+
+    const cakeIcon = () => {
+        let element = [];
+
+        for (let i = 0; i < number; i++) {
+            element.push(
+                <Img
+                    key={i}
+                    className="cursor-pointer"
+                    src={choosedCake === i || hoverCake === i ? "images/icon_cake.svg" : "images/icon_cake_hover.svg"}
+                    alt="icon_cake"
+                    onClick={() => handleChoosedCake(i)}
+                    onMouseEnter={() => handleCakeIconEnter(i)}
+                    onMouseLeave={() => handleCakeIconLeave(i)}
+                />
+            )
+        }
+
+        return element;
     }
 
     const content = () => {
@@ -205,10 +243,12 @@ const CuscakeForm = (props) => {
                             CUSCAKE
                         </Text>
                         <Text className="font-sfmono italic mt-0.5 text-center text-lg text-red-500">100.000 VNĐ</Text>
-                        <Img className="h-[122px] mt-[39px] w-[122px]" src="images/img_frame393.svg" alt="frame393" />
+                        <div className="flex flex-row gap-[75px] items-center justify-center my-[39px]">
+                            {cakeIcon()}
+                        </div>
                         <div className="flex flex-row font-sfmono gap-5 items-center justify-between mt-[302px] w-full">
                             <Button
-                                className="bg-orange-50 border border-indigo-900 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 text-lg"
+                                className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
                                 onClick={() => handleBtxPayClick()}
                             >
                                 pay now
