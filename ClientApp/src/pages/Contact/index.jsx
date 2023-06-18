@@ -13,7 +13,7 @@ const Contact = () => {
     const timeout = 150;
 
     useEffect(() => {
-        window.scrollTo({ top: 0, behavior: "smooth" })
+        // window.scrollTo({ top: 0, behavior: "smooth" })
     }, []);
 
     const handleFirst = () => {
