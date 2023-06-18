@@ -7,6 +7,7 @@ import TermsOfService from "pages/TermsOfService";
 import PrivacyPolicy from "pages/PrivacyPolicy";
 import OurStory from "pages/OurStory";
 import Contact from "pages/Contact";
+import Cuscake from "pages/Cuscake";
 
 const AppRoutes = [
   {
@@ -44,6 +45,10 @@ const AppRoutes = [
   {
     path: "/contact",
     element: <Contact />,
+  },
+  {
+    path: "/cuscake",
+    element: <Cuscake />,
   }
 ];
 
