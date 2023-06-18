@@ -1,6 +1,6 @@
-export const handleSectionNavigation = (id) => {
+export const handleSectionNavigation = (id, offsetValue) => {
   const element = document.getElementById(id);
-  const offset = 117;
+  const offset = offsetValue;
   const bodyRect = document.body.getBoundingClientRect().top;
   const elementRect = element?.getBoundingClientRect().top ?? 0;
   const elementPosition = elementRect - bodyRect;

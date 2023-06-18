@@ -1,5 +1,7 @@
 import React from "react";
 
+import { handleSectionNavigation } from "utils";
+
 import { Link } from "react-router-dom";
 import { Button, Img, Line, Text } from "components";
 
@@ -13,7 +15,7 @@ const Footer = (props) => {
             <div className="flex md:flex-col flex-row md:gap-10 items-center justify-between md:ml-[0] ml-[90px] mr-[90px] mt-16 w-[85%] md:w-full">
               <div className="flex flex-col gap-5 items-center justify-start">
                 <Img
-                  className="h-auto w-auto"
+                  className="h-[205px] md:h-auto sm:h-auto w-auto"
                   src="images/img_logosmall.png"
                   alt="logobig"
                 />
@@ -47,12 +49,14 @@ const Footer = (props) => {
                     </Text>
                   </div>
                   <div className="flex md:flex-col flex-row md:gap-5 items-start justify-start mt-4">
-                    <Text
-                      className="text-base text-red-500"
-                      size="txtSFMonoRegular16"
-                    >
-                      Cuscake
-                    </Text>
+                    <Link to="/cuscake">
+                      <Text
+                        className="text-base text-red-500"
+                        size="txtSFMonoRegular16"
+                      >
+                        Cuscake
+                      </Text>
+                    </Link>
                     <Link to="/our-story">
                       <Text
                         className="md:ml-[0] ml-[301px] md:mt-0 mt-0.5 text-base text-red-500"
@@ -71,12 +75,14 @@ const Footer = (props) => {
                     </Link>
                   </div>
                   <div className="flex md:flex-col flex-row md:gap-5 items-center justify-start mt-3">
-                    <Text
-                      className="text-base text-red-500"
-                      size="txtSFMonoRegular16"
-                    >
-                      Ez Zone
-                    </Text>
+                    <Link to="/" onClick={() => setTimeout(() => handleSectionNavigation("ezzone", 117), 100)}>
+                      <Text
+                        className="text-base text-red-500"
+                        size="txtSFMonoRegular16"
+                      >
+                        Ez Zone
+                      </Text>
+                    </Link>
                     <Link to="/contact">
                       <Text
                         className="md:ml-[0] ml-[301px] text-base text-red-500"

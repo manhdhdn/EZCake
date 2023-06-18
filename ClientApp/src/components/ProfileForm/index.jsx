@@ -16,6 +16,8 @@ const ProfileForm = (props) => {
     const [address, setAddress] = useState("");
     const [gender, setGender] = useState(true);
     const [open, setOpen] = useState(false);
+    const [edit, setEdit] = useState(-1);
+    const [hoverEdit, setHoverEdit] = useState(-1);
 
     const { enqueueSnackbar } = useSnackbar();
 
@@ -35,6 +37,21 @@ const ProfileForm = (props) => {
             }
         });
     }, []);
+
+    const handleIconEditEnter = (id) => {
+        setHoverEdit(id);
+    }
+
+    const handleIconEditLeave = () => {
+        setHoverEdit(-1);
+    }
+
+    const handleBtxEditClick = (e, id, edit) => {
+        e.preventDefault();
+
+        setEdit(edit);
+        document.getElementById(id).focus();
+    }
 
     const handleButtonGenderLeftClick = () => {
         setGender(true);
@@ -90,59 +107,111 @@ const ProfileForm = (props) => {
             <div className="flex flex-col gap-5 items-center justify-start mt-[57px] w-full">
                 <div className="flex flex-col gap-[5px] items-start justify-start w-full">
                     <Text className="text-red-500 text-sm">Full name:</Text>
-                    <Input
-                        name="group39839"
-                        placeholder=""
-                        className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
-                        wrapClassName="bg-orange-50 border border-red-500 border-solid pb-[17px] pl-5 pt-5 rounded-[5px] w-full"
-                        defaultValue={fullName}
-                        onChange={(value) => setFullName(value)}
-                    ></Input>
+                    <div className='flex flex-row gap-5 w-full'>
+                        <Input
+                            id="fullName"
+                            name="fullName"
+                            placeholder=""
+                            className={`leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full ${edit === 0 ? "" : "cursor-not-allowed"}`}
+                            wrapClassName="bg-orange-50 border border-red-500 border-solid pb-[17px] pl-5 pt-5 rounded-[5px] w-full"
+                            type="text"
+                            readOnly={edit === 0 ? false : true}
+                            defaultValue={fullName}
+                            onChange={(value) => setFullName(value)}
+                        ></Input>
+                        <Img
+                            className="cursor-pointer"
+                            src={hoverEdit === 0 ? "images/icon_edit_hover.svg" : "images/icon_edit.svg"}
+                            alt="edit"
+                            onClick={(e) => handleBtxEditClick(e, "fullName", 0)}
+                            onMouseEnter={() => handleIconEditEnter(0)}
+                            onMouseLeave={() => handleIconEditLeave()}
+                        />
+                    </div>
                 </div>
-                <div className="flex flex-col gap-[5px] items-start justify-start mr-[40px] w-[96%] md:w-full">
+                <div className="flex flex-col gap-[5px] items-start justify-start w-full">
                     <Text className="text-red-500 text-sm">Phone number:</Text>
                     <div className="flex md:flex-col flex-row md:gap-10 items-center justify-between w-full">
-                        <Input
-                            name="mobileNo"
-                            placeholder=""
-                            className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
-                            wrapClassName="bg-orange-50 border border-red-500 border-solid md:flex-1 pl-5 pr-[35px] py-[18px] rounded-[5px] md:w-full"
-                            type="number"
-                            defaultValue={phoneNumber}
-                            onChange={(value) => setPhoneNumber(value)}
-                        ></Input>
-                        <div className="flex md:flex-1 flex-row items-start justify-between w-[39%] md:w-full">
+                        <div className="flex flex-row gap-5 w-full">
+                            <Input  
+                                id="mobileNo"
+                                name="mobileNo"
+                                placeholder=""
+                                className={`leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full ${edit === 1 ? "" : "cursor-not-allowed"}`}
+                                wrapClassName="bg-orange-50 border border-red-500 border-solid md:flex-1 pl-5 pr-[35px] py-[18px] rounded-[5px] md:w-full"
+                                type="number"
+                                readOnly={edit === 1 ? false : true}
+                                defaultValue={phoneNumber}
+                                onChange={(value) => setPhoneNumber(value)}
+                            ></Input>
+                            <Img
+                                className="cursor-pointer"
+                                src={hoverEdit === 1 ? "images/icon_edit_hover.svg" : "images/icon_edit.svg"}
+                                alt="edit"
+                                onClick={(e) => handleBtxEditClick(e, "mobileNo", 1)}
+                                onMouseEnter={() => handleIconEditEnter(1)}
+                                onMouseLeave={() => handleIconEditLeave()}
+                            />
+                        </div>
+                        <div className="flex md:flex-1 flex-row gap-5 items-start justify-end w-full">
                             <Text className="mt-[13px] text-[22px] sm:text-lg text-red-500 text-right md:text-xl">Gender</Text>
-                            <Img className="h-[51px] w-[51px]" src={gender ? "images/img_frame380.svg" : "images/img_frame379.svg"} alt="frame379" onClick={handleButtonGenderLeftClick} />
-                            <Text className="mt-[13px] text-[22px] sm:text-lg text-red-500 md:text-xl">Male</Text>
-                            <Img className="h-[51px] w-[51px]" src={!gender ? "images/img_frame380.svg" : "images/img_frame379.svg"} alt="frame380" onClick={handleButtonGenderRightClick} />
-                            <Text className="mt-[13px] text-[22px] sm:text-lg text-red-500 md:text-xl">Female</Text>
+                            <div className="flex flex-row">
+                                <Img className="h-[51px] w-[51px]" src={gender ? "images/img_frame380.svg" : "images/img_frame379.svg"} alt="frame379" onClick={handleButtonGenderLeftClick} />
+                                <Text className="mt-[13px] text-[22px] sm:text-lg text-red-500 md:text-xl">Male</Text>
+                            </div>
+                            <div className="flex flex-row">
+                                <Img className="h-[51px] w-[51px]" src={!gender ? "images/img_frame380.svg" : "images/img_frame379.svg"} alt="frame380" onClick={handleButtonGenderRightClick} />
+                                <Text className="mt-[13px] text-[22px] sm:text-lg text-red-500 md:text-xl">Female</Text>
+                            </div>
+                            <Img className="opacity-0" src="images/icon_edit.svg" alt="edit" />
                         </div>
                     </div>
                 </div>
                 <div className="flex flex-col gap-1.5 items-start justify-start w-full">
                     <Text className="text-red-500 text-sm">Email:</Text>
-                    <Input
-                        name="group39843"
-                        className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
-                        wrapClassName="bg-orange-50 border border-red-500 border-solid pb-[17px] pl-5 pt-5 rounded-[5px] w-full"
-                        type="email"
-                        disabled
-                        defaultValue={email}
-                        onChange={(value) => setEmail(value)}
-                    ></Input>
+                    <div className="flex flex-row gap-5 w-full cursor-not-allowed">
+                        <Input
+                            id="email"
+                            name="email"
+                            className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full cursor-not-allowed"
+                            wrapClassName="bg-orange-50 border border-red-500 border-solid pb-[17px] pl-5 pt-5 rounded-[5px] w-full"
+                            type="email"
+                            disabled
+                            defaultValue={email}
+                            onChange={(value) => setEmail(value)}
+                        ></Input>
+                        <Img
+                            src={hoverEdit === 2 ? "images/icon_edit_hover.svg" : "images/icon_edit.svg"}
+                            alt="edit"
+                            onClick={() => {}}
+                            onMouseEnter={() => handleIconEditEnter(2)}
+                            onMouseLeave={() => handleIconEditLeave()}
+                        />
+                    </div>
                 </div>
                 <div className="flex flex-col gap-[5px] items-start justify-start w-full">
                     <Text className="text-red-500 text-sm">Address:</Text>
-                    <Input
-                        name="group39844"
-                        placeholder=""
-                        className="leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full"
-                        wrapClassName="bg-orange-50 border border-red-500 border-solid pb-[27px] pl-5 pt-[27px] rounded-[5px] w-full"
-                        type="address"
-                        defaultValue={address}
-                        onChange={(value) => setAddress(value)}
-                    ></Input>
+                    <div className="flex flex-row gap-5 w-full">
+                        <Input
+                            id="address"
+                            name="address"
+                            placeholder=""
+                            className={`leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 w-full ${edit === 3 ? "" : "cursor-not-allowed"}`}
+                            wrapClassName="bg-orange-50 border border-red-500 border-solid pb-[27px] pl-5 pt-[27px] rounded-[5px] w-full"
+                            type="address"
+                            readOnly={edit === 3 ? false : true}
+                            defaultValue={address}
+                            onChange={(value) => setAddress(value)}
+                        ></Input>
+                        <Img
+                            className="cursor-pointer"
+                            src={hoverEdit === 3 ? "images/icon_edit_hover.svg" : "images/icon_edit.svg"}
+                            alt="edit"
+                            onClick={(e) => handleBtxEditClick(e, "address", 3)}
+                            onMouseEnter={() => handleIconEditEnter(3)}
+                            onMouseLeave={() => handleIconEditLeave()}
+                        />
+                    </div>
                 </div>
             </div>
             <Button

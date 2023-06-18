@@ -10,8 +10,8 @@ import ProfileForm from "components/ProfileForm";
 
 const Profile = () => {
     useEffect(() => {
-        handleSectionNavigation("first");
-    })
+        handleSectionNavigation("profile", 117);
+    }, []);
 
     return (
         <>
@@ -22,7 +22,7 @@ const Profile = () => {
                     <Line className="absolute bg-red-500 h-px inset-x-[0] mx-auto top-[0] w-full" />
                     <Chat />
                 </div>
-                <Line id="first" className="bg-red-500 h-px w-full" />
+                <Line id="profile" className="bg-red-500 h-px w-full" />
                 <ProfileForm className="flex flex-col items-center justify-start max-w-[1014px] mt-14 mx-auto md:px-5 w-full" />
                 <Footer className="bg-orange-50 flex items-center justify-center mt-[100px] md:px-5 w-full" />
             </div>

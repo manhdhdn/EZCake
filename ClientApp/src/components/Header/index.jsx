@@ -1,9 +1,13 @@
 import React from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import { Button, Img, Line, Text } from "components";
 import Chat from "components/Chat";
 
 const Header = (props) => {
+  const navigate = useNavigate();
+
   return (
     <div className={props.className}>
       <div className="absolute flex flex-col h-full inset-y-[0] items-center justify-start left-[0] my-auto w-[96%]">
@@ -29,7 +33,10 @@ const Header = (props) => {
               offers the best CUPCAKE cakes and the most unique CUSCAKE cakes,
               so that you can satisfy your passion for creativity and love.
             </Text>
-            <Button className="bg-orange-50 border border-indigo-900 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] mt-[60px] py-3.5 rounded-[5px] text-center text-indigo-900 text-lg">
+            <Button
+              className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] mt-[60px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+              onClick={() => navigate("/cuscake")}
+            >
               CUSCAKE now!
             </Button>
           </div>

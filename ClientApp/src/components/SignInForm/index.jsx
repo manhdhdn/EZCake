@@ -58,7 +58,7 @@ const SignInForm = (props) => {
                             onChange={(value) => setPassword(value)}
                         ></Input>
                         <Button
-                            className="bg-orange-50 border border-indigo-900 border-solid cursor-pointer leading-[normal] min-w-[193px] mt-5 py-3.5 rounded-[5px] text-center text-indigo-900 text-lg"
+                            className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] mt-5 py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
                             type="button"
                             onClick={handleSignInBtxClick}
                         >
