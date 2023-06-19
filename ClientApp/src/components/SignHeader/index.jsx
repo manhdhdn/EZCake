@@ -5,7 +5,7 @@ import { Img } from 'components'
 
 const SignHeader = (props) => {
     return (
-        <div className={props.className}>
+        <div className={props.className} style={{zIndex: 100}}>
             <Link to="/">
                 <Img
                     className="h-[62px]"

@@ -2,18 +2,20 @@ import React, { useEffect, useState } from "react";
 
 import CakeApi from "apis/services/Cake";
 
-import LazyLoad from "react-lazy-load";
 import { CircularProgress } from "@mui/material";
 import { Button, Img, Text } from "components";
 
 const BestSeller = (props) => {
   const [change, setChange] = useState(false);
   const [cakeInfo, setCakeInfo] = useState(null);
+  const [cakeImages, setCakeImages] = useState(null);
+  const [count, setCount] = useState(0);
   const [textAnimaion, setTextAnimation] = useState("");
   const [imageAnimation, setImageAnimation] = useState("");
 
   useEffect(() => {
     let cakeInfos = [];
+    let cakeImages = [];
     let count = 0;
 
     const loadCake = async () => {
@@ -25,10 +27,13 @@ const BestSeller = (props) => {
             let cakeInfo = await CakeApi.getCake(element.id);
 
             cakeInfos.push(cakeInfo);
+            cakeImages.push(cakeInfo.image);
           } catch (error) {
 
           }
         });
+
+        setCakeImages(cakeImages);
       } catch (error) {
 
       }
@@ -37,12 +42,15 @@ const BestSeller = (props) => {
     loadCake();
 
     const interalId = setInterval(() => {
-      if (count === 3) {
+      setCakeInfo(cakeInfos[count]);
+      setCount(count);
+
+      if (count === 2) {
         count = 0;
+      } else {
+        count++;
       }
 
-      setCakeInfo(cakeInfos[count]);
-      count++;
       setChange(true);
     }, 3000);
 
@@ -54,24 +62,23 @@ const BestSeller = (props) => {
   useEffect(() => {
     if (change) {
       setTextAnimation("opacity-1");
-      setImageAnimation(`-rotate-6 opacity-1`);
+      setImageAnimation(`-rotate-6`);
       setTimeout(() => {
-        setImageAnimation(`rotate-6 opacity-1`);
+        setImageAnimation(`rotate-6`);
       }, 500);
       setTimeout(() => {
-        setImageAnimation(`opacity-1`);
+        setImageAnimation("");
       }, 1000);
 
       setTimeout(() => {
         setChange(false);
-      }, 2500);
+      }, 2700);
     }
   }, [change])
 
   useEffect(() => {
     if (!change) {
       setTextAnimation("mr-[500px] opacity-0");
-      setImageAnimation("opacity-0");
     }
   }, [change])
 
@@ -161,13 +168,15 @@ const BestSeller = (props) => {
             </div>
           </div>
           <div className="md:h-[675px] h-[754px] relative w-[69%] md:w-full">
-            <LazyLoad>
+            <div className="absolute h-[675px] inset-[0] justify-center m-auto object-cover w-[92%] transition-all duration-500 ease-in" />
+            {cakeImages.map((image, index) => (
               <Img
-                className={`absolute h-[675px] inset-[0] justify-center m-auto object-cover w-[92%] transition-all duration-500 ease-in ${imageAnimation}`}
-                src={cakeInfo.image}
+                key={index}
+                className={`absolute inset-[0] justify-center m-auto object-cover w-[92%] transition-all duration-500 ease-in ${count === index ? `opacity-1 h-[675px] ${imageAnimation}` : "opacity-0 h-0"}`}
+                src={image}
                 alt="bestSeller"
               />
-            </LazyLoad>
+            ))}
           </div>
         </>
       )}
