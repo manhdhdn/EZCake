@@ -16,7 +16,7 @@ const AppRoutes = [
   },
   {
     path: "*",
-    element: <NotFound />,
+    element: <Home />,
   },
   {
     path: "/signup",

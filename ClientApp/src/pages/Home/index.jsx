@@ -9,7 +9,7 @@ import Navbar from "components/Navbar";
 import Slo from "components/Slo";
 import HomeComment from "components/HomeComment";
 
-const GuestHome = () => {
+const Home = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }, []);
@@ -33,4 +33,4 @@ const GuestHome = () => {
   );
 };
 
-export default GuestHome;
+export default Home;
