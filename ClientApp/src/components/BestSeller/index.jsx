@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import { useSnackbar } from "notistack";
 import CakeApi from "apis/services/Cake";
 
 import { CircularProgress } from "@mui/material";
@@ -12,6 +13,8 @@ const BestSeller = (props) => {
   const [count, setCount] = useState(0);
   const [textAnimaion, setTextAnimation] = useState("");
   const [imageAnimation, setImageAnimation] = useState("");
+
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     let cakeInfos = [];
@@ -29,21 +32,21 @@ const BestSeller = (props) => {
             cakeInfos.push(cakeInfo);
             cakeImages.push(cakeInfo.image);
           } catch (error) {
-
+            enqueueSnackbar("Cake could not be loaded", { variant: "error" });
           }
         });
 
         setCakeImages(cakeImages);
       } catch (error) {
-
+        enqueueSnackbar("Cake could not be loaded", { variant: "error" });
       }
     };
 
     loadCake();
 
     const interalId = setInterval(() => {
-      setCakeInfo(cakeInfos[count]);
       setCount(count);
+      setCakeInfo(cakeInfos[count]);
 
       if (count === 2) {
         count = 0;
@@ -57,6 +60,8 @@ const BestSeller = (props) => {
     return () => {
       clearInterval(interalId);
     };
+
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {

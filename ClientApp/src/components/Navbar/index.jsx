@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 import { UserAuth } from "apis/auth/AuthContext";
 
 import { Link } from "react-router-dom";
@@ -15,6 +16,7 @@ const Navbar = (props) => {
   const dropdownRef = useRef();
 
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const { logout } = UserAuth();
 
   useEffect(() => {
@@ -74,7 +76,7 @@ const Navbar = (props) => {
 
       navigate("/");
     } catch (error) {
-
+      enqueueSnackbar("Logout failed", { variant: "error" });
     }
   };
 
