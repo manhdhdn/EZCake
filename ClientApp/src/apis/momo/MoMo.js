@@ -1,4 +1,4 @@
-import React from 'react'
+import { HmacSHA256, enc } from "crypto-js";
 
 const MoMo = {
     createRequest: async (amount) => {
@@ -19,13 +19,13 @@ const MoMo = {
         var requestType = "captureWallet"
         var extraData = ""; //pass empty value if your merchant does not have stores
 
-        var rawSignature = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData + "&ipnUrl=" + ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&partnerCode=" + partnerCode + "&redirectUrl=" + redirectUrl + "&requestId=" + requestId + "&requestType=" + requestType
+        //raw
+        var rawSignature = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData + "&ipnUrl=" + ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&partnerCode=" + partnerCode + "&redirectUrl=" + redirectUrl + "&requestId=" + requestId + "&requestType=" + requestType;
+        var rawPaymentSignature = "accessKey=" + accessKey + "&orderId=" + orderId + "&partnerCode=" + partnerCode + "&requestId=" + requestId;
 
         //signature
-        const crypto = require('crypto');
-        var signature = crypto.createHmac('sha256', secretkey)
-            .update(rawSignature)
-            .digest('hex');
+        var signature = HmacSHA256(rawSignature, secretkey).toString(enc.Hex);
+        var paymentSignature = HmacSHA256(rawPaymentSignature, secretkey).toString(enc.Hex);
 
         //json object send to MoMo endpoint
         const requestBody = JSON.stringify({
@@ -44,42 +44,75 @@ const MoMo = {
         });
 
         //Create the HTTPS objects
-        const https = require('https');
-        const options = {
-            hostname: 'test-payment.momo.vn',
-            port: 443,
-            path: '/v2/gateway/api/create',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(requestBody)
-            }
+        const encoder = new TextEncoder();
+
+        const requestBodyString = JSON.stringify(requestBody);
+        const requestBodyBytes = encoder.encode(requestBodyString);
+
+        const headers = {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Content-Length': requestBodyBytes.length.toString()
         }
 
         //Send the request and get the response
-        const req = https.request(options, res => {
-            res.setEncoding('utf8');
-            res.on('data', (body) => {
-                qrCodeUrl = JSON.parse(body).qrCodeUrl;
+        await fetch(
+            'https://test-payment.momo.vn:443/v2/gateway/api/create',
+            {
+                method: "POST",
+                headers: headers,
+                body: requestBodyString
+            }
+        )
+            .then(response => response.json())
+            .then(data => {
+                qrCodeUrl = data.qrCodeUrl;
             });
-        })
-
-        req.on('error', (e) => {
-            error = e.message;
-        });
-
-        // write data to request body
-        req.write(requestBody);
-        req.end();
 
         return {
+            partnerCode: partnerCode,
+            requestId: requestId,
+            orderId: orderId,
+            signature: paymentSignature,
             qrCodeUrl: qrCodeUrl,
             error: error
         }
     },
 
     checkPayment: async (params) => {
-        return;
+        var status = -1;
+
+        const requestBody = JSON.stringify({
+            partnerCode: params.partnerCode,
+            requestId: params.requestId,
+            orderId: params.orderId,
+            signature: params.signature,
+            lang: 'en'
+        });
+
+        const encoder = new TextEncoder();
+
+        const requestBodyString = JSON.stringify(requestBody);
+        const requestBodyBytes = encoder.encode(requestBodyString);
+
+        const headers = {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Content-Length': requestBodyBytes.length.toString()
+        }
+
+        await fetch(
+            'https://test-payment.momo.vn/v2/gateway/api/query',
+            {
+                method: "POST",
+                headers: headers,
+                body: requestBodyString
+            }
+        )
+            .then(response => response.json())
+            .then(data => {
+                status = data.resultCode;
+            });
+
+        return status;
     }
 }
 

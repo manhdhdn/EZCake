@@ -193,7 +193,7 @@ const CuscakeForm = (props) => {
             });
 
             if (status === 201) {
-                customedCakes.forEach(async (element, index) => {
+                customedCakes.forEach(async (element) => {
                     let cakeId = v4();
 
                     status = await CakeApi.createCake({
@@ -203,11 +203,11 @@ const CuscakeForm = (props) => {
                     });
 
                     if (status === 201) {
-                        for (let index = 0; index < Object.keys(element.length); index++) {
+                        for (let index = 0; index < Object.keys(element).length; index++) {
                             status = await CakeIngredientApi.createCakeIngredient({
                                 id: v4(),
                                 cakeId,
-                                ingredientId: Object.keys(element)[index]
+                                ingredientId: element[Object.keys(element)[index]]
                             });
 
                             if (status !== 201) {
@@ -216,12 +216,14 @@ const CuscakeForm = (props) => {
                             }
                         }
 
+                        let cake = await CakeApi.getCake(cakeId);
+
                         if (status === 201) {
                             status = await OrderDetailApi.createOrderDetail({
                                 id: v4(),
                                 orderId,
                                 cakeId,
-                                price: number * 30000,
+                                price: cake.price,
                                 quantity: 1
                             });
 
@@ -239,6 +241,8 @@ const CuscakeForm = (props) => {
         } catch (error) {
             enqueueSnackbar("Order could not be created", { variant: "error" });
         }
+
+        navigate("/payment/99f4e228-a38b-49e1-836f-f54e34d29ed1");
     }
 
     const cakeIcon = () => {

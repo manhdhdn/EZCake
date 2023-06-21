@@ -47,6 +47,9 @@ namespace EZCake.Controllers
                 return NotFound();
             }
 
+            await _context.Entry(order).Reference(o => o.ShippingInformation).LoadAsync();
+            await _context.Entry(order).Collection(o => o.OrderDetails).LoadAsync();
+
             return order;
         }
 

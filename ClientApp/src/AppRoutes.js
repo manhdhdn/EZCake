@@ -56,7 +56,7 @@ const AppRoutes = [
     element: <Cuscake />,
   },
   {
-    path: "/payment",
+    path: "/payment/*",
     element: <Payment />,
   }
 ];

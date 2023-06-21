@@ -1,8 +1,14 @@
 import React from "react";
+
+import { CircularProgress } from "@mui/material";
 import { QRCodeSVG } from "qrcode.react";
 import { Img } from "components";
 
 const QRCodeWithIcon = ({ value }) => {
+    if (!value) {
+        value = "https://ezcake.azurewebsites.net";
+    }
+
     return (
         <div className="flex items-center justify-center z-10">
             <div className="relative">
@@ -11,7 +17,8 @@ const QRCodeWithIcon = ({ value }) => {
                 </div>
 
                 <div className="absolute inset-0 flex items-center justify-center rounded-[15px]">
-                    <Img className="bg-white-A700 w-12 h-12 p-2 rounded-full" src="images/img_momo.svg" alt="momo" />
+                    <Img className="absolute bg-white-A700 w-12 h-12 p-2 rounded-full" src="images/img_momo.svg" alt="momo" />
+                    <CircularProgress color="success" />
                 </div>
             </div>
         </div>
