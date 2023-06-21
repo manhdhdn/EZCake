@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 
-import { Line } from "components";
+import { Img, Line } from "components";
 import SignHeader from "components/SignHeader";
-import Animation from "components/Animation";
 import SignUpForm from "components/SignUpForm";
 import Chat from "components/Chat";
 import Footer from "components/Footer";
@@ -18,7 +17,14 @@ const SignUp = () => {
         <div className="md:h-[1729px] sm:h-[665px] h-[785px] md:px-5 relative w-full">
           <div className="absolute bottom-[0] flex flex-col inset-x-[0] items-center justify-start mx-auto w-full">
             <div className="flex md:flex-col flex-row gap-[19px] items-center justify-between w-full">
-              <Animation className="flex md:flex-1 md:flex-col flex-row md:gap-5 items-center justify-evenly w-[66%] md:w-full" />
+              <div className="flex md:flex-1 md:flex-col flex-row md:gap-5 items-center justify-evenly w-[66%] md:w-full">
+                <Img
+                  className="h-[665px] sm:h-auto object-cover w-full"
+                  src="images/img_header.png"
+                  alt="pictureOne"
+                />
+                <Line className="bg-red-500 h-[665px] md:h-px md:w-full w-px" />
+              </div>
               <SignUpForm className="flex md:flex-1 flex-col items-center justify-start mr-3 w-[34%] md:w-full" />
             </div>
           </div>

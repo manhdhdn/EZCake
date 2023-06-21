@@ -18,7 +18,7 @@ const Profile = () => {
             <div className="bg-orange-50 flex flex-col font-sfmono items-center justify-start mx-auto w-full">
                 <Navbar className="bg-orange-50 flex flex-row font-sfmono items-center justify-start p-[27px] sm:px-5 shadow-bs w-full" />
                 <div className="h-[665px] md:px-5 relative w-full mt-navbar">
-                    <Img className="h-[665px] m-auto object-cover w-full" src="images/img_picture1.png" alt="pictureOne" />
+                    <Img className="h-[665px] m-auto object-cover w-full" src="images/img_header.png" alt="pictureOne" />
                     <Line className="absolute bg-red-500 h-px inset-x-[0] mx-auto top-[0] w-full" />
                     <Chat />
                 </div>

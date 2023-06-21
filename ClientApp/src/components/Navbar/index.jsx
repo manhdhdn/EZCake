@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 import { UserAuth } from "apis/auth/AuthContext";
 
 import { Link } from "react-router-dom";
 import { Button, Img, Line } from "components";
 
 const Navbar = (props) => {
-  const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [userLoggedIn, setUserLoggedIn] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [userIcon, setUserIcon] = useState("images/img_user.svg");
   const [cartIcon, setCartIcon] = useState("images/img_cart.svg");
@@ -15,13 +16,14 @@ const Navbar = (props) => {
   const dropdownRef = useRef();
 
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const { logout } = UserAuth();
 
   useEffect(() => {
     var user = localStorage.getItem("user");
 
-    if (user) {
-      setUserLoggedIn(true);
+    if (!user) {
+      setUserLoggedIn(false);
     }
   }, []);
 
@@ -74,7 +76,7 @@ const Navbar = (props) => {
 
       navigate("/");
     } catch (error) {
-
+      enqueueSnackbar("Logout failed", { variant: "error" });
     }
   };
 
@@ -133,7 +135,7 @@ const Navbar = (props) => {
                       </Button>
                       <Button
                         className="bg-red-500 hover:bg-orange-50 border border-orange-50 hover:border-teal-100 border-solid font-extrabold text-[12px] sm:text-sm md:text-sm text-center text-orange-50 hover:text-red-500 flex flex-col items-center justify-start p-4 px-8 md:px-4 sm:px-2 w-full"
-                        onClick={() => navigate("/profile")}
+                        onClick={() => navigate("/order")}
                       >
                         YOUR ORDER
                       </Button>

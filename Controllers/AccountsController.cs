@@ -44,7 +44,7 @@ namespace EZCake.Controllers
 
             if (email != null)
             {
-                account = await _context.Accounts.Include(a => a.ShippingInformations).SingleOrDefaultAsync(a => a.Email == email);
+                account = await _context.Accounts.Include(a => a.ShippingInformations.OrderBy(sif => !sif.Prioritisation)).SingleOrDefaultAsync(a => a.Email == email);
             }
 
             if (account == null)

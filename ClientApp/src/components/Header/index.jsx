@@ -14,7 +14,7 @@ const Header = (props) => {
         <div className="flex md:flex-col flex-row md:gap-5 items-center justify-start w-full">
           <Img
             className="md:flex-1 h-[665px] sm:h-auto object-cover w-[68%] md:w-full"
-            src="images/img_picture1.png"
+            src="images/img_header.png"
             alt="pictureOne"
           />
           <Line className="bg-red-500 h-[665px] md:h-px md:w-full w-px" />

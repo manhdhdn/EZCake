@@ -62,7 +62,7 @@ const Contact = () => {
                     <div className="h-[667px] m-auto w-full">
                         <Img
                             className="absolute h-[667px] inset-y-[0] left-[0] my-auto object-cover w-[55%]"
-                            src="images/img_picture1.png"
+                            src="images/img_header.png"
                             alt="EZCake"
                         />
                         <div className="absolute flex flex-col gap-5 h-max inset-y-[0] items-center justify-start my-auto right-[5%] left-[60%] w-[35%]">
@@ -144,7 +144,7 @@ const Contact = () => {
                         </div>
                         <Img
                             className="absolute h-[667px] inset-y-[0] right-[0] my-auto object-cover w-[55%]"
-                            src="images/img_picture1.png"
+                            src="images/img_header.png"
                             alt="EZCake"
                         />
                         <Line className="absolute bg-red-500 h-px inset-x-[0] mx-auto top-[0] w-full" />

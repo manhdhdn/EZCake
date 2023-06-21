@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import { useSnackbar } from "notistack";
 import CakeApi from "apis/services/Cake";
 
 import { CircularProgress } from "@mui/material";
@@ -12,6 +13,8 @@ const BestSeller = (props) => {
   const [count, setCount] = useState(0);
   const [textAnimaion, setTextAnimation] = useState("");
   const [imageAnimation, setImageAnimation] = useState("");
+
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     let cakeInfos = [];
@@ -29,21 +32,21 @@ const BestSeller = (props) => {
             cakeInfos.push(cakeInfo);
             cakeImages.push(cakeInfo.image);
           } catch (error) {
-
+            enqueueSnackbar("Cake could not be loaded", { variant: "error" });
           }
         });
 
         setCakeImages(cakeImages);
       } catch (error) {
-
+        enqueueSnackbar("Cake could not be loaded", { variant: "error" });
       }
     };
 
     loadCake();
 
     const interalId = setInterval(() => {
-      setCakeInfo(cakeInfos[count]);
       setCount(count);
+      setCakeInfo(cakeInfos[count]);
 
       if (count === 2) {
         count = 0;
@@ -57,6 +60,8 @@ const BestSeller = (props) => {
     return () => {
       clearInterval(interalId);
     };
+
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -162,7 +167,7 @@ const BestSeller = (props) => {
                   </Text>
                 </div>
               </div>
-              <Button className="bg-orange-50 border border-red-500 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] md:ml-[0] ml-[45px] mt-[49px] py-3.5 rounded-[5px] text-center text-lg text-red-500">
+              <Button className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] md:ml-[0] ml-[45px] mt-[49px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50">
                 shop now
               </Button>
             </div>

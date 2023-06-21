@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react'
 
+import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
+import { v4 } from 'uuid';
+import moment from 'moment';
 import IngredientTypeApi from 'apis/services/IngredientType';
+import CakeApi from 'apis/services/Cake';
+import CakeIngredientApi from 'apis/services/CakeIngredient';
+import OrderDetailApi from 'apis/services/OrderDetail';
+import OrderApi from 'apis/services/Order';
 
 import { CircularProgress } from '@mui/material';
 import { Button, Img, Input, Line, Text } from "components";
@@ -17,6 +25,14 @@ const CuscakeForm = (props) => {
     const [flour, setFlour] = useState("");
     const [flavor, setFlavor] = useState("");
     const [topping, setTopping] = useState("");
+    // eslint-disable-next-line
+    const [customedCakes, setCustomedCakes] = useState([]);
+    // eslint-disable-next-line
+    const [historyCustomedCakes, setHistoryCustomedCakes] = useState([]);
+    const [cakeAnimation, setCakeAnimation] = useState("");
+
+    const { enqueueSnackbar } = useSnackbar();
+    const navigate = useNavigate();
 
     useEffect(() => {
         let ingredientTypes = [];
@@ -30,30 +46,33 @@ const CuscakeForm = (props) => {
                         try {
                             setFlours(await IngredientTypeApi.getIngredientType(element.id));
                         } catch (error) {
-
+                            enqueueSnackbar("Flour could not be loaded", { variant: "error" });
                         }
                     }
+
                     if (element.name === "Flavor") {
                         try {
                             setFlavors(await IngredientTypeApi.getIngredientType(element.id));
                         } catch (error) {
-
+                            enqueueSnackbar("Flavor could not be loaded", { variant: "error" });
                         }
                     }
+
                     if (element.name === "Topping") {
                         try {
                             setToppings(await IngredientTypeApi.getIngredientType(element.id));
                         } catch (error) {
-
+                            enqueueSnackbar("Topping could not be loaded", { variant: "error" });
                         }
                     }
                 });
             } catch (error) {
-
+                enqueueSnackbar("Ingredient could not be loaded", { variant: "error" });
             }
         }
 
         loadIngredientTypes();
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -65,8 +84,68 @@ const CuscakeForm = (props) => {
         }
     }, [flours, flavors, toppings]);
 
+    useEffect(() => {
+        saveCakeInformation();
+        // eslint-disable-next-line
+    }, [flour, flavor, topping]);
+
+    useEffect(() => {
+        handleChoosedCake(choosedCake);
+        // eslint-disable-next-line
+    }, [choosedCake]);
+
+    const saveCakeInformation = () => {
+        customedCakes[choosedCake] = {
+            flour: flour,
+            flavor: flavor,
+            topping: topping
+        }
+    }
+
+    const handleChoosedCake = (id) => {
+        setFlour(customedCakes[id].flour);
+        setFlavor(customedCakes[id].flavor);
+        setTopping(customedCakes[id].topping);
+    }
+
     const handleNumberClick = (number) => {
         setNumber(number);
+        setChoosedCake(0);
+        setHoverCake(-1);
+
+        setCakeAnimation("opacity-1 gap-[86px]");
+
+        let customedCakesLength = customedCakes.length;
+        let historyCustomedCakesLength = historyCustomedCakes.length;
+
+        if (customedCakesLength < number) {
+            if (historyCustomedCakesLength === 0) {
+                for (let index = 0; index < number - customedCakesLength; index++) {
+                    customedCakes.push({
+                        flour: flours.ingredients[0].id,
+                        flavor: flavors.ingredients[0].id,
+                        topping: toppings.ingredients[0].id
+                    })
+                }
+
+            } else {
+                customedCakes.push(...historyCustomedCakes.slice(customedCakesLength));
+            }
+        }
+
+        if (customedCakesLength > number) {
+            customedCakes.filter((element, index) => {
+                if (historyCustomedCakes[index] !== element) {
+                    historyCustomedCakes[index] = element;
+                }
+
+                return true;
+            })
+
+            for (let index = 0; index < customedCakesLength - number; index++) {
+                customedCakes.pop();
+            }
+        }
     }
 
     const handleFlourClick = (id) => {
@@ -81,10 +160,6 @@ const CuscakeForm = (props) => {
         setTopping(id);
     }
 
-    const handleChoosedCake = (id) => {
-        setChoosedCake(id);
-    }
-
     const handleCakeIconEnter = (id) => {
         if (choosedCake !== id) {
             setHoverCake(id);
@@ -97,8 +172,77 @@ const CuscakeForm = (props) => {
         }
     }
 
-    const handleBtxPayClick = () => {
+    const handleNumberEnter = () => {
+        setCakeAnimation("opacity-0 gap-0");
+    }
 
+    const handleNumberLeave = () => {
+        setCakeAnimation("opacity-1 gap-[86px]");
+    }
+
+    const handleBtxPayClick = async () => {
+        try {
+            let orderId = v4();
+            let shippingInformationId = JSON.parse(localStorage.getItem("userInfo")).shippingInformations[0].id;
+
+            let status = await OrderApi.createOrder({
+                id: orderId,
+                orderDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
+                shippingInformationId,
+                status: "Pending"
+            });
+
+            if (status === 201) {
+                customedCakes.forEach(async (element) => {
+                    let cakeId = v4();
+
+                    status = await CakeApi.createCake({
+                        id: cakeId,
+                        name: "Cuscake",
+                        sold: 1
+                    });
+
+                    if (status === 201) {
+                        for (let index = 0; index < Object.keys(element).length; index++) {
+                            status = await CakeIngredientApi.createCakeIngredient({
+                                id: v4(),
+                                cakeId,
+                                ingredientId: element[Object.keys(element)[index]]
+                            });
+
+                            if (status !== 201) {
+                                enqueueSnackbar("Cake could not be created", { variant: "error" });
+                                return;
+                            }
+                        }
+
+                        let cake = await CakeApi.getCake(cakeId);
+
+                        if (status === 201) {
+                            status = await OrderDetailApi.createOrderDetail({
+                                id: v4(),
+                                orderId,
+                                cakeId,
+                                price: cake.price,
+                                quantity: 1
+                            });
+
+                            if (status === 201) {
+                                navigate("/payment");
+                            }
+                        } else {
+                            enqueueSnackbar("Order could not be created", { variant: "error" });
+                        }
+                    } else {
+                        enqueueSnackbar("Cake could not be created", { variant: "error" });
+                    }
+                });
+            }
+        } catch (error) {
+            enqueueSnackbar("Order could not be created", { variant: "error" });
+        }
+
+        navigate("/payment/99f4e228-a38b-49e1-836f-f54e34d29ed1");
     }
 
     const cakeIcon = () => {
@@ -111,14 +255,18 @@ const CuscakeForm = (props) => {
                     className="cursor-pointer"
                     src={choosedCake === i || hoverCake === i ? "images/icon_cake.svg" : "images/icon_cake_hover.svg"}
                     alt="icon_cake"
-                    onClick={() => handleChoosedCake(i)}
+                    onClick={() => setChoosedCake(i)}
                     onMouseEnter={() => handleCakeIconEnter(i)}
                     onMouseLeave={() => handleCakeIconLeave(i)}
                 />
             )
         }
 
-        return element;
+        return (
+            <div className={`absolute flex flex-row transition-all duration-300 ${cakeAnimation} items-center justify-center`}>
+                {element}
+            </div>
+        );
     }
 
     const content = () => {
@@ -138,10 +286,19 @@ const CuscakeForm = (props) => {
                                 src="images/img_bvdt1.png"
                                 alt="bvdtOne"
                             />
-                            <Line className="absolute bg-red-500 h-[666px] inset-y-[0] my-auto right-[0] w-px" />
+                            <Line className="absolute bg-red-500 h-[666px] inset-y-[0] my-auto right-[0] w-[0.5px]" />
                         </div>
-                        <div className="flex md:flex-col flex-row gap-5 items-start justify-between md:mt-0 mt-[326px] w-[55%] md:w-full">
-                            <div className="flex flex-col gap-[18px] items-center justify-start w-[17%] md:w-full">
+                    </div>
+                    <div className="absolute bottom-[3%] flex flex-col items-center justify-center left-[46%] right-[4%] w-[50%]">
+                        <Text className="font-extrabold font-monumentextended sm:text-[39px] md:text-[45px] text-[53px] text-center text-red-500">
+                            CUSCAKE
+                        </Text>
+                        <Text className="font-sfmono italic mt-0.5 mb-[56px] text-center text-lg text-red-500">{(number * 30000).toLocaleString("vi-VN")} VNĐ</Text>
+                        <div className="flex items-center justify-center my-[39px]">
+                            {cakeIcon()}
+                        </div>
+                        <div className="flex md:flex-col flex-row gap-5 items-start justify-between md:mt-0 mt-[56px] w-full">
+                            <div className="flex flex-col gap-[18px] items-center justify-start w-[17%] md:w-full z-10">
                                 <div className="flex flex-col items-center justify-start w-full">
                                     <Text className="font-bold text-[22px] text-center sm:text-lg text-red-500 md:text-xl">Number</Text>
                                     <Line className="bg-red-500 h-px mt-1 w-full" />
@@ -150,24 +307,32 @@ const CuscakeForm = (props) => {
                                     <Text
                                         className={`text-center text-lg text-red-500 cursor-pointer ${number === 1 ? "font-bold" : ""}`}
                                         onClick={() => handleNumberClick(1)}
+                                        onMouseEnter={() => handleNumberEnter()}
+                                        onMouseLeave={() => handleNumberLeave()}
                                     >
                                         1
                                     </Text>
                                     <Text
                                         className={`text-center text-lg text-red-500 cursor-pointer ${number === 2 ? "font-bold" : ""}`}
                                         onClick={() => handleNumberClick(2)}
+                                        onMouseEnter={() => handleNumberEnter()}
+                                        onMouseLeave={() => handleNumberLeave()}
                                     >
                                         2
                                     </Text>
                                     <Text
                                         className={`text-center text-lg text-red-500 cursor-pointer ${number === 4 ? "font-bold" : ""}`}
                                         onClick={() => handleNumberClick(4)}
+                                        onMouseEnter={() => handleNumberEnter()}
+                                        onMouseLeave={() => handleNumberLeave()}
                                     >
                                         4
                                     </Text>
                                     <Text
                                         className={`text-center text-lg text-red-500 cursor-pointer ${number === 6 ? "font-bold" : ""}`}
                                         onClick={() => handleNumberClick(6)}
+                                        onMouseEnter={() => handleNumberEnter()}
+                                        onMouseLeave={() => handleNumberLeave()}
                                     >
                                         6
                                     </Text>
@@ -179,6 +344,7 @@ const CuscakeForm = (props) => {
                                     placeholder="Flour"
                                     className="font-bold leading-[normal] md:text-xl p-0 placeholder:text-red-500 sm:px-5 sm:text-lg text-[22px] text-center text-red-500 w-full"
                                     wrapClassName="border-b border-red-500 pb-[5px] px-[35px] w-full"
+                                    disabled
                                 ></Input>
                                 <div className="flex flex-col gap-[18px] items-center justify-start">
                                     {flours &&
@@ -200,6 +366,7 @@ const CuscakeForm = (props) => {
                                     placeholder="Flavor"
                                     className="font-bold leading-[normal] md:text-xl p-0 placeholder:text-red-500 sm:px-5 sm:text-lg text-[22px] text-center text-red-500 w-full"
                                     wrapClassName="border-b border-red-500 pb-[5px] px-[35px] w-full"
+                                    disabled
                                 ></Input>
                                 <div className="flex flex-col gap-[18px] items-center justify-start">
                                     {flavors &&
@@ -221,6 +388,7 @@ const CuscakeForm = (props) => {
                                     placeholder="Topping"
                                     className="font-bold leading-[normal] md:text-xl p-0 placeholder:text-red-500 sm:px-5 sm:text-lg text-[22px] text-center text-red-500 w-full"
                                     wrapClassName="border-b border-red-500 pb-1 px-[35px] w-full"
+                                    disabled
                                 ></Input>
                                 <div className="flex flex-col gap-[18px] items-center justify-start">
                                     {toppings &&
@@ -237,16 +405,7 @@ const CuscakeForm = (props) => {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="absolute bottom-[3%] flex flex-col items-center justify-start right-[18%] w-[24%]">
-                        <Text className="font-extrabold font-monumentextended sm:text-[39px] md:text-[45px] text-[53px] text-center text-red-500">
-                            CUSCAKE
-                        </Text>
-                        <Text className="font-sfmono italic mt-0.5 text-center text-lg text-red-500">100.000 VNĐ</Text>
-                        <div className="flex flex-row gap-[75px] items-center justify-center my-[39px]">
-                            {cakeIcon()}
-                        </div>
-                        <div className="flex flex-row font-sfmono gap-5 items-center justify-between mt-[302px] w-full">
+                        <div className="flex flex-row font-sfmono gap-5 items-center justify-center mt-[8px] w-full">
                             <Button
                                 className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
                                 onClick={() => handleBtxPayClick()}

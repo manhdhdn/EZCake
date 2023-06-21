@@ -49,10 +49,7 @@ export const AuthContextProvider = ({ children }) => {
         localStorage.removeItem("userInfo");
       } else {
         localStorage.setItem("user", JSON.stringify(currentUser));
-
-        let email = currentUser.email;
-        let userInfo = await AccountApi.getAccount({ email: email });
-        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        localStorage.setItem('userInfo', JSON.stringify(await AccountApi.getAccount({ email: currentUser.email })));
       }
     });
   }, []);
