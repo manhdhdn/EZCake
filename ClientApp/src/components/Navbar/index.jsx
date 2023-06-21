@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { Button, Img, Line } from "components";
 
 const Navbar = (props) => {
-  const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [userLoggedIn, setUserLoggedIn] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [userIcon, setUserIcon] = useState("images/img_user.svg");
   const [cartIcon, setCartIcon] = useState("images/img_cart.svg");
@@ -22,8 +22,8 @@ const Navbar = (props) => {
   useEffect(() => {
     var user = localStorage.getItem("user");
 
-    if (user) {
-      setUserLoggedIn(true);
+    if (!user) {
+      setUserLoggedIn(false);
     }
   }, []);
 
