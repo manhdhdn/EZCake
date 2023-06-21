@@ -48,12 +48,16 @@ namespace EZCake.Controllers
             {
                 return NotFound();
             }
-            var cake = await _context.Cakes.Include(c => c.CakeIngredients).ThenInclude(ci => ci.Ingredient).Include(c => c.CakeReviews).SingleOrDefaultAsync(c => c.Id == id);
+
+            var cake = await _context.Cakes.FindAsync(id);
 
             if (cake == null)
             {
                 return NotFound();
             }
+
+            await _context.Entry(cake).Collection(c => c.CakeIngredients).Query().Include(ci => ci.Ingredient).LoadAsync();
+            await _context.Entry(cake).Collection(c => c.CakeReviews).Query().Include(cr => cr.Review).LoadAsync();
 
             return cake;
         }

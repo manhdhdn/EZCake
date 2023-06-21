@@ -44,13 +44,15 @@ namespace EZCake.Controllers
 
             if (email != null)
             {
-                account = await _context.Accounts.Include(a => a.ShippingInformations.OrderBy(sif => !sif.Prioritisation)).SingleOrDefaultAsync(a => a.Email == email);
+                account = await _context.Accounts.SingleOrDefaultAsync(a => a.Email == email);
             }
 
             if (account == null)
             {
                 return NotFound();
             }
+
+            await _context.Entry(account).Collection(a => a.ShippingInformations).Query().OrderBy(sif => !sif.Prioritisation).LoadAsync();
 
             return account;
         }

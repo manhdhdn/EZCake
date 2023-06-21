@@ -23,12 +23,15 @@ namespace EZCake.Controllers
 
         // GET: api/Orders
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrders(Guid accountId, string status)
         {
-          if (_context.Orders == null)
-          {
-              return NotFound();
-          }
+            if (_context.Orders == null)
+            {
+                return NotFound();
+            }
+
+            //var 
+
             return await _context.Orders.ToListAsync();
         }
 
@@ -36,10 +39,10 @@ namespace EZCake.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(Guid id)
         {
-          if (_context.Orders == null)
-          {
-              return NotFound();
-          }
+            if (_context.Orders == null)
+            {
+                return NotFound();
+            }
             var order = await _context.Orders.FindAsync(id);
 
             if (order == null)
@@ -48,7 +51,7 @@ namespace EZCake.Controllers
             }
 
             await _context.Entry(order).Reference(o => o.ShippingInformation).LoadAsync();
-            await _context.Entry(order).Collection(o => o.OrderDetails).LoadAsync();
+            await _context.Entry(order).Collection(o => o.OrderDetails).Query().Include(od => od.Cake).LoadAsync();
 
             return order;
         }
@@ -89,10 +92,10 @@ namespace EZCake.Controllers
         [HttpPost]
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
-          if (_context.Orders == null)
-          {
-              return Problem("Entity set 'EZCakeContext.Orders'  is null.");
-          }
+            if (_context.Orders == null)
+            {
+                return Problem("Entity set 'EZCakeContext.Orders'  is null.");
+            }
             _context.Orders.Add(order);
             try
             {
