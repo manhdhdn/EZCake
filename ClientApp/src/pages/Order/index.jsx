@@ -2,6 +2,7 @@ import React from "react";
 
 import { Button, Img, Input, Line, Text } from "components";
 import Navbar from "components/Navbar";
+import Chat from "components/Chat";
 import Footer from "components/Footer";
 
 const Order = () => {
@@ -13,9 +14,6 @@ const Order = () => {
                     <div className="h-[665px] mt-navbar md:px-5 relative w-full">
                         <Img className="h-[665px] m-auto object-cover w-full" src="images/img_picture1.png" alt="pictureOne" />
                         <Line className="absolute bg-red-500 h-px inset-x-[0] mx-auto top-[0] w-full" />
-                        <Button className="absolute bg-orange-50 border-2 border-red-500 border-solid bottom-[16%] flex h-[51px] items-center justify-center p-2 right-[1%] rounded-[18px] w-[51px]">
-                            <Img src="images/img_vector.svg" alt="vector" />
-                        </Button>
                     </div>
                     <Line className="bg-red-500 h-px w-full" />
                     <div className="flex-wrap md:gap-10 gap-[122px] grid sm:grid-cols-1 md:grid-cols-2 grid-cols-4 items-center justify-between max-w-[1298px] mt-[18px] mx-auto md:px-5 w-full">
@@ -260,6 +258,7 @@ const Order = () => {
                             </div>
                         </div>
                     </div>
+                    <Chat />
                     <Footer className="bg-orange-50 flex items-center justify-center mt-[100px] md:px-5 w-full" />
                 </div>
             </div>
