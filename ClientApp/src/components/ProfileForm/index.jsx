@@ -84,6 +84,8 @@ const ProfileForm = (props) => {
                 })
 
                 if (status === 204) {
+                    localStorage.setItem('userInfo', JSON.stringify(await AccountApi.getAccount({ email: email })));
+
                     setOpen(false);
                     enqueueSnackbar("Account updated", { variant: "success" });
                 }
@@ -133,7 +135,7 @@ const ProfileForm = (props) => {
                     <Text className="text-red-500 text-sm">Phone number:</Text>
                     <div className="flex md:flex-col flex-row md:gap-10 items-center justify-between w-full">
                         <div className="flex flex-row gap-5 w-full">
-                            <Input  
+                            <Input
                                 id="mobileNo"
                                 name="mobileNo"
                                 placeholder=""
@@ -183,7 +185,7 @@ const ProfileForm = (props) => {
                         <Img
                             src={hoverEdit === 2 ? "images/icon_edit_hover.svg" : "images/icon_edit.svg"}
                             alt="edit"
-                            onClick={() => {}}
+                            onClick={() => { }}
                             onMouseEnter={() => handleIconEditEnter(2)}
                             onMouseLeave={() => handleIconEditLeave()}
                         />
@@ -215,7 +217,7 @@ const ProfileForm = (props) => {
                 </div>
             </div>
             <Button
-                className="bg-orange-50 border border-red-500 border-solid cursor-pointer leading-[normal] min-w-[193px] mt-[60px] py-3.5 rounded-[5px] text-center text-lg text-red-500"
+                className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] mt-[60px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
                 onClick={handleBtxSaveClick}
             >
                 save

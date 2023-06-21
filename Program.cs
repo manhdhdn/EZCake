@@ -40,6 +40,13 @@ builder.Services.AddDbContext<EZCakeContext>(option =>
     }
 });
 
+// Prevent include loop
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    });
+
 // Add Firebase authen and author
 builder.Services.AddSingleton(FirebaseApp.Create(new AppOptions()
 {

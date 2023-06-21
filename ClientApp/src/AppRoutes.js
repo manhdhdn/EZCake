@@ -2,11 +2,13 @@ import Home from "pages/Home";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import Profile from "pages/Profile";
+import Order from "pages/Order";
 import TermsOfService from "pages/TermsOfService";
 import PrivacyPolicy from "pages/PrivacyPolicy";
 import OurStory from "pages/OurStory";
 import Contact from "pages/Contact";
 import Cuscake from "pages/Cuscake";
+import Payment from "pages/Payment";
 
 const AppRoutes = [
   {
@@ -30,6 +32,10 @@ const AppRoutes = [
     element: <Profile />,
   },
   {
+    path: "/order",
+    element: <Order />,
+  },
+  {
     path: "/terms-of-service",
     element: <TermsOfService />,
   },
@@ -48,6 +54,10 @@ const AppRoutes = [
   {
     path: "/cuscake",
     element: <Cuscake />,
+  },
+  {
+    path: "/payment/*",
+    element: <Payment />,
   }
 ];
 

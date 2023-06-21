@@ -8,22 +8,22 @@ const Cakes = (props) => {
       <div className={props.className}>
         <Img
           className="h-[500px] md:h-auto object-cover w-full"
-          src="images/img_picture7.png"
+          src="images/img_cake_sell.png"
           alt="pictureSeven"
         />
         <Img
           className="h-[500px] md:h-auto object-cover w-full"
-          src="images/img_picture7.png"
+          src="images/img_cake_sell.png"
           alt="pictureEight"
         />
         <Img
           className="h-[500px] md:h-auto object-cover w-full"
-          src="images/img_picture7.png"
+          src="images/img_cake_sell.png"
           alt="pictureNine"
         />
         <Img
           className="h-[500px] md:h-auto object-cover w-full"
-          src="images/img_picture7.png"
+          src="images/img_cake_sell.png"
           alt="pictureTen"
         />
       </div>
