@@ -48,6 +48,9 @@ const OrderApi = {
             }
         );
 
+        console.log(response);
+        console.log(await response.json());
+
         return response.status;
     },
 

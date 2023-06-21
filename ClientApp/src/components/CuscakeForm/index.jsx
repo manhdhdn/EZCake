@@ -183,7 +183,7 @@ const CuscakeForm = (props) => {
     const handleBtxPayClick = async () => {
         try {
             let orderId = v4();
-            let shippingInformationId = JSON.parse(localStorage.getItem("userInfo")).shippingInformations[0];
+            let shippingInformationId = JSON.parse(localStorage.getItem("userInfo")).shippingInformations[0].id;
 
             let status = await OrderApi.createOrder({
                 id: orderId,
