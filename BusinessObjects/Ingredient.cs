@@ -7,7 +7,7 @@ namespace EZCake.BusinessObjects
     {
         public Ingredient()
         {
-            //CakeIngredients = new HashSet<CakeIngredient>();
+            CakeIngredients = new HashSet<CakeIngredient>();
         }
 
         public Guid Id { get; set; }
@@ -15,7 +15,7 @@ namespace EZCake.BusinessObjects
         public string? Image { get; set; }
         public Guid IngredientTypeId { get; set; }
 
-        //public virtual IngredientType? IngredientType { get; set; }
-        //public virtual ICollection<CakeIngredient>? CakeIngredients { get; set; }
+        public virtual IngredientType IngredientType { get; set; } = null!;
+        public virtual ICollection<CakeIngredient> CakeIngredients { get; set; }
     }
 }

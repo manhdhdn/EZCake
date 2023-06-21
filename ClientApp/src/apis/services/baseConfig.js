@@ -11,6 +11,8 @@ const API_CONFIG = {
         cake: "api/cakes",
         ingredientType: "api/ingredientTypes",
         cakeIngredient: "api/cakeIngredients",
+        orderDetail: "api/orderDetails",
+        order: "api/orders",
     },
     context: [
         "/api/accounts",
@@ -18,6 +20,8 @@ const API_CONFIG = {
         "/api/cakes",
         "/api/ingredientTypes",
         "/api/cakeIngredients",
+        "/api/orderDetails",
+        "/api/orders",
     ]
 };
 

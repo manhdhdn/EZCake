@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react'
 
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { v4 } from 'uuid';
+import moment from 'moment';
 import IngredientTypeApi from 'apis/services/IngredientType';
+import CakeApi from 'apis/services/Cake';
+import CakeIngredientApi from 'apis/services/CakeIngredient';
+import OrderDetailApi from 'apis/services/OrderDetail';
+import OrderApi from 'apis/services/Order';
 
 import { CircularProgress } from '@mui/material';
 import { Button, Img, Input, Line, Text } from "components";
@@ -19,7 +25,9 @@ const CuscakeForm = (props) => {
     const [flour, setFlour] = useState("");
     const [flavor, setFlavor] = useState("");
     const [topping, setTopping] = useState("");
+    // eslint-disable-next-line
     const [customedCakes, setCustomedCakes] = useState([]);
+    // eslint-disable-next-line
     const [historyCustomedCakes, setHistoryCustomedCakes] = useState([]);
     const [cakeAnimation, setCakeAnimation] = useState("");
 
@@ -73,9 +81,6 @@ const CuscakeForm = (props) => {
             setFlour(flours.ingredients[0].id);
             setFlavor(flavors.ingredients[0].id);
             setTopping(toppings.ingredients[0].id);
-
-            setCustomedCakes([]);
-            setHistoryCustomedCakes([]);
         }
     }, [flours, flavors, toppings]);
 
@@ -177,12 +182,63 @@ const CuscakeForm = (props) => {
 
     const handleBtxPayClick = async () => {
         try {
+            let orderId = v4();
+            let shippingInformationId = JSON.parse(localStorage.getItem("userInfo")).shippingInformations[0];
 
+            let status = await OrderApi.createOrder({
+                id: orderId,
+                orderDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
+                shippingInformationId,
+                status: "Pending"
+            });
+
+            if (status === 201) {
+                customedCakes.forEach(async (element, index) => {
+                    let cakeId = v4();
+
+                    status = await CakeApi.createCake({
+                        id: cakeId,
+                        name: "Cuscake",
+                        sold: 1
+                    });
+
+                    if (status === 201) {
+                        for (let index = 0; index < Object.keys(element.length); index++) {
+                            status = await CakeIngredientApi.createCakeIngredient({
+                                id: v4(),
+                                cakeId,
+                                ingredientId: Object.keys(element)[index]
+                            });
+
+                            if (status !== 201) {
+                                enqueueSnackbar("Cake could not be created", { variant: "error" });
+                                return;
+                            }
+                        }
+
+                        if (status === 201) {
+                            status = await OrderDetailApi.createOrderDetail({
+                                id: v4(),
+                                orderId,
+                                cakeId,
+                                price: number * 30000,
+                                quantity: 1
+                            });
+
+                            if (status === 201) {
+                                navigate("/payment");
+                            }
+                        } else {
+                            enqueueSnackbar("Order could not be created", { variant: "error" });
+                        }
+                    } else {
+                        enqueueSnackbar("Cake could not be created", { variant: "error" });
+                    }
+                });
+            }
         } catch (error) {
-
+            enqueueSnackbar("Order could not be created", { variant: "error" });
         }
-
-        navigate("/payment");
     }
 
     const cakeIcon = () => {
@@ -203,7 +259,7 @@ const CuscakeForm = (props) => {
         }
 
         return (
-            <div className={`absolute flex flex-row transition-all duration-500 ${cakeAnimation} items-center justify-center`}>
+            <div className={`absolute flex flex-row transition-all duration-300 ${cakeAnimation} items-center justify-center`}>
                 {element}
             </div>
         );
@@ -233,7 +289,7 @@ const CuscakeForm = (props) => {
                         <Text className="font-extrabold font-monumentextended sm:text-[39px] md:text-[45px] text-[53px] text-center text-red-500">
                             CUSCAKE
                         </Text>
-                        <Text className="font-sfmono italic mt-0.5 mb-[56px] text-center text-lg text-red-500">100.000 VNĐ</Text>
+                        <Text className="font-sfmono italic mt-0.5 mb-[56px] text-center text-lg text-red-500">{(number * 30000).toLocaleString("vi-VN")} VNĐ</Text>
                         <div className="flex items-center justify-center my-[39px]">
                             {cakeIcon()}
                         </div>

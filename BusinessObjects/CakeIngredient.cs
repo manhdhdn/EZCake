@@ -9,7 +9,7 @@ namespace EZCake.BusinessObjects
         public Guid CakeId { get; set; }
         public Guid IngredientId { get; set; }
 
-        //public virtual Cake? Cake { get; set; } 
-        public virtual Ingredient? Ingredient { get; set; }
+        public virtual Cake Cake { get; set; } = null!;
+        public virtual Ingredient Ingredient { get; set; } = null!;
     }
 }

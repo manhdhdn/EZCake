@@ -16,7 +16,7 @@ namespace EZCake.BusinessObjects
         public Guid ShippingInformationId { get; set; }
         public string Status { get; set; } = null!;
 
-        public virtual ShippingInformation? ShippingInformation { get; set; }
+        public virtual ShippingInformation ShippingInformation { get; set; } = null!;
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
     }
 }
