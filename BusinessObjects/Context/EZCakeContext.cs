@@ -20,14 +20,12 @@ namespace EZCake.BusinessObjects.Context
         public virtual DbSet<Account> Accounts { get; set; } = null!;
         public virtual DbSet<Cake> Cakes { get; set; } = null!;
         public virtual DbSet<CakeIngredient> CakeIngredients { get; set; } = null!;
-        public virtual DbSet<CakeReview> CakeReviews { get; set; } = null!;
         public virtual DbSet<Ingredient> Ingredients { get; set; } = null!;
         public virtual DbSet<IngredientType> IngredientTypes { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<OrderDetail> OrderDetails { get; set; } = null!;
         public virtual DbSet<Review> Reviews { get; set; } = null!;
         public virtual DbSet<ShippingInformation> ShippingInformations { get; set; } = null!;
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,23 +73,6 @@ namespace EZCake.BusinessObjects.Context
                     .HasConstraintName("FK_CakeIngredients_Ingredients");
             });
 
-            modelBuilder.Entity<CakeReview>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.HasOne(d => d.Cake)
-                    .WithMany(p => p.CakeReviews)
-                    .HasForeignKey(d => d.CakeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_CakeReviews_Cakes");
-
-                entity.HasOne(d => d.Review)
-                    .WithMany(p => p.CakeReviews)
-                    .HasForeignKey(d => d.ReviewId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_CakeReviews_Reviews");
-            });
-
             modelBuilder.Entity<Ingredient>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -126,7 +107,7 @@ namespace EZCake.BusinessObjects.Context
 
                 entity.Property(e => e.Status)
                     .HasMaxLength(15)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.ShippingInformation)
                     .WithMany(p => p.Orders)
@@ -163,6 +144,18 @@ namespace EZCake.BusinessObjects.Context
                 entity.Property(e => e.Comment).HasMaxLength(300);
 
                 entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.HasOne(d => d.Account)
+                    .WithMany(p => p.Reviews)
+                    .HasForeignKey(d => d.AccountId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Reviews_Accounts");
+
+                entity.HasOne(d => d.Cake)
+                    .WithMany(p => p.Reviews)
+                    .HasForeignKey(d => d.CakeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Reviews_Cakes");
             });
 
             modelBuilder.Entity<ShippingInformation>(entity =>
@@ -177,8 +170,7 @@ namespace EZCake.BusinessObjects.Context
                     .HasMaxLength(10)
                     .IsFixedLength();
 
-                entity
-                    .HasOne(d => d.Account)
+                entity.HasOne(d => d.Account)
                     .WithMany(p => p.ShippingInformations)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)

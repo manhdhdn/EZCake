@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EZCake.BusinessObjects;
 using EZCake.BusinessObjects.Context;
+using EZCake.Utils;
 
 namespace EZCake.Controllers
 {
@@ -23,16 +24,26 @@ namespace EZCake.Controllers
 
         // GET: api/Orders
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders(Guid accountId, string status)
+        public async Task<ActionResult<PagedList<Order>>> GetOrders(Guid? accountId, string? status, string? subStatus, int? pageNumber, int? pageSize)
         {
             if (_context.Orders == null)
             {
                 return NotFound();
             }
 
-            //var 
+            var orders = _context.Orders.AsQueryable();
 
-            return await _context.Orders.ToListAsync();
+            if (accountId != null && status != null && subStatus != null)
+            {
+                orders = orders.Where(o => o.ShippingInformation!.AccountId == accountId && (o.Status == status || o.Status == subStatus)).OrderBy(o => o.Status == subStatus).ThenBy(o => o.OrderDate);
+            }
+
+            if (accountId != null && status != null && subStatus == null)
+            {
+                orders = orders.Where(o => o.ShippingInformation!.AccountId == accountId && o.Status == status).OrderBy(o => o.OrderDate);
+            }
+
+            return await PagedList<Order>.ToPagedListAsync(orders, pageNumber ?? 1, pageSize ?? 6);
         }
 
         // GET: api/Orders/5

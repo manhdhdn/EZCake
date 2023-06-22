@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 
+import { useSnackbar } from "notistack";
 import { handleSectionNavigation } from "utils";
+import OrderApi from "apis/services/Order";
 
 import { Button, Img, Input, Line, Text } from "components";
 import Navbar from "components/Navbar";
@@ -21,9 +23,52 @@ const Order = () => {
     const animationLineShow = "opacity-1 h-[234px]";
     const animationTextShow = "opacity-1";
 
+    const { enqueueSnackbar } = useSnackbar();
+
     useEffect(() => {
         handleSectionNavigation("order", 117);
     }, []);
+
+    useEffect(() => {
+        const loadOrder = async () => {
+            try {
+                let order = []
+                let accountId = JSON.parse(localStorage.getItem("userInfo")).id
+
+                order = await OrderApi.getOrders({
+                    accountId,
+                    status: "Pending",
+                    subStatus: "Confirmed"
+                });
+
+                setConfirms(order);
+
+                order = await OrderApi.getOrders({
+                    accountId,
+                    status: "Making"
+                })
+
+                setMakings(order);
+
+                order = await OrderApi.getOrders({
+                    accountId,
+                    status: "Delivering",
+                    subStatus: "Delivered"
+                })
+
+                setDeliveries(order);
+
+                order = await OrderApi.getOrders({
+                    accountId,
+                    status: "Completed"
+                })
+
+                setHistories(order);
+            } catch (error) {
+                enqueueSnackbar("Could not load order", { variant: "error" });
+            }
+        }
+    }, [])
 
     const noOrder = (id) => {
         return (

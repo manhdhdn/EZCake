@@ -7,6 +7,7 @@ namespace EZCake.BusinessObjects
     {
         public Account()
         {
+            Reviews = new HashSet<Review>();
             ShippingInformations = new HashSet<ShippingInformation>();
         }
 
@@ -16,6 +17,7 @@ namespace EZCake.BusinessObjects
         public bool? Gender { get; set; }
         public bool? Role { get; set; }
 
+        public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<ShippingInformation> ShippingInformations { get; set; }
     }
 }

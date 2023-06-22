@@ -199,7 +199,8 @@ const CuscakeForm = (props) => {
                     status = await CakeApi.createCake({
                         id: cakeId,
                         name: "Cuscake",
-                        sold: 1
+                        sold: 1,
+                        status: "Custom"
                     });
 
                     if (status === 201) {
