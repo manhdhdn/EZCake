@@ -15,7 +15,7 @@ namespace EZCake.BusinessObjects
         public string Name { get; set; } = null!;
         public string Email { get; set; } = null!;
         public bool? Gender { get; set; }
-        public bool? Role { get; set; }
+        public string Role { get; set; } = null!;
 
         public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<ShippingInformation> ShippingInformations { get; set; }

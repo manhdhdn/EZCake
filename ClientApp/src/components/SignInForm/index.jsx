@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { UserAuth } from "apis/auth/AuthContext";
+import AccountApi from 'apis/services/Account';
 
 import { Button, Input, Text } from "components";
 import { Backdrop, CircularProgress } from '@mui/material';
@@ -14,19 +15,23 @@ const SignInForm = (props) => {
 
     const navigate = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
-    const { login } = UserAuth();
+    const { login, loginWithCustomToken } = UserAuth();
 
     const handleSignInBtxClick = async () => {
         setOpen(true);
 
         try {
-            await login(email, password);
+            let uid = await login(email, password);
+            let data = await AccountApi.getAccount({ email: email, uid });
+
+            await loginWithCustomToken(data.token);
 
             enqueueSnackbar("Login successful", { variant: "success" });
             navigate("/");
         } catch (error) {
             setOpen(false);
             enqueueSnackbar("Invalid email or password", { variant: "error" });
+            console.log(error);
         }
     }
 

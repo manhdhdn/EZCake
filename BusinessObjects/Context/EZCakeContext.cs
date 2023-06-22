@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using EZCake.BusinessObjects;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace EZCake.BusinessObjects.Context
 {
@@ -41,6 +37,10 @@ namespace EZCake.BusinessObjects.Context
                     .IsUnicode(false);
 
                 entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.Role)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Cake>(entity =>
@@ -54,6 +54,10 @@ namespace EZCake.BusinessObjects.Context
                 entity.Property(e => e.Price)
                     .HasColumnType("decimal(18, 0)")
                     .HasDefaultValueSql("((30000))");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<CakeIngredient>(entity =>
@@ -101,9 +105,9 @@ namespace EZCake.BusinessObjects.Context
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.OrderDate).HasColumnType("date");
+                entity.Property(e => e.OrderDate).HasColumnType("datetime");
 
-                entity.Property(e => e.ShippedDate).HasColumnType("date");
+                entity.Property(e => e.ShippedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Status)
                     .HasMaxLength(15)

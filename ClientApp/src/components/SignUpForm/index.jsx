@@ -31,7 +31,8 @@ const SignUpForm = (props) => {
         let status = await AccountApi.createAccount({
           id: accountId,
           name,
-          email
+          email,
+          role: "User"
         });
 
         if (status === 201) {

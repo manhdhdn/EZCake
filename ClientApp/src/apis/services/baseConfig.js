@@ -2,7 +2,7 @@ const API_CONFIG = {
     api: {
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${JSON.parse(localStorage.getItem("user")) && JSON.parse(localStorage.getItem("user")).stsTokenManager.accessToken}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
     },
     endpoints: {

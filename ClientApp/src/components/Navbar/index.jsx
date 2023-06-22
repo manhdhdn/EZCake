@@ -20,7 +20,7 @@ const Navbar = (props) => {
   const { logout } = UserAuth();
 
   useEffect(() => {
-    var user = localStorage.getItem("user");
+    var user = localStorage.getItem("token");
 
     if (!user) {
       setUserLoggedIn(false);
