@@ -61,7 +61,19 @@ const Payment = () => {
             let status = await MoMo.checkPayment(checkPaymentBody);
 
             if (status === 0) {
-                navigate("/order");
+                try {
+                    await OrderApi.updateOrder(order.id, {
+                        id: order.id,
+                        orderDate: order.orderDate,
+                        shippedDate: order.shippedDate,
+                        shippingInformationId: order.shippingInformationId,
+                        status: "Confirmed"
+                    });
+
+                    navigate("/order");
+                } catch (error) {
+                    enqueueSnackbar("Order could not be updated", { variant: "error" });
+                }
             }
         }, 1000);
 
