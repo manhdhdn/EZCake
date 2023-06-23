@@ -31,7 +31,6 @@ const SignInForm = (props) => {
         } catch (error) {
             setOpen(false);
             enqueueSnackbar("Invalid email or password", { variant: "error" });
-            console.log(error);
         }
     }
 

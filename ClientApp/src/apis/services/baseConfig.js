@@ -1,7 +1,8 @@
 const API_CONFIG = {
     api: {
         headers: {
-            "Content-Type": "application/json",
+            accept: "*/*",
+            "Content-Type": "application/json-patch+json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
     },
@@ -15,6 +16,7 @@ const API_CONFIG = {
         order: "api/orders",
         ingredient: "api/ingredients",
         review: "api/reviews",
+        momo: "api/momo",
     },
     context: [
         "/api/accounts",
@@ -26,6 +28,7 @@ const API_CONFIG = {
         "/api/orders",
         "/api/ingredients",
         "/api/reviews",
+        "/api/momo",
     ]
 };
 
