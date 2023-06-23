@@ -114,9 +114,7 @@ const Order = () => {
 
         if (confirms) {
             loadConfirmOrder();
-            setTimeout(() => {
-                setLoad(false);
-            }, 1000);
+            setLoad();
         }
 
         // eslint-disable-next-line
