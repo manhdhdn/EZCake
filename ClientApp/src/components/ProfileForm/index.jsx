@@ -80,7 +80,7 @@ const ProfileForm = (props) => {
                     name: fullName,
                     email,
                     gender,
-                    role: null
+                    role: "User"
                 })
 
                 if (status === 204) {

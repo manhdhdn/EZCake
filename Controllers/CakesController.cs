@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EZCake.BusinessObjects;
 using EZCake.BusinessObjects.Context;
+using EZCake.Utils;
 
 namespace EZCake.Controllers
 {
@@ -23,7 +24,7 @@ namespace EZCake.Controllers
 
         // GET: api/Cakes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cake>>> GetCakes(bool? bestSeller)
+        public async Task<IActionResult> GetCakes(bool? bestSeller, int? pageNumber, int? pageSize, string? status, string? subStatus)
         {
             if (_context.Cakes == null)
             {
@@ -35,9 +36,22 @@ namespace EZCake.Controllers
             if (bestSeller == true)
             {
                 cakes = cakes.OrderByDescending(c => c.Sold).Take(3);
+                return Ok(await cakes.ToListAsync());
             }
 
-            return await cakes.ToListAsync();
+            if (status != null && subStatus == null)
+            {
+                cakes = cakes.Where(c => c.Status == status);
+            }
+
+            if (status != null && subStatus != null)
+            {
+                cakes = cakes.Where(c => c.Status == status || c.Status == subStatus);
+            }
+
+            cakes = cakes.OrderBy(c => c.Status != "Available" && c.Status != "Unavailable");
+
+            return Ok(await PagedList<Cake>.ToPagedListAsync(cakes, pageNumber ?? 1, pageSize ?? 4));
         }
 
         // GET: api/Cakes/5
@@ -48,12 +62,16 @@ namespace EZCake.Controllers
             {
                 return NotFound();
             }
-            var cake = await _context.Cakes.Include(c => c.CakeIngredients).ThenInclude(ci => ci.Ingredient).Include(c => c.CakeReviews).SingleOrDefaultAsync(c => c.Id == id);
+
+            var cake = await _context.Cakes.FindAsync(id);
 
             if (cake == null)
             {
                 return NotFound();
             }
+
+            await _context.Entry(cake).Collection(c => c.CakeIngredients).Query().Include(ci => ci.Ingredient).LoadAsync();
+            await _context.Entry(cake).Collection(c => c.Reviews).LoadAsync();
 
             return cake;
         }

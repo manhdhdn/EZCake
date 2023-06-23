@@ -10,7 +10,7 @@ const Slo = (props) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let user = localStorage.getItem("user");
+    let user = localStorage.getItem("token");
 
     if (user) {
       setUserLoggedIn(true);

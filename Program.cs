@@ -3,6 +3,7 @@ using EZCake.Utils;
 using FirebaseAdmin;
 using FirebaseAdminAuthentication.DependencyInjection.Extensions;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -20,7 +21,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
+        Scheme = "Bearer",
         BearerFormat = "JWT"
     });
     options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
@@ -52,6 +53,7 @@ builder.Services.AddSingleton(FirebaseApp.Create(new AppOptions()
 {
     Credential = GoogleCredential.FromJson(builder.Configuration["FIREBASE_SERVICE"])
 }));
+
 builder.Services.AddFirebaseAuthentication();
 builder.Services.AddAuthorization();
 
