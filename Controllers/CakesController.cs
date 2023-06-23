@@ -24,7 +24,7 @@ namespace EZCake.Controllers
 
         // GET: api/Cakes
         [HttpGet]
-        public async Task<IActionResult> GetCakes(bool? bestSeller, int? pageNumber, int? pageSize)
+        public async Task<IActionResult> GetCakes(bool? bestSeller, int? pageNumber, int? pageSize, string? status, string? subStatus)
         {
             if (_context.Cakes == null)
             {
@@ -37,6 +37,16 @@ namespace EZCake.Controllers
             {
                 cakes = cakes.OrderByDescending(c => c.Sold).Take(3);
                 return Ok(await cakes.ToListAsync());
+            }
+
+            if (status != null && subStatus == null)
+            {
+                cakes = cakes.Where(c => c.Status == status);
+            }
+
+            if (status != null && subStatus != null)
+            {
+                cakes = cakes.Where(c => c.Status == status || c.Status == subStatus);
             }
 
             cakes = cakes.OrderBy(c => c.Status != "Available" && c.Status != "Unavailable");

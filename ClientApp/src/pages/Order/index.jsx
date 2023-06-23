@@ -116,6 +116,8 @@ const Order = () => {
                 setLoad(false);
             }, 1000);
         }
+
+        // eslint-disable-next-line
     }, [confirms]);
 
     useEffect(() => {
@@ -129,6 +131,17 @@ const Order = () => {
                     orderDetails.push(order);
                 }));
 
+                orderDetails = [...orderDetails].sort((a, b) => {
+                    if (a.status === 'Pending' && b.status !== 'Pending') {
+                        return -1;
+                    }
+                    if (a.status !== 'Pending' && b.status === 'Pending') {
+                        return 1;
+                    }
+
+                    return new Date(b.orderDate) - new Date(a.orderDate);
+                })
+
                 setMakingDetails(orderDetails);
             } catch (error) {
                 enqueueSnackbar("Could not load order", { variant: "error" });
@@ -138,6 +151,8 @@ const Order = () => {
         if (makings) {
             loadMakingOrder();
         }
+
+        // eslint-disable-next-line
     }, [makings]);
 
     useEffect(() => {
@@ -151,6 +166,17 @@ const Order = () => {
                     orderDetails.push(order);
                 }));
 
+                orderDetails = [...orderDetails].sort((a, b) => {
+                    if (a.status === 'Pending' && b.status !== 'Pending') {
+                        return -1;
+                    }
+                    if (a.status !== 'Pending' && b.status === 'Pending') {
+                        return 1;
+                    }
+
+                    return new Date(b.orderDate) - new Date(a.orderDate);
+                })
+
                 setDeliveryDetails(orderDetails);
             } catch (error) {
                 enqueueSnackbar("Could not load order", { variant: "error" });
@@ -160,6 +186,8 @@ const Order = () => {
         if (deliveries) {
             loadDeliveryOrder();
         }
+
+        // eslint-disable-next-line
     }, [deliveries]);
 
     useEffect(() => {
@@ -173,6 +201,17 @@ const Order = () => {
                     orderDetails.push(order);
                 }));
 
+                orderDetails = [...orderDetails].sort((a, b) => {
+                    if (a.status === 'Pending' && b.status !== 'Pending') {
+                        return -1;
+                    }
+                    if (a.status !== 'Pending' && b.status === 'Pending') {
+                        return 1;
+                    }
+
+                    return new Date(b.orderDate) - new Date(a.orderDate);
+                })
+
                 setHistoryDetails(orderDetails);
             } catch (error) {
                 enqueueSnackbar("Could not load order", { variant: "error" });
@@ -182,6 +221,8 @@ const Order = () => {
         if (histories) {
             loadHistoryOrder();
         }
+
+        // eslint-disable-next-line
     }, [histories]);
 
     const noOrder = (id) => {

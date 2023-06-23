@@ -25,7 +25,7 @@ const Home = () => {
           <Line className="bg-red-500 h-px mt-[123px] w-full" />
           <HomeComment />
           <Slo className="bg-red-500 flex flex-col items-center justify-start mt-[204px] p-[111px] md:px-10 sm:px-5 w-full" />
-          <Cakes className="gap-5 grid sm:grid-cols-1 md:grid-cols-2 grid-cols-4 items-center justify-between max-w-[1400px] mt-5 mx-auto md:px-5 w-full" />
+          <Cakes className="gap-5 grid sm:grid-cols-1 md:grid-cols-2 grid-cols-4 items-center justify-between max-w-[1400px] mt-5 mx-auto md:px-5 h-[500px] w-full" />
           <Footer className="bg-orange-50 flex font-sfmono items-center justify-center mt-[18px] md:px-5 w-full" />
         </div>
       </div>
