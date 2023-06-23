@@ -30,7 +30,7 @@ namespace EZCake.Controllers
 
             if (accountId != null && status != null && subStatus != null)
             {
-                orders = orders.Where(o => o.ShippingInformation!.AccountId == accountId && (o.Status == status || o.Status == subStatus)).OrderBy(o => o.Status == subStatus).ThenBy(o => o.OrderDate);
+                orders = orders.Where(o => o.ShippingInformation!.AccountId == accountId && (o.Status == status || o.Status == subStatus)).OrderBy(o => o.Status == subStatus).ThenByDescending(o => o.OrderDate);
             }
 
             if (accountId != null && status != null && subStatus == null)

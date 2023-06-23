@@ -39,7 +39,9 @@ namespace EZCake.Controllers
                 return Ok(await cakes.ToListAsync());
             }
 
-            return Ok(await PagedList<Cake>.ToPagedListAsync(cakes, pageNumber ?? 1, pageSize ?? 6));
+            cakes = cakes.OrderBy(c => c.Status != "Available" && c.Status != "Unavailable");
+
+            return Ok(await PagedList<Cake>.ToPagedListAsync(cakes, pageNumber ?? 1, pageSize ?? 4));
         }
 
         // GET: api/Cakes/5

@@ -93,6 +93,17 @@ const Order = () => {
                     orderDetails.push(order);
                 }));
 
+                orderDetails = [...orderDetails].sort((a, b) => {
+                    if (a.status === 'Pending' && b.status !== 'Pending') {
+                        return -1;
+                    }
+                    if (a.status !== 'Pending' && b.status === 'Pending') {
+                        return 1;
+                    }
+
+                    return new Date(b.orderDate) - new Date(a.orderDate);
+                })
+
                 setConfirmDetails(orderDetails);
             } catch (error) {
                 enqueueSnackbar("Could not load order", { variant: "error" });
