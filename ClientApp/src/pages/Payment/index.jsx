@@ -16,6 +16,7 @@ const Payment = () => {
     const [order, setOrder] = useState(null);
     const [price, setPrice] = useState(0);
     const [qrCodeUrl, setQrCodeUrl] = useState(null);
+    const [checkPaymentBody, setCheckPaymentBody] = useState(null);
 
     const navigate = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
@@ -25,13 +26,10 @@ const Payment = () => {
     }, []);
 
     useEffect(() => {
-        let price = 0;
-        let checkPaymentBody = null;
-        let qrCreated = false;
-
         const loadOrder = async () => {
             try {
-                const order = await OrderApi.getOrder(window.location.pathname.split("/").pop());
+                let order = await OrderApi.getOrder(window.location.pathname.split("/").pop());
+                let price = 0;
 
                 order.orderDetails.forEach(element => {
                     price += element.price;
@@ -41,13 +39,13 @@ const Payment = () => {
                 setOrder(order);
 
                 try {
-                    checkPaymentBody = await MoMo.createRequest(price);
+                    let checkPaymentBody = await MoMo.createRequest(price);
+
+                    setCheckPaymentBody(checkPaymentBody);
+                    setQrCodeUrl(checkPaymentBody.qrCodeUrl);
                 } catch (error) {
                     enqueueSnackbar("QR code could not be generated", { variant: "error" });
                 }
-
-                setQrCodeUrl(checkPaymentBody.qrCodeUrl);
-                qrCreated = true;
             } catch (error) {
                 enqueueSnackbar("Order could not be loaded", { variant: "error" });
             }
@@ -55,11 +53,27 @@ const Payment = () => {
 
         loadOrder();
 
-        const intervalId = qrCreated && setInterval(async () => {
+        // eslint-disable-next-line
+    }, [])
+
+    useEffect(() => {
+        const intervalId = checkPaymentBody && setInterval(async () => {
             let status = await MoMo.checkPayment(checkPaymentBody);
 
             if (status === 0) {
-                navigate("/order");
+                try {
+                    await OrderApi.updateOrder(order.id, {
+                        id: order.id,
+                        orderDate: order.orderDate,
+                        shippedDate: order.shippedDate,
+                        shippingInformationId: order.shippingInformationId,
+                        status: "Confirmed"
+                    });
+
+                    navigate("/order");
+                } catch (error) {
+                    enqueueSnackbar("Order could not be updated", { variant: "error" });
+                }
             }
         }, 1000);
 
@@ -68,7 +82,7 @@ const Payment = () => {
         }
 
         // eslint-disable-next-line
-    }, [])
+    }, [checkPaymentBody]);
 
     return (
         <>

@@ -1,5 +1,7 @@
 import { HmacSHA256, enc } from "crypto-js";
 
+import API_CONFIG from "apis/services/baseConfig";
+
 const MoMo = {
     createRequest: async (amount) => {
         //https://developers.momo.vn/#/docs/en/aiov2/?id=payment-method
@@ -43,30 +45,24 @@ const MoMo = {
             lang: 'en'
         });
 
-        //Create the HTTPS objects
-        const encoder = new TextEncoder();
-
-        const requestBodyString = JSON.stringify(requestBody);
-        const requestBodyBytes = encoder.encode(requestBodyString);
-
-        const headers = {
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Content-Length': requestBodyBytes.length.toString()
-        }
+        const endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
+        const postJsonString = requestBody;
 
         //Send the request and get the response
-        await fetch(
-            'https://test-payment.momo.vn:443/v2/gateway/api/create',
+        const response = await fetch(
+            `${API_CONFIG.endpoints.momo}`,
             {
                 method: "POST",
-                headers: headers,
-                body: requestBodyString
+                headers: API_CONFIG.api.headers,
+                body: JSON.stringify({
+                    endpoint,
+                    postJsonString
+                }),
             }
-        )
-            .then(response => response.json())
-            .then(data => {
-                qrCodeUrl = data.qrCodeUrl;
-            });
+        );
+
+        const data = (await response.json()).data;
+        qrCodeUrl = JSON.parse(data).qrCodeUrl;
 
         return {
             partnerCode: partnerCode,
@@ -89,28 +85,23 @@ const MoMo = {
             lang: 'en'
         });
 
-        const encoder = new TextEncoder();
+        const endpoint = "https://test-payment.momo.vn/v2/gateway/api/query";
+        const postJsonString = requestBody;
 
-        const requestBodyString = JSON.stringify(requestBody);
-        const requestBodyBytes = encoder.encode(requestBodyString);
-
-        const headers = {
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Content-Length': requestBodyBytes.length.toString()
-        }
-
-        await fetch(
-            'https://test-payment.momo.vn/v2/gateway/api/query',
+        const response = await fetch(
+            `${API_CONFIG.endpoints.momo}`,
             {
                 method: "POST",
-                headers: headers,
-                body: requestBodyString
+                headers: API_CONFIG.api.headers,
+                body: JSON.stringify({
+                    endpoint,
+                    postJsonString
+                })
             }
-        )
-            .then(response => response.json())
-            .then(data => {
-                status = data.resultCode;
-            });
+        );
+
+        const data = (await response.json()).data;
+        status = JSON.parse(data).resultCode;
 
         return status;
     }
