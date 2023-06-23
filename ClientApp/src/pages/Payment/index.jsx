@@ -14,6 +14,7 @@ import QRCodeWithIcon from "components/QrCode";
 
 const Payment = () => {
     const [order, setOrder] = useState(null);
+    const [price, setPrice] = useState(0);
     const [qrCodeUrl, setQrCodeUrl] = useState(null);
 
     const navigate = useNavigate();
@@ -36,12 +37,19 @@ const Payment = () => {
                     price += element.price;
                 });
 
+                setPrice(price);
                 setOrder(order);
-                checkPaymentBody = await MoMo.createRequest(price);
+
+                try {
+                    checkPaymentBody = await MoMo.createRequest(price);
+                } catch (error) {
+                    enqueueSnackbar("QR code could not be generated", { variant: "error" });
+                }
+
                 setQrCodeUrl(checkPaymentBody.qrCodeUrl);
                 qrCreated = true;
             } catch (error) {
-                enqueueSnackbar(error.message, { variant: "error" });
+                enqueueSnackbar("Order could not be loaded", { variant: "error" });
             }
         }
 
@@ -130,14 +138,14 @@ const Payment = () => {
                                             <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500">
                                                 CUSCAKE
                                             </Text>
-                                            <Text className="font-sfmono mt-2 text-lg text-red-500">4 Cake</Text>
-                                            <Text className="font-sfmono mt-1 text-lg text-red-500">Gift Box, 4</Text>
+                                            <Text className="font-sfmono mt-2 text-lg text-red-500">{order && order.orderDetails.length} Cake</Text>
+                                            <Text className="font-sfmono mt-1 text-lg text-red-500">Gift Box, {order && order.orderDetails.length}</Text>
                                         </div>
                                         <Text className="italic text-red-500 text-sm underline opacity-0">Edit</Text>
                                     </div>
                                     <div className="flex flex-col items-start justify-start">
                                         <Text className="font-bold text-deep_orange-500 text-lg">Total:</Text>
-                                        <Text className="mt-1 text-deep_orange-500 text-lg">120.000 VNĐ</Text>
+                                        <Text className="mt-1 text-deep_orange-500 text-lg">{price.toLocaleString("vi-VN")} VNĐ</Text>
                                     </div>
                                 </div>
                             </div>

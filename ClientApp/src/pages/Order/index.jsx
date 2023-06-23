@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { handleSectionNavigation } from "utils";
 import OrderApi from "apis/services/Order";
@@ -31,6 +32,7 @@ const Order = () => {
     const animationLineShow = "opacity-1 h-[234px]";
     const animationTextShow = "opacity-1";
 
+    const navigate = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
@@ -231,6 +233,10 @@ const Order = () => {
         );
     }
 
+    const handlePayBtxClick = (id) => {
+        navigate(`/payment/${id}`);
+    }
+
     const confirm = () => {
         if (confirmDetails.length !== 0) {
             let contents = [];
@@ -326,6 +332,7 @@ const Order = () => {
                                         <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
                                             <Button
                                                 className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                onClick={() => handlePayBtxClick(order.id)}
                                             >
                                                 pay
                                             </Button>
