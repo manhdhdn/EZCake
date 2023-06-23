@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EZCake.BusinessObjects;
 using EZCake.BusinessObjects.Context;
+using EZCake.Utils;
 
 namespace EZCake.Controllers
 {
@@ -23,23 +19,36 @@ namespace EZCake.Controllers
 
         // GET: api/Orders
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
+        public async Task<ActionResult<PagedList<Order>>> GetOrders(Guid? accountId, string? status, string? subStatus, int? pageNumber, int? pageSize)
         {
-          if (_context.Orders == null)
-          {
-              return NotFound();
-          }
-            return await _context.Orders.ToListAsync();
+            if (_context.Orders == null)
+            {
+                return NotFound();
+            }
+
+            var orders = _context.Orders.AsQueryable();
+
+            if (accountId != null && status != null && subStatus != null)
+            {
+                orders = orders.Where(o => o.ShippingInformation!.AccountId == accountId && (o.Status == status || o.Status == subStatus)).OrderBy(o => o.Status == subStatus).ThenByDescending(o => o.OrderDate);
+            }
+
+            if (accountId != null && status != null && subStatus == null)
+            {
+                orders = orders.Where(o => o.ShippingInformation!.AccountId == accountId && o.Status == status).OrderBy(o => o.OrderDate);
+            }
+
+            return await PagedList<Order>.ToPagedListAsync(orders, pageNumber ?? 1, pageSize ?? 6);
         }
 
         // GET: api/Orders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(Guid id)
         {
-          if (_context.Orders == null)
-          {
-              return NotFound();
-          }
+            if (_context.Orders == null)
+            {
+                return NotFound();
+            }
             var order = await _context.Orders.FindAsync(id);
 
             if (order == null)
@@ -48,7 +57,7 @@ namespace EZCake.Controllers
             }
 
             await _context.Entry(order).Reference(o => o.ShippingInformation).LoadAsync();
-            await _context.Entry(order).Collection(o => o.OrderDetails).LoadAsync();
+            await _context.Entry(order).Collection(o => o.OrderDetails).Query().Include(od => od.Cake).LoadAsync();
 
             return order;
         }
@@ -89,10 +98,10 @@ namespace EZCake.Controllers
         [HttpPost]
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
-          if (_context.Orders == null)
-          {
-              return Problem("Entity set 'EZCakeContext.Orders'  is null.");
-          }
+            if (_context.Orders == null)
+            {
+                return Problem("Entity set 'EZCakeContext.Orders'  is null.");
+            }
             _context.Orders.Add(order);
             try
             {

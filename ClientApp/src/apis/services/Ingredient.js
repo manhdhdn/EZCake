@@ -1,9 +1,9 @@
 import API_CONFIG from "./baseConfig";
 
-const OrderApi = {
-    getOrders: async (params) => {
+const IngredientApi = {
+    getIngredients: async (params) => {
         const response = await fetch(
-            `${API_CONFIG.endpoints.order}?` + new URLSearchParams(params),
+            `${API_CONFIG.endpoints.ingredient}?` + new URLSearchParams(params),
             {
                 method: "GET",
                 headers: API_CONFIG.api.headers,
@@ -13,9 +13,9 @@ const OrderApi = {
         return await response.json();
     },
 
-    getOrder: async (id) => {
+    getIngredient: async (id) => {
         const response = await fetch(
-            `${API_CONFIG.endpoints.order}/${id}`,
+            `${API_CONFIG.endpoints.ingredient}/${id}`,
             {
                 method: "GET",
                 headers: API_CONFIG.api.headers,
@@ -25,9 +25,9 @@ const OrderApi = {
         return await response.json();
     },
 
-    updateOrder: async (id, params) => {
+    updateIngredient: async (id, params) => {
         const response = await fetch(
-            `${API_CONFIG.endpoints.order}/${id}`,
+            `${API_CONFIG.endpoints.ingredient}/${id}`,
             {
                 method: "PUT",
                 headers: API_CONFIG.api.headers,
@@ -38,9 +38,9 @@ const OrderApi = {
         return response.status;
     },
 
-    createOrder: async (params) => {
+    createIngredient: async (params) => {
         const response = await fetch(
-            `${API_CONFIG.endpoints.order}`,
+            `${API_CONFIG.endpoints.ingredient}`,
             {
                 method: "POST",
                 headers: API_CONFIG.api.headers,
@@ -51,9 +51,9 @@ const OrderApi = {
         return response.status;
     },
 
-    deleteOrder: async (id) => {
+    deleteIngredient: async (id) => {
         const response = await fetch(
-            `${API_CONFIG.endpoints.order}/${id}`,
+            `${API_CONFIG.endpoints.ingredient}/${id}`,
             {
                 method: "DELETE",
                 headers: API_CONFIG.api.headers,
@@ -64,4 +64,4 @@ const OrderApi = {
     }
 };
 
-export default OrderApi;
+export default IngredientApi;

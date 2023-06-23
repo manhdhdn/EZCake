@@ -1,9 +1,9 @@
 import API_CONFIG from "./baseConfig";
 
-const OrderApi = {
-    getOrders: async (params) => {
+const ReviewApi = {
+    getReviews: async (params) => {
         const response = await fetch(
-            `${API_CONFIG.endpoints.order}?` + new URLSearchParams(params),
+            `${API_CONFIG.endpoints.review}?` + new URLSearchParams(params),
             {
                 method: "GET",
                 headers: API_CONFIG.api.headers,
@@ -13,9 +13,9 @@ const OrderApi = {
         return await response.json();
     },
 
-    getOrder: async (id) => {
+    getReview: async (id) => {
         const response = await fetch(
-            `${API_CONFIG.endpoints.order}/${id}`,
+            `${API_CONFIG.endpoints.review}/${id}`,
             {
                 method: "GET",
                 headers: API_CONFIG.api.headers,
@@ -25,9 +25,9 @@ const OrderApi = {
         return await response.json();
     },
 
-    updateOrder: async (id, params) => {
+    updateReview: async (id, params) => {
         const response = await fetch(
-            `${API_CONFIG.endpoints.order}/${id}`,
+            `${API_CONFIG.endpoints.review}/${id}`,
             {
                 method: "PUT",
                 headers: API_CONFIG.api.headers,
@@ -38,9 +38,9 @@ const OrderApi = {
         return response.status;
     },
 
-    createOrder: async (params) => {
+    createReview: async (params) => {
         const response = await fetch(
-            `${API_CONFIG.endpoints.order}`,
+            `${API_CONFIG.endpoints.review}`,
             {
                 method: "POST",
                 headers: API_CONFIG.api.headers,
@@ -51,9 +51,9 @@ const OrderApi = {
         return response.status;
     },
 
-    deleteOrder: async (id) => {
+    deleteReview: async (id) => {
         const response = await fetch(
-            `${API_CONFIG.endpoints.order}/${id}`,
+            `${API_CONFIG.endpoints.review}/${id}`,
             {
                 method: "DELETE",
                 headers: API_CONFIG.api.headers,
@@ -64,4 +64,4 @@ const OrderApi = {
     }
 };
 
-export default OrderApi;
+export default ReviewApi;

@@ -2,6 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using EZCake.BusinessObjects;
 using EZCake.BusinessObjects.Context;
+using FirebaseAdmin.Auth;
+using System.Security.Claims;
+using EZCake.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EZCake.Controllers
 {
@@ -18,6 +22,8 @@ namespace EZCake.Controllers
 
         // GET: api/Accounts
         [HttpGet]
+        [Authorize]
+        [ClaimRequirement(ClaimTypes.Role, "Admin")]
         public async Task<ActionResult<IEnumerable<Account>>> GetAccounts()
         {
             if (_context.Accounts == null)
@@ -29,12 +35,13 @@ namespace EZCake.Controllers
 
         // GET: api/Accounts/5
         [HttpGet("id")]
-        public async Task<ActionResult<Account>> GetAccount(Guid? id, string? email)
+        public async Task<IActionResult> GetAccount(Guid? id, string? email, string? uid)
         {
             if (_context.Accounts == null)
             {
                 return NotFound();
             }
+
             var account = new Account();
 
             if (id != null)
@@ -44,7 +51,7 @@ namespace EZCake.Controllers
 
             if (email != null)
             {
-                account = await _context.Accounts.Include(a => a.ShippingInformations.OrderBy(sif => !sif.Prioritisation)).SingleOrDefaultAsync(a => a.Email == email);
+                account = await _context.Accounts.SingleOrDefaultAsync(a => a.Email == email);
             }
 
             if (account == null)
@@ -52,7 +59,21 @@ namespace EZCake.Controllers
                 return NotFound();
             }
 
-            return account;
+            await _context.Entry(account).Collection(a => a.ShippingInformations).Query().OrderBy(sif => !sif.Prioritisation).LoadAsync();
+
+            if (uid != null)
+            {
+                var additionalClaims = new Dictionary<string, object>()
+                {
+                    {ClaimTypes.Role, account.Role},
+                };
+
+                var token = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(uid, additionalClaims);
+
+                return Ok(new { token });
+            }
+
+            return Ok(account);
         }
 
         // PUT: api/Accounts/5

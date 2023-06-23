@@ -7,6 +7,7 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithCustomToken,
 } from "firebase/auth";
 import { createContext, useContext, useEffect } from "react";
 import { auth } from "./firebase";
@@ -29,12 +30,20 @@ export const AuthContextProvider = ({ children }) => {
     return sendPasswordResetEmail(auth, email);
   };
 
-  const login = (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password);
+  const login = async (email, password) => {
+    return await signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        return userCredential.user.uid;
+      });
   };
+
+  const loginWithCustomToken = (token) => {
+    return signInWithCustomToken(auth, token);
+  }
 
   const loginWithGoogle = () => {
     googleProvider.addScope("email");
+
     return signInWithPopup(auth, googleProvider);
   };
 
@@ -45,10 +54,10 @@ export const AuthContextProvider = ({ children }) => {
   useEffect(() => {
     onIdTokenChanged(auth, async (currentUser) => {
       if (!currentUser) {
-        localStorage.removeItem("user");
+        localStorage.removeItem("token");
         localStorage.removeItem("userInfo");
       } else {
-        localStorage.setItem("user", JSON.stringify(currentUser));
+        localStorage.setItem("token", await currentUser.getIdToken());
         localStorage.setItem('userInfo', JSON.stringify(await AccountApi.getAccount({ email: currentUser.email })));
       }
     });
@@ -60,6 +69,7 @@ export const AuthContextProvider = ({ children }) => {
         createUser,
         sendEmail,
         login,
+        loginWithCustomToken,
         loginWithGoogle,
         resetPassword,
         logout,

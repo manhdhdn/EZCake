@@ -8,8 +8,8 @@ namespace EZCake.BusinessObjects
         public Cake()
         {
             CakeIngredients = new HashSet<CakeIngredient>();
-            CakeReviews = new HashSet<CakeReview>();
             OrderDetails = new HashSet<OrderDetail>();
+            Reviews = new HashSet<Review>();
         }
 
         public Guid Id { get; set; }
@@ -17,9 +17,10 @@ namespace EZCake.BusinessObjects
         public decimal? Price { get; set; }
         public int Sold { get; set; }
         public string? Image { get; set; }
+        public string Status { get; set; } = null!;
 
         public virtual ICollection<CakeIngredient> CakeIngredients { get; set; }
-        public virtual ICollection<CakeReview> CakeReviews { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual ICollection<Review> Reviews { get; set; }
     }
 }

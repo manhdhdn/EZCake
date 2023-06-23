@@ -198,8 +198,10 @@ const CuscakeForm = (props) => {
 
                     status = await CakeApi.createCake({
                         id: cakeId,
-                        name: "Cuscake",
-                        sold: 1
+                        name: "CUSCAKE",
+                        sold: 1,
+                        image: "https://firebasestorage.googleapis.com/v0/b/ezcake-exe201.appspot.com/o/img_cake_box.png?alt=media&token=51b5cc5a-d2b4-4a71-9646-a2b0dc796faf",
+                        status: "Custom"
                     });
 
                     if (status === 201) {

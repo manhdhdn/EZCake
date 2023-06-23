@@ -14,7 +14,6 @@ import QRCodeWithIcon from "components/QrCode";
 
 const Payment = () => {
     const [order, setOrder] = useState(null);
-    const [price, setPrice] = useState(0);
     const [qrCodeUrl, setQrCodeUrl] = useState(null);
 
     const navigate = useNavigate();
@@ -27,6 +26,7 @@ const Payment = () => {
     useEffect(() => {
         let price = 0;
         let checkPaymentBody = null;
+        let qrCreated = false;
 
         const loadOrder = async () => {
             try {
@@ -36,9 +36,10 @@ const Payment = () => {
                     price += element.price;
                 });
 
-                checkPaymentBody = await MoMo.createRequest(price);
-
                 setOrder(order);
+                checkPaymentBody = await MoMo.createRequest(price);
+                setQrCodeUrl(checkPaymentBody.qrCodeUrl);
+                qrCreated = true;
             } catch (error) {
                 enqueueSnackbar(error.message, { variant: "error" });
             }
@@ -46,13 +47,19 @@ const Payment = () => {
 
         loadOrder();
 
-        const interalId = setInterval(async () => {
+        const intervalId = qrCreated && setInterval(async () => {
             let status = await MoMo.checkPayment(checkPaymentBody);
 
             if (status === 0) {
                 navigate("/order");
             }
         }, 1000);
+
+        return () => {
+            clearInterval(intervalId);
+        }
+
+        // eslint-disable-next-line
     }, [])
 
     return (
