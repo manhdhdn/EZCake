@@ -230,7 +230,7 @@ const CuscakeForm = (props) => {
                             });
 
                             if (status === 201) {
-                                navigate("/payment");
+                                navigate(`/payment/${orderId}`);
                             }
                         } else {
                             enqueueSnackbar("Order could not be created", { variant: "error" });
