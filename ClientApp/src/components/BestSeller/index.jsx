@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import CakeApi from "apis/services/Cake";
 
@@ -7,13 +8,13 @@ import { CircularProgress } from "@mui/material";
 import { Button, Img, Text } from "components";
 
 const BestSeller = (props) => {
-  const [change, setChange] = useState(false);
   const [cakeInfo, setCakeInfo] = useState(null);
   const [cakeImages, setCakeImages] = useState(null);
   const [count, setCount] = useState(0);
   const [textAnimaion, setTextAnimation] = useState("");
   const [imageAnimation, setImageAnimation] = useState("");
 
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
@@ -54,8 +55,20 @@ const BestSeller = (props) => {
         count++;
       }
 
-      setChange(true);
-    }, 3000);
+      setTextAnimation("opacity-1");
+      setImageAnimation(`h-[675px] -rotate-6`);
+      setTimeout(() => {
+        setImageAnimation(`h-[675px] rotate-6`);
+      }, 450);
+      setTimeout(() => {
+        setImageAnimation("h-[675px]");
+      }, 900);
+
+      setTimeout(() => {
+        setTextAnimation("mr-[500px] opacity-0");
+        setImageAnimation("opacity-0 h-0");
+      }, 2600);
+    }, 3500);
 
     return () => {
       clearInterval(interalId);
@@ -63,29 +76,6 @@ const BestSeller = (props) => {
 
     // eslint-disable-next-line
   }, []);
-
-  useEffect(() => {
-    if (change) {
-      setTextAnimation("opacity-1");
-      setImageAnimation(`-rotate-6`);
-      setTimeout(() => {
-        setImageAnimation(`rotate-6`);
-      }, 500);
-      setTimeout(() => {
-        setImageAnimation("");
-      }, 1000);
-
-      setTimeout(() => {
-        setChange(false);
-      }, 2700);
-    }
-  }, [change])
-
-  useEffect(() => {
-    if (!change) {
-      setTextAnimation("mr-[500px] opacity-0");
-    }
-  }, [change])
 
   return (
     <div className={props.className}>
@@ -167,17 +157,20 @@ const BestSeller = (props) => {
                   </Text>
                 </div>
               </div>
-              <Button className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] md:ml-[0] ml-[45px] mt-[49px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50">
+              <Button
+                className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] md:ml-[0] ml-[45px] mt-[49px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
+                onClick={() => navigate("/shop")}
+              >
                 shop now
               </Button>
             </div>
           </div>
           <div className="md:h-[675px] h-[754px] relative w-[69%] md:w-full">
-            <div className="absolute h-[675px] inset-[0] justify-center m-auto object-cover w-[92%] transition-all duration-500 ease-in" />
+            <div className="absolute h-[675px] inset-[0] justify-center m-auto object-cover w-[92%] ease-in" />
             {cakeImages.map((image, index) => (
               <Img
                 key={index}
-                className={`absolute inset-[0] justify-center m-auto object-cover w-[92%] transition-all duration-500 ease-in ${count === index ? `opacity-1 h-[675px] ${imageAnimation}` : "opacity-0 h-0"}`}
+                className={`absolute inset-[0] justify-center m-auto object-cover w-[92%] transition-all duration-500 ease-in ${count === index ? `opacity-1 ${imageAnimation}` : "opacity-0 h-0"}`}
                 src={image}
                 alt="bestSeller"
               />

@@ -14,9 +14,11 @@ namespace EZCake.BusinessObjects
         public DateTime OrderDate { get; set; }
         public DateTime? ShippedDate { get; set; }
         public Guid ShippingInformationId { get; set; }
+        public string? Message { get; set; }
         public string Status { get; set; } = null!;
 
         public virtual ShippingInformation? ShippingInformation { get; set; }
+        public virtual Payment? Payment { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
     }
 }

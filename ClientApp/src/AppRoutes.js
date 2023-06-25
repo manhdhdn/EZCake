@@ -8,6 +8,8 @@ import PrivacyPolicy from "pages/PrivacyPolicy";
 import OurStory from "pages/OurStory";
 import Contact from "pages/Contact";
 import Cuscake from "pages/Cuscake";
+import Shop from "pages/Shop";
+import CakeDetail from "pages/CakeDetail";
 import Payment from "pages/Payment";
 
 const AppRoutes = [
@@ -54,6 +56,13 @@ const AppRoutes = [
   {
     path: "/cuscake",
     element: <Cuscake />,
+  },
+  {
+    path: "/shop",
+    element: <Shop />,
+  },{
+    path: "/cake-detail/*",
+    element: <CakeDetail />,
   },
   {
     path: "/payment/*",

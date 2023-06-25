@@ -17,6 +17,7 @@ const API_CONFIG = {
         ingredient: "api/ingredients",
         review: "api/reviews",
         momo: "api/momo",
+        payment: "api/payments",
     },
     context: [
         "/api/accounts",
@@ -29,6 +30,7 @@ const API_CONFIG = {
         "/api/ingredients",
         "/api/reviews",
         "/api/momo",
+        "/api/payments",
     ]
 };
 

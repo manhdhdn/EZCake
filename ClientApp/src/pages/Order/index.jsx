@@ -258,10 +258,6 @@ const Order = () => {
                     quantity += order.orderDetails[index].quantity;
                 }
 
-                while (name.length > 1) {
-                    name.pop();
-                }
-
                 contents.push(
                     <div key={index} className={`transition-all duration-300 ${selected === 1 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
                         <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
@@ -272,7 +268,15 @@ const Order = () => {
                             />
                             <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
                                 <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
-                                    {name.join(", ")}
+                                    {name.length === 1 ? (
+                                        <>
+                                            {name[0]}
+                                        </>
+                                    ) : (
+                                        <>
+                                            {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
+                                        </>
+                                    )}
                                 </Text>
                                 <Text className="font-sfmono mt-4 text-lg text-red-500">
                                     {name.includes("CUSCAKE") ? (
@@ -380,10 +384,6 @@ const Order = () => {
                     quantity += order.orderDetails[index].quantity;
                 }
 
-                while (name.length > 1) {
-                    name.pop();
-                }
-
                 contents.push(
                     <div key={index} className={`transition-all duration-300 ${selected === 2 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
                         <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
@@ -394,7 +394,15 @@ const Order = () => {
                             />
                             <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
                                 <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
-                                    {name.join(", ")}
+                                    {name.length === 1 ? (
+                                        <>
+                                            {name[0]}
+                                        </>
+                                    ) : (
+                                        <>
+                                            {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
+                                        </>
+                                    )}
                                 </Text>
                                 <Text className="font-sfmono mt-4 text-lg text-red-500">
                                     {name.includes("CUSCAKE") ? (
@@ -478,10 +486,6 @@ const Order = () => {
                     quantity += order.orderDetails[index].quantity;
                 }
 
-                while (name.length > 1) {
-                    name.pop();
-                }
-
                 contents.push(
                     <div className={`transition-all duration-300 ${selected === 3 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
                         <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
@@ -492,7 +496,15 @@ const Order = () => {
                             />
                             <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
                                 <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
-                                    {name.join(", ")}
+                                    {name.length === 1 ? (
+                                        <>
+                                            {name[0]}
+                                        </>
+                                    ) : (
+                                        <>
+                                            {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
+                                        </>
+                                    )}
                                 </Text>
                                 <Text className="font-sfmono mt-4 text-lg text-red-500">
                                     {name.includes("CUSCAKE") ? (
@@ -592,10 +604,6 @@ const Order = () => {
                     quantity += order.orderDetails[index].quantity;
                 }
 
-                while (name.length > 1) {
-                    name.pop();
-                }
-
                 contents.push(
                     <div className={`transition-all duration-300 ${selected === 4 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
                         <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
@@ -606,7 +614,15 @@ const Order = () => {
                             />
                             <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
                                 <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
-                                    {name.join(", ")}
+                                    {name.length === 1 ? (
+                                        <>
+                                            {name[0]}
+                                        </>
+                                    ) : (
+                                        <>
+                                            {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
+                                        </>
+                                    )}
                                 </Text>
                                 <Text className="font-sfmono mt-4 text-lg text-red-500">
                                     {name.includes("CUSCAKE") ? (

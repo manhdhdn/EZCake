@@ -13,8 +13,8 @@ const QRCodeWithIcon = ({ value }) => {
                 </div>
 
                 <div className="absolute inset-0 flex items-center justify-center rounded-[15px]">
-                    <Img className="absolute bg-white-A700 w-12 h-12 p-2 rounded-full" src="images/img_momo.svg" alt="momo" />
-                    {!value && <CircularProgress color="success" />}
+                    <Img className="absolute bg-white-A700 w-9 h-9 p-[4px] rounded-full" src="images/img_momo.svg" alt="momo" />
+                    {!value && <CircularProgress size={35} color="success" />}
                 </div>
             </div>
         </div>

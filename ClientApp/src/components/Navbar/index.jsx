@@ -158,7 +158,7 @@ const Navbar = (props) => {
 
               <div className="relative">
                 <Img
-                  className="h-[35px] ml-0 md:ml-[0] w-[35px] rounded-full cursor-pointer"
+                  className="h-[36px] ml-0 md:ml-[0] w-[38px] cursor-pointer"
                   src={cartIcon}
                   alt="cart"
                   onMouseEnter={handleCartIconEnter}
