@@ -17,6 +17,7 @@ namespace EZCake.BusinessObjects
         public decimal? Price { get; set; }
         public int Sold { get; set; }
         public string? Image { get; set; }
+        public string? Description { get; set; }
         public string Status { get; set; } = null!;
 
         public virtual ICollection<CakeIngredient> CakeIngredients { get; set; }
