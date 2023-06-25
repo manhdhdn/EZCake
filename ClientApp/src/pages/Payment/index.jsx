@@ -3,8 +3,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { handleSectionNavigation } from "utils";
+import { v4 } from "uuid";
 import OrderApi from "apis/services/Order";
 import MoMo from "apis/momo/MoMo";
+import PaymentApi from "apis/services/Payment";
 
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import { Skeleton, Tooltip } from "@mui/material";
@@ -78,33 +80,43 @@ const Payment = () => {
         // eslint-disable-next-line
     }, [])
 
-    // useEffect(() => {
-    //     const intervalId = checkPaymentBody && setInterval(async () => {
-    //         let status = await MoMo.checkPayment(checkPaymentBody);
+    useEffect(() => {
+        const intervalId = checkPaymentBody && setInterval(async () => {
+            let status = await MoMo.checkPayment(checkPaymentBody);
 
-    //         if (status === 0) {
-    //             try {
-    //                 await OrderApi.updateOrder(order.id, {
-    //                     id: order.id,
-    //                     orderDate: order.orderDate,
-    //                     shippedDate: order.shippedDate,
-    //                     shippingInformationId: order.shippingInformationId,
-    //                     status: "Confirmed"
-    //                 });
+            if (status === 0) {
+                try {
+                    await OrderApi.updateOrder(order.id, {
+                        id: order.id,
+                        orderDate: order.orderDate,
+                        shippedDate: order.shippedDate,
+                        shippingInformationId: order.shippingInformationId,
+                        status: "Confirmed"
+                    });
 
-    //                 navigate("/order");
-    //             } catch (error) {
-    //                 enqueueSnackbar("Order could not be updated", { variant: "error" });
-    //             }
-    //         }
-    //     }, 1000);
+                    await PaymentApi.createPayment({
+                        id: v4(),
+                        partnerCode: checkPaymentBody.partnerCode,
+                        requestId: checkPaymentBody.requestId,
+                        orderId: checkPaymentBody.orderId,
+                        signature: checkPaymentBody.signature,
+                        lang: checkPaymentBody.lang,
+                        orderUni: order.id
+                    });
 
-    //     return () => {
-    //         clearInterval(intervalId);
-    //     }
+                    navigate("/order");
+                } catch (error) {
+                    enqueueSnackbar("Order could not be updated", { variant: "error" });
+                }
+            }
+        }, 1000);
 
-    //     // eslint-disable-next-line
-    // }, [checkPaymentBody]);
+        return () => {
+            clearInterval(intervalId);
+        }
+
+        // eslint-disable-next-line
+    }, [checkPaymentBody]);
 
     const cakeInfo = () => {
         let element = (
