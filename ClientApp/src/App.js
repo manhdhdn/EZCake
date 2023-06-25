@@ -1,24 +1,26 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import { AuthContextProvider } from "apis/auth/AuthContext";
 import AppRoutes from "./AppRoutes";
 import { SnackbarProvider } from "notistack";
 
-export default class App extends Component {
-  static displayName = App.name;
+const App = () => {
+  useEffect(() => {
+    document.body.style.zoom = '125%';
+  }, []);
 
-  render() {
-    return (
-      <AuthContextProvider>
-        <SnackbarProvider maxSnack={3}>
-          <Routes>
-            {AppRoutes.map((route, index) => {
-              const { element, ...rest } = route;
-              return <Route key={index} {...rest} element={element} />;
-            })}
-          </Routes>
-        </SnackbarProvider>
-      </AuthContextProvider>
-    );
-  }
+  return (
+    <AuthContextProvider>
+      <SnackbarProvider maxSnack={3}>
+        <Routes>
+          {AppRoutes.map((route, index) => {
+            const { element, ...rest } = route;
+            return <Route key={index} {...rest} element={element} />;
+          })}
+        </Routes>
+      </SnackbarProvider>
+    </AuthContextProvider>
+  );
 }
+
+export default App;

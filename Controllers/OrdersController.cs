@@ -58,6 +58,7 @@ namespace EZCake.Controllers
 
             await _context.Entry(order).Reference(o => o.ShippingInformation).LoadAsync();
             await _context.Entry(order).Collection(o => o.OrderDetails).Query().Include(od => od.Cake).LoadAsync();
+            await _context.Entry(order).Reference(o => o.Payment).LoadAsync();
 
             return order;
         }

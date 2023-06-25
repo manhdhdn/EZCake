@@ -3,9 +3,13 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { handleSectionNavigation } from "utils";
+import { v4 } from "uuid";
 import OrderApi from "apis/services/Order";
 import MoMo from "apis/momo/MoMo";
+import PaymentApi from "apis/services/Payment";
 
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+import { Skeleton, Tooltip } from "@mui/material";
 import { Button, Img, Input, Line, Text } from "../../components";
 import SignHeader from "components/SignHeader";
 import Chat from "components/Chat";
@@ -14,6 +18,8 @@ import QRCodeWithIcon from "components/QrCode";
 
 const Payment = () => {
     const [order, setOrder] = useState(null);
+    const [image, setImage] = useState("images/img_cake_box.png");
+    const [name, setName] = useState([]);
     const [price, setPrice] = useState(0);
     const [qrCodeUrl, setQrCodeUrl] = useState(null);
     const [checkPaymentBody, setCheckPaymentBody] = useState(null);
@@ -28,15 +34,29 @@ const Payment = () => {
     useEffect(() => {
         const loadOrder = async () => {
             try {
-                let order = await OrderApi.getOrder(window.location.pathname.split("/").pop());
+                let orderId = window.location.pathname.split("/").pop();
+                let order = await OrderApi.getOrder(orderId);
+
+                if (order.status === "Confirmed") {
+                    throw new Error("Confirmed");
+                }
+
+                setImage(order.orderDetails[0].cake.image);
+
+                let name = [];
                 let price = 0;
 
-                order.orderDetails.forEach(element => {
-                    price += element.price;
+                order.orderDetails.forEach((element, index) => {
+                    if (!name.includes(order.orderDetails[index].cake.name)) {
+                        name.push(order.orderDetails[index].cake.name);
+                    }
+
+                    price += element.price * element.quantity;
                 });
 
-                setPrice(price);
                 setOrder(order);
+                setName(name);
+                setPrice(price);
 
                 try {
                     let checkPaymentBody = await MoMo.createRequest(price);
@@ -47,7 +67,11 @@ const Payment = () => {
                     enqueueSnackbar("QR code could not be generated", { variant: "error" });
                 }
             } catch (error) {
-                enqueueSnackbar("Order could not be loaded", { variant: "error" });
+                if (error.message === "Confirmed") {
+                    enqueueSnackbar("Order already payed", { variant: "info" });
+                } else {
+                    enqueueSnackbar("Order could not be loaded", { variant: "error" });
+                }
             }
         }
 
@@ -70,6 +94,16 @@ const Payment = () => {
                         status: "Confirmed"
                     });
 
+                    await PaymentApi.createPayment({
+                        id: v4(),
+                        partnerCode: checkPaymentBody.partnerCode,
+                        requestId: checkPaymentBody.requestId,
+                        orderId: checkPaymentBody.orderId,
+                        signature: checkPaymentBody.signature,
+                        lang: checkPaymentBody.lang,
+                        orderUni: order.id
+                    });
+
                     navigate("/order");
                 } catch (error) {
                     enqueueSnackbar("Order could not be updated", { variant: "error" });
@@ -83,6 +117,63 @@ const Payment = () => {
 
         // eslint-disable-next-line
     }, [checkPaymentBody]);
+
+    const cakeInfo = () => {
+        let element = (
+            <>
+                <div className="flex flex-col items-start justify-start w-full">
+                    <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500 w-[233px]"><Skeleton animation="wave" /></Text>
+                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-[233px]" ><Skeleton animation="wave" /></Text>
+                    <Text className="font-sfmono mt-1 text-lg text-red-500 w-[233px]" ><Skeleton animation="wave" /></Text>
+                </div>
+            </>
+        )
+
+
+        if (name.length === 1) {
+            element = (
+                <>
+                    <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500">
+                        {name[0]}
+                    </Text>
+                    <Text className="font-sfmono mt-2 text-lg text-red-500">{name.includes("CUSCAKE") ? order.orderDetails.length : order.orderDetails[0].quantity} {order.orderDetails[0].quantity > 1 || order.orderDetails.length > 1 ? "Cakes" : "Cake"}</Text>
+                    <div className="flex flex-row items-center w-full">
+                        <Text className="font-sfmono mt-1 text-lg text-red-500 cursor-pointer">Gift Box</Text>
+                        <Tooltip disableFocusListener title={<Text className="font-sfmono p-1 text-sm cursor-pointer">Gift box depending on the quantity of your cake</Text>}>
+                            <ArrowCircleDownIcon sx={{ marginTop: "5px", marginLeft: "8px", color: "#ee4e34" }} />
+                        </Tooltip>
+                    </div>
+                </>
+            )
+        }
+
+        if (name.length > 1) {
+            let title = "";
+
+            name.forEach((element, index) => {
+                title += `${name[index]('\n')}`;
+            })
+
+            title = title.slice(0, -1);
+
+            element = (
+                <>
+                    <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500 w-full">
+                        {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
+                    </Text>
+                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-full" >{name.length} types of cake</Text>
+                    <div className="flex flex-row w-full">
+                        <Text className="italic text-red-500 text-sm underline">Hover for more</Text>
+                        <Tooltip title={title}>
+                            <ArrowCircleDownIcon sx={{ marginTop: "5px", marginLeft: "8px", color: "#ee4e34" }} />
+                        </Tooltip>
+                    </div>
+                </>
+            )
+        }
+
+        return element;
+    }
 
     return (
         <>
@@ -132,15 +223,18 @@ const Payment = () => {
                                 </div>
                                 <Text className="italic text-red-500 text-sm underline">Review your note</Text>
                             </div>
-                            <Button className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] md:ml-[0] ml-[268px] mt-6 py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50">
-                                done
+                            <Button
+                                className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] md:ml-[0] ml-[268px] mt-6 py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
+                                onClick={() => navigate("/order")}
+                            >
+                                pay later
                             </Button>
                         </div>
                         <div className="flex md:flex-1 flex-col gap-[18px] items-start justify-start w-[43%] md:w-full">
                             <div className="flex sm:flex-col flex-row gap-[50px] items-center justify-start w-full">
                                 <Img
                                     className="h-[233px] md:h-auto object-cover w-[233px]"
-                                    src="images/img_cake_box.png"
+                                    src={image}
                                     alt="rectangle28155"
                                 />
                                 <QRCodeWithIcon value={qrCodeUrl} />
@@ -149,11 +243,7 @@ const Payment = () => {
                                 <div className="flex flex-col gap-14 items-start justify-start">
                                     <div className="flex flex-col gap-2 items-start justify-start w-full">
                                         <div className="flex flex-col items-start justify-start w-full">
-                                            <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500">
-                                                CUSCAKE
-                                            </Text>
-                                            <Text className="font-sfmono mt-2 text-lg text-red-500">{order && order.orderDetails.length} Cake</Text>
-                                            <Text className="font-sfmono mt-1 text-lg text-red-500">Gift Box, {order && order.orderDetails.length}</Text>
+                                            {cakeInfo()}
                                         </div>
                                         <Text className="italic text-red-500 text-sm underline opacity-0">Edit</Text>
                                     </div>

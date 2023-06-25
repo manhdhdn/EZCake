@@ -69,6 +69,7 @@ const MoMo = {
             requestId: requestId,
             orderId: orderId,
             signature: paymentSignature,
+            lang: 'en',
             qrCodeUrl: qrCodeUrl,
             error: error
         }
@@ -82,7 +83,7 @@ const MoMo = {
             requestId: params.requestId,
             orderId: params.orderId,
             signature: params.signature,
-            lang: 'en'
+            lang: params.lang
         });
 
         const endpoint = "https://test-payment.momo.vn/v2/gateway/api/query";
