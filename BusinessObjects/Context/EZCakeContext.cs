@@ -148,6 +148,9 @@ namespace EZCake.BusinessObjects.Context
 
             modelBuilder.Entity<Payment>(entity =>
             {
+                entity.HasIndex(e => e.OrderUni, "IX_Payments")
+                    .IsUnique();
+
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Lang)
@@ -171,8 +174,8 @@ namespace EZCake.BusinessObjects.Context
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.OrderUniNavigation)
-                    .WithMany(p => p.Payments)
-                    .HasForeignKey(d => d.OrderUni)
+                    .WithOne(p => p.Payment)
+                    .HasForeignKey<Payment>(d => d.OrderUni)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Payments_Orders");
             });

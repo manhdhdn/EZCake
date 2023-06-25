@@ -8,7 +8,6 @@ namespace EZCake.BusinessObjects
         public Order()
         {
             OrderDetails = new HashSet<OrderDetail>();
-            Payments = new HashSet<Payment>();
         }
 
         public Guid Id { get; set; }
@@ -18,7 +17,7 @@ namespace EZCake.BusinessObjects
         public string Status { get; set; } = null!;
 
         public virtual ShippingInformation? ShippingInformation { get; set; }
+        public virtual Payment? Payment { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        public virtual ICollection<Payment> Payments { get; set; }
     }
 }
