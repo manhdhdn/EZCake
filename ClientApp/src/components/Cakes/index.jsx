@@ -65,7 +65,7 @@ const Cakes = (props) => {
           onMouseLeave={() => handleCakeLeave()}
         >
           <Img
-            className="h-[500px] md:h-auto object-cover w-[335px]"
+            className="h-[500px] border boder-solid border-red-500 border-2 md:h-auto object-cover w-[335px]"
             src={hover === index ? "images/img_cake_hover.png" : cake.image}
             alt="cake"
           />

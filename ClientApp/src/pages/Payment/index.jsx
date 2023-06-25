@@ -59,10 +59,10 @@ const Payment = () => {
                 setPrice(price);
 
                 try {
-                    // let checkPaymentBody = await MoMo.createRequest(price);
+                    let checkPaymentBody = await MoMo.createRequest(price);
 
-                    // setCheckPaymentBody(checkPaymentBody);
-                    // setQrCodeUrl(checkPaymentBody.qrCodeUrl);
+                    setCheckPaymentBody(checkPaymentBody);
+                    setQrCodeUrl(checkPaymentBody.qrCodeUrl);
                 } catch (error) {
                     enqueueSnackbar("QR code could not be generated", { variant: "error" });
                 }
@@ -223,8 +223,11 @@ const Payment = () => {
                                 </div>
                                 <Text className="italic text-red-500 text-sm underline">Review your note</Text>
                             </div>
-                            <Button className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] md:ml-[0] ml-[268px] mt-6 py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50">
-                                done
+                            <Button
+                                className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] md:ml-[0] ml-[268px] mt-6 py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
+                                onClick={() => navigate("/order")}
+                            >
+                                pay later
                             </Button>
                         </div>
                         <div className="flex md:flex-1 flex-col gap-[18px] items-start justify-start w-[43%] md:w-full">
