@@ -13,7 +13,6 @@ import SignHeader from "components/SignHeader";
 import Chat from "components/Chat";
 import Footer from "../../components/Footer";
 import QRCodeWithIcon from "components/QrCode";
-import { element } from "prop-types";
 
 const Payment = () => {
     const [order, setOrder] = useState(null);
@@ -137,7 +136,7 @@ const Payment = () => {
         }
 
         if (name.length > 1) {
-            const title = "";
+            let title = "";
 
             name.forEach((element, index) => {
                 title += `${name[index]('\n')}`;

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 
+import { useNavigate } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
 import { handleSectionNavigation } from "utils";
 import CakeApi from "apis/services/Cake";
 
+import { CircularProgress } from "@mui/material";
 import { Img, Line, Text } from "components";
 import Navbar from "components/Navbar";
 import Footer from "components/Footer";
@@ -11,6 +13,8 @@ import Chat from "components/Chat";
 
 const Shop = () => {
     const [cakes, setCakes] = useState(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadCakes = async () => {
@@ -30,28 +34,43 @@ const Shop = () => {
         handleSectionNavigation("shop", -1);
     }, []);
 
+    const handleCakeClick = (id) => {
+        navigate(`/cake-detail/${id}`);
+    }
+
     const content = () => {
         let element = [];
 
-        cakes.forEach((cake, index) => {
-            element.push(
-                <div key={index} className="h-[726px] flex flex-row items-center justify-center w-1/3">
-                    <div className="h-full flex flex-col items-center justify-center w-full">
-                        <Img
-                            className="h-[665px] object-cover w-full"
-                            src={cake.image}
-                            alt="cake for sell"
-                        />
-                        <Line className="bg-red-500 h-px w-full" />
-                        <Text className="md:ml-[0] sm:text-[21px] md:text-[23px] text-[25px] text-center text-red-500 my-4">
-                            {cake.name} Cupcake
-                        </Text>
-                        <Line className="bg-red-500 h-px w-full" />
+        if (cakes) {
+            cakes.forEach((cake, index) => {
+                element.push(
+                    <div
+                        key={index} className="h-[726px] flex flex-row items-center justify-center w-1/3"
+                        onClick={() => handleCakeClick(cake.id)}
+                    >
+                        <div className="h-full flex flex-col items-center justify-center w-full">
+                            <Img
+                                className="h-[665px] object-cover w-full"
+                                src={cake.image}
+                                alt="cake for sell"
+                            />
+                            <Line className="bg-red-500 h-px w-full" />
+                            <Text className="md:ml-[0] sm:text-[21px] md:text-[23px] text-[25px] text-center text-red-500 my-4">
+                                {cake.name} Cupcake
+                            </Text>
+                            <Line className="bg-red-500 h-px w-full" />
+                        </div>
+                        <Line className="bg-red-500 h-full inset-y-[0] right-0 w-px" />
                     </div>
-                    <Line className="bg-red-500 h-full inset-y-[0] right-0 w-px" />
+                )
+            })
+        } else {
+            element.push(
+                <div className="h-[726px] flex items-center justify-center w-full">
+                    <CircularProgress color="success" />
                 </div>
             )
-        })
+        }
 
         return element;
     }
@@ -109,7 +128,7 @@ const Shop = () => {
                     </div>
                 </div> */}
                 <div id="shop" className="flex flex-wrap items-start justify-start mt-navbar w-full">
-                    {cakes && content()}
+                    {content()}
                 </div>
                 <Chat />
                 <Footer className="bg-orange-50 flex font-sfmono items-center justify-center md:px-5 w-full" />

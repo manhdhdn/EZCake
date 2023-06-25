@@ -56,12 +56,12 @@ const BestSeller = (props) => {
       }
 
       setTextAnimation("opacity-1");
-      setImageAnimation(`-rotate-6`);
+      setImageAnimation(`h-[675px] -rotate-6`);
       setTimeout(() => {
-        setImageAnimation(`rotate-6`);
+        setImageAnimation(`h-[675px] rotate-6`);
       }, 450);
       setTimeout(() => {
-        setImageAnimation("");
+        setImageAnimation("h-[675px]");
       }, 900);
 
       setTimeout(() => {
@@ -170,7 +170,7 @@ const BestSeller = (props) => {
             {cakeImages.map((image, index) => (
               <Img
                 key={index}
-                className={`absolute inset-[0] justify-center m-auto object-cover w-[92%] transition-all duration-500 ease-in ${count === index ? `opacity-1 h-[675px] ${imageAnimation}` : "opacity-0 h-0"}`}
+                className={`absolute inset-[0] justify-center m-auto object-cover w-[92%] transition-all duration-500 ease-in ${count === index ? `opacity-1 ${imageAnimation}` : "opacity-0 h-0"}`}
                 src={image}
                 alt="bestSeller"
               />
