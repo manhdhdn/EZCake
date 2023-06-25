@@ -243,8 +243,6 @@ const CuscakeForm = (props) => {
         } catch (error) {
             enqueueSnackbar("Order could not be created", { variant: "error" });
         }
-
-        navigate("/payment/99f4e228-a38b-49e1-836f-f54e34d29ed1");
     }
 
     const cakeIcon = () => {

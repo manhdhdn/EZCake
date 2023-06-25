@@ -6,14 +6,19 @@ import { handleSectionNavigation } from "utils";
 import OrderApi from "apis/services/Order";
 import MoMo from "apis/momo/MoMo";
 
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+import { Skeleton, Tooltip } from "@mui/material";
 import { Button, Img, Input, Line, Text } from "../../components";
 import SignHeader from "components/SignHeader";
 import Chat from "components/Chat";
 import Footer from "../../components/Footer";
 import QRCodeWithIcon from "components/QrCode";
+import { element } from "prop-types";
 
 const Payment = () => {
     const [order, setOrder] = useState(null);
+    const [image, setImage] = useState("images/img_cake_box.png");
+    const [name, setName] = useState([]);
     const [price, setPrice] = useState(0);
     const [qrCodeUrl, setQrCodeUrl] = useState(null);
     const [checkPaymentBody, setCheckPaymentBody] = useState(null);
@@ -28,26 +33,44 @@ const Payment = () => {
     useEffect(() => {
         const loadOrder = async () => {
             try {
-                let order = await OrderApi.getOrder(window.location.pathname.split("/").pop());
+                let orderId = window.location.pathname.split("/").pop();
+                let order = await OrderApi.getOrder(orderId);
+
+                if (order.status === "Confirmed") {
+                    throw new Error("Confirmed");
+                }
+
+                setImage(order.orderDetails[0].cake.image);
+
+                let name = [];
                 let price = 0;
 
-                order.orderDetails.forEach(element => {
-                    price += element.price;
+                order.orderDetails.forEach((element, index) => {
+                    if (!name.includes(order.orderDetails[index].cake.name)) {
+                        name.push(order.orderDetails[index].cake.name);
+                    }
+
+                    price += element.price * element.quantity;
                 });
 
-                setPrice(price);
                 setOrder(order);
+                setName(name);
+                setPrice(price);
 
                 try {
-                    let checkPaymentBody = await MoMo.createRequest(price);
+                    // let checkPaymentBody = await MoMo.createRequest(price);
 
-                    setCheckPaymentBody(checkPaymentBody);
-                    setQrCodeUrl(checkPaymentBody.qrCodeUrl);
+                    // setCheckPaymentBody(checkPaymentBody);
+                    // setQrCodeUrl(checkPaymentBody.qrCodeUrl);
                 } catch (error) {
                     enqueueSnackbar("QR code could not be generated", { variant: "error" });
                 }
             } catch (error) {
-                enqueueSnackbar("Order could not be loaded", { variant: "error" });
+                if (error.message === "Confirmed") {
+                    enqueueSnackbar("Order already payed", { variant: "info" });
+                } else {
+                    enqueueSnackbar("Order could not be loaded", { variant: "error" });
+                }
             }
         }
 
@@ -56,33 +79,90 @@ const Payment = () => {
         // eslint-disable-next-line
     }, [])
 
-    useEffect(() => {
-        const intervalId = checkPaymentBody && setInterval(async () => {
-            let status = await MoMo.checkPayment(checkPaymentBody);
+    // useEffect(() => {
+    //     const intervalId = checkPaymentBody && setInterval(async () => {
+    //         let status = await MoMo.checkPayment(checkPaymentBody);
 
-            if (status === 0) {
-                try {
-                    await OrderApi.updateOrder(order.id, {
-                        id: order.id,
-                        orderDate: order.orderDate,
-                        shippedDate: order.shippedDate,
-                        shippingInformationId: order.shippingInformationId,
-                        status: "Confirmed"
-                    });
+    //         if (status === 0) {
+    //             try {
+    //                 await OrderApi.updateOrder(order.id, {
+    //                     id: order.id,
+    //                     orderDate: order.orderDate,
+    //                     shippedDate: order.shippedDate,
+    //                     shippingInformationId: order.shippingInformationId,
+    //                     status: "Confirmed"
+    //                 });
 
-                    navigate("/order");
-                } catch (error) {
-                    enqueueSnackbar("Order could not be updated", { variant: "error" });
-                }
-            }
-        }, 1000);
+    //                 navigate("/order");
+    //             } catch (error) {
+    //                 enqueueSnackbar("Order could not be updated", { variant: "error" });
+    //             }
+    //         }
+    //     }, 1000);
 
-        return () => {
-            clearInterval(intervalId);
+    //     return () => {
+    //         clearInterval(intervalId);
+    //     }
+
+    //     // eslint-disable-next-line
+    // }, [checkPaymentBody]);
+
+    const cakeInfo = () => {
+        let element = (
+            <>
+                <div className="flex flex-col items-start justify-start w-full">
+                    <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500 w-[233px]"><Skeleton animation="wave" /></Text>
+                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-[233px]" ><Skeleton animation="wave" /></Text>
+                    <Text className="font-sfmono mt-1 text-lg text-red-500 w-[233px]" ><Skeleton animation="wave" /></Text>
+                </div>
+            </>
+        )
+
+
+        if (name.length === 1) {
+            element = (
+                <>
+                    <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500">
+                        {name[0]}
+                    </Text>
+                    <Text className="font-sfmono mt-2 text-lg text-red-500">{name.includes("CUSCAKE") ? order.orderDetails.length : order.orderDetails[0].quantity} {order.orderDetails[0].quantity > 1 || order.orderDetails.length > 1 ? "Cakes" : "Cake"}</Text>
+                    <div className="flex flex-row items-center w-full">
+                        <Text className="font-sfmono mt-1 text-lg text-red-500 cursor-pointer">Gift Box</Text>
+                        <Tooltip disableFocusListener title={<Text className="font-sfmono p-1 text-sm cursor-pointer">Gift box depending on the quantity of your cake</Text>}>
+                            <ArrowCircleDownIcon sx={{ marginTop: "5px", marginLeft: "8px", color: "#ee4e34" }} />
+                        </Tooltip>
+                    </div>
+                </>
+            )
         }
 
-        // eslint-disable-next-line
-    }, [checkPaymentBody]);
+        if (name.length > 1) {
+            const title = "";
+
+            name.forEach((element, index) => {
+                title += `${name[index]('\n')}`;
+            })
+
+            title = title.slice(0, -1);
+
+            element = (
+                <>
+                    <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500 w-full">
+                        {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
+                    </Text>
+                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-full" >{name.length} types of cake</Text>
+                    <div className="flex flex-row w-full">
+                        <Text className="italic text-red-500 text-sm underline">Hover for more</Text>
+                        <Tooltip title={title}>
+                            <ArrowCircleDownIcon sx={{ marginTop: "5px", marginLeft: "8px", color: "#ee4e34" }} />
+                        </Tooltip>
+                    </div>
+                </>
+            )
+        }
+
+        return element;
+    }
 
     return (
         <>
@@ -140,7 +220,7 @@ const Payment = () => {
                             <div className="flex sm:flex-col flex-row gap-[50px] items-center justify-start w-full">
                                 <Img
                                     className="h-[233px] md:h-auto object-cover w-[233px]"
-                                    src="images/img_cake_box.png"
+                                    src={image}
                                     alt="rectangle28155"
                                 />
                                 <QRCodeWithIcon value={qrCodeUrl} />
@@ -149,11 +229,7 @@ const Payment = () => {
                                 <div className="flex flex-col gap-14 items-start justify-start">
                                     <div className="flex flex-col gap-2 items-start justify-start w-full">
                                         <div className="flex flex-col items-start justify-start w-full">
-                                            <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500">
-                                                CUSCAKE
-                                            </Text>
-                                            <Text className="font-sfmono mt-2 text-lg text-red-500">{order && order.orderDetails.length} Cake</Text>
-                                            <Text className="font-sfmono mt-1 text-lg text-red-500">Gift Box, {order && order.orderDetails.length}</Text>
+                                            {cakeInfo()}
                                         </div>
                                         <Text className="italic text-red-500 text-sm underline opacity-0">Edit</Text>
                                     </div>

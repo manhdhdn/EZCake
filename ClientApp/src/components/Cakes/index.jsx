@@ -6,8 +6,6 @@ import CakeApi from "apis/services/Cake";
 import { Img, Text } from "components";
 
 const Cakes = (props) => {
-  const [load, setLoad] = useState(true);
-  const [stop, setStop] = useState(false);
   const [cakes, setCakes] = useState(null);
   const [hover, setHover] = useState(-1);
   const [cartIcon, setCartIcon] = useState("images/img_cart_orange_50.svg");
@@ -23,42 +21,28 @@ const Cakes = (props) => {
         let cakes = await CakeApi.getCakes({ pageNumber, status: "Available" });
 
         setCakes(cakes.data);
-        setTimeout(() => {
-          setLoad(false);
-        }, 300);
 
-        if (cakes.hasNext) {
-          pageNumber++;
-        } else {
-          pageNumber = 1;
-        }
+        // if (cakes.hasNext) {
+        //   pageNumber++;
+        // } else {
+        //   pageNumber = 1;
+        // }
       } catch (error) {
         enqueueSnackbar("Load cakes failed", { variant: "error" });
       }
     }
 
-    const intervalId = !stop && setInterval(() => {
-      setLoad(true);
-      setTimeout(() => {
-        loadCakes();
-      }, 200);
-    }, 3000);
-
-    return () => {
-      clearInterval(intervalId);
-    }
+    loadCakes();
 
     // eslint-disable-next-line
-  }, [stop]);
+  }, []);
 
   const handleCakeEnter = (id) => {
     setHover(id);
-    setStop(true);
   }
 
   const handleCakeLeave = () => {
     setHover(-1);
-    setStop(false);
   }
 
   const handleCartIconEnter = () => {
@@ -76,7 +60,7 @@ const Cakes = (props) => {
       element.push(
         <div
           key={index}
-          className={`relative transition-all duration-300 ${load ? animationHide : animationShow} w-full`}
+          className={`relative w-full`}
           onMouseEnter={() => handleCakeEnter(index)}
           onMouseLeave={() => handleCakeLeave()}
         >
