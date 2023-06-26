@@ -37,7 +37,7 @@ const Payment = () => {
                 let orderId = window.location.pathname.split("/").pop();
                 let order = await OrderApi.getOrder(orderId);
 
-                if (order.status === "Confirmed") {
+                if (order.status !== "Pending") {
                     throw new Error("Confirmed");
                 }
 
