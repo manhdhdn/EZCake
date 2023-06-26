@@ -840,7 +840,7 @@ const Order = () => {
                 <Input
                     name="group100"
                     placeholder="Search..."
-                    className="placeholder:italic leading-[normal] p-0 focus:bg-orange-50 placeholder:text-red-500_87 sm:pr-5 text-left text-red-500 placeholder:text-red-500_87 text-sm w-full"
+                    className="placeholder:italic leading-[normal] p-0 placeholder:text-red-500_87 sm:pr-5 text-left text-red-500 placeholder:text-red-500_87 text-sm w-full"
                     wrapClassName={`${searchAnimation} flex mt-5 mb-5 pl-5 pr-[35px] py-1 rounded-[5px] w-[87.2%]`}
                     prefix={<Img className="h-[51px] mr-5 my-auto" src={searchIcon} alt="search" />}
                     onFocus={(e) => handleSearchFocus(e)}
