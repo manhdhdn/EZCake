@@ -48,14 +48,14 @@ const SignInForm = (props) => {
                         <Input
                             name="group39694"
                             placeholder="email"
-                            className="italic leading-[normal] p-0 placeholder:text-red-500_87 sm:px-5 text-left text-lg text-red-500_87 w-full"
+                            className="placeholder:italic leading-[normal] p-0 placeholder:text-red-500_87 sm:px-5 text-left text-lg text-red-500 w-full"
                             wrapClassName="bg-orange-50 border border-red-500 border-solid pb-[15px] pl-[21px] pr-[35px] pt-3 rounded-[5px] w-[98%]"
                             type="email"
                             autoComplete="email"
                             onChange={(value) => setEmail(value)}
                         ></Input>
                         <Input name="group39702" placeholder="password"
-                            className="italic leading-[normal] p-0 placeholder:text-red-500_87 sm:pr-5 text-left text-lg text-red-500_87 w-full"
+                            className="placeholder:italic leading-[normal] p-0 placeholder:text-red-500_87 sm:pr-5 text-left text-lg text-red-500 w-full"
                             wrapClassName="bg-orange-50 border border-red-500 border-solid mt-5 pl-5 pr-[35px] py-[13px] rounded-[5px] w-[98%]"
                             type="password"
                             autoComplete="current-password"

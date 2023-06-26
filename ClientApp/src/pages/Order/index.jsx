@@ -5,7 +5,7 @@ import { useSnackbar } from "notistack";
 import { handleSectionNavigation } from "utils";
 import OrderApi from "apis/services/Order";
 
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Pagination } from "@mui/material";
 import { Button, Img, Input, Line, Text } from "components";
 import Navbar from "components/Navbar";
 import Chat from "components/Chat";
@@ -13,6 +13,8 @@ import Footer from "components/Footer";
 
 const Order = () => {
     const [load, setLoad] = useState(true);
+    const [pageNumber, setPageNumber] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
     const [confirms, setConfirms] = useState(null);
     const [confirmDetails, setConfirmDetails] = useState([]);
     const [makings, setMakings] = useState(null);
@@ -22,6 +24,9 @@ const Order = () => {
     const [histories, setHistories] = useState(null);
     const [historyDetails, setHistoryDetails] = useState([]);
     const [selected, setSelected] = useState(1);
+    const [searchAnimation, setSearchAnimation] = useState("bg-red-500_63");
+    const [searchIcon, setSearchIcon] = useState("images/img_search.svg");
+    const [search, setSearch] = useState("");
 
     const buttonClassSelected = "bg-red-500 border-teal-100 text-orange-50";
     const buttonClassDefault = "bg-orange-50 border-red-500 text-red-500";
@@ -45,35 +50,68 @@ const Order = () => {
                 let orders = []
                 let accountId = JSON.parse(localStorage.getItem("userInfo")).id
 
-                orders = await OrderApi.getOrders({
-                    accountId,
-                    status: "Pending",
-                    subStatus: "Confirmed"
-                });
+                setLoad(true);
 
-                setConfirms(orders);
+                if (selected === 1) {
+                    orders = await OrderApi.getOrders({
+                        accountId,
+                        status: "Pending",
+                        subStatus: "Confirmed",
+                        pageNumber,
+                        search
+                    });
 
-                orders = await OrderApi.getOrders({
-                    accountId,
-                    status: "Making"
-                })
+                    setConfirms(orders);
+                    setMakings([]);
+                    setDeliveries([]);
+                    setHistories([]);
+                    return;
+                }
 
-                setMakings(orders);
+                if (selected === 2) {
+                    orders = await OrderApi.getOrders({
+                        accountId,
+                        status: "Making",
+                        pageNumber,
+                        search
+                    })
 
-                orders = await OrderApi.getOrders({
-                    accountId,
-                    status: "Delivering",
-                    subStatus: "Delivered"
-                })
+                    setMakings(orders);
+                    setConfirms([]);
+                    setDeliveries([]);
+                    setHistories([]);
+                    return;
+                }
 
-                setDeliveries(orders);
+                if (selected === 3) {
+                    orders = await OrderApi.getOrders({
+                        accountId,
+                        status: "Delivering",
+                        subStatus: "Delivered",
+                        pageNumber,
+                        search
+                    })
 
-                orders = await OrderApi.getOrders({
-                    accountId,
-                    status: "Completed"
-                })
+                    setDeliveries(orders);
+                    setConfirms([]);
+                    setMakings([]);
+                    setHistories([]);
+                    return;
+                }
 
-                setHistories(orders);
+                if (selected === 4) {
+                    orders = await OrderApi.getOrders({
+                        accountId,
+                        status: "Completed",
+                        pageNumber,
+                        search
+                    })
+
+                    setHistories(orders);
+                    setConfirms([]);
+                    setMakings([]);
+                    setDeliveries([]);
+                }
             } catch (error) {
                 enqueueSnackbar("Could not load order", { variant: "error" });
             }
@@ -82,7 +120,7 @@ const Order = () => {
         loadOrder();
 
         // eslint-disable-next-line
-    }, [])
+    }, [pageNumber, selected, search]);
 
     useEffect(() => {
         const loadConfirmOrder = async () => {
@@ -107,14 +145,17 @@ const Order = () => {
                 })
 
                 setConfirmDetails(orderDetails);
+                setTotalPages(confirms.totalPages);
             } catch (error) {
                 enqueueSnackbar("Could not load order", { variant: "error" });
             }
         }
 
         if (confirms) {
-            loadConfirmOrder();
-            setLoad();
+            if (confirms.data !== undefined) {
+                loadConfirmOrder();
+                setLoad(false);
+            }
         }
 
         // eslint-disable-next-line
@@ -143,13 +184,17 @@ const Order = () => {
                 })
 
                 setMakingDetails(orderDetails);
+                setTotalPages(makings.totalPages);
             } catch (error) {
                 enqueueSnackbar("Could not load order", { variant: "error" });
             }
         }
 
         if (makings) {
-            loadMakingOrder();
+            if (makings.data !== undefined) {
+                loadMakingOrder();
+                setLoad(false);
+            }
         }
 
         // eslint-disable-next-line
@@ -178,13 +223,17 @@ const Order = () => {
                 })
 
                 setDeliveryDetails(orderDetails);
+                setTotalPages(deliveries.totalPages);
             } catch (error) {
                 enqueueSnackbar("Could not load order", { variant: "error" });
             }
         }
 
         if (deliveries) {
-            loadDeliveryOrder();
+            if (deliveries.data !== undefined) {
+                loadDeliveryOrder();
+                setLoad(false);
+            }
         }
 
         // eslint-disable-next-line
@@ -213,13 +262,17 @@ const Order = () => {
                 })
 
                 setHistoryDetails(orderDetails);
+                setTotalPages(histories.totalPages);
             } catch (error) {
                 enqueueSnackbar("Could not load order", { variant: "error" });
             }
         }
 
         if (histories) {
-            loadHistoryOrder();
+            if (histories.data !== undefined) {
+                loadHistoryOrder();
+                setLoad(false);
+            }
         }
 
         // eslint-disable-next-line
@@ -233,6 +286,36 @@ const Order = () => {
 
     const handlePayBtxClick = (id) => {
         navigate(`/payment/${id}`);
+    }
+
+    const handlePageChange = (e, page) => {
+        e.preventDefault();
+
+        console.log(page);
+        console.log(pageNumber);
+
+        if (parseInt(page) !== pageNumber) {
+            setPageNumber(page);
+        }
+    }
+
+    const handleSearch = (value) => {
+        setSearch(value);
+        setPageNumber(1);
+    }
+
+    const handleSearchFocus = (e) => {
+        e.preventDefault();
+
+        setSearchAnimation("bg-orange-50 border border-solid border-red-500");
+        setSearchIcon("images/img_search_focus.svg");
+    }
+
+    const handleSearchBlur = (e) => {
+        e.preventDefault();
+
+        setSearchAnimation("bg-red-500_63");
+        setSearchIcon("images/img_search.svg");
     }
 
     const confirm = () => {
@@ -259,10 +342,10 @@ const Order = () => {
                 }
 
                 contents.push(
-                    <div key={index} className={`transition-all duration-300 ${selected === 1 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
+                    <div key={order.id} className={`transition-all duration-300 ${selected === 1 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
                         <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
                             <Img
-                                className={`transition-all duration-300 ${selected === 1 ? animationShow : animationHide} md:h-auto object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
+                                className={`transition-all duration-300 ${selected === 1 ? animationShow : animationHide} md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
                                 src={image}
                                 alt="pictureEleven"
                             />
@@ -308,9 +391,9 @@ const Order = () => {
                             </div>
                             <Line className={`transition-all duration-300 ${selected === 1 ? animationLineShow : animationHide} bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
                             <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
-                                <div className="flex flex-row gap-[147px] items-center justify-start w-[93%] md:w-full">
+                                <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
                                     <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl">
+                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
                                         {price.toLocaleString("vi-VN")} VNĐ
                                     </Text>
                                 </div>
@@ -385,10 +468,10 @@ const Order = () => {
                 }
 
                 contents.push(
-                    <div key={index} className={`transition-all duration-300 ${selected === 2 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
+                    <div key={order.id} className={`transition-all duration-300 ${selected === 2 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
                         <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
                             <Img
-                                className={`transition-all duration-300 ${selected === 2 ? animationShow : animationHide} md:h-auto object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
+                                className={`transition-all duration-300 ${selected === 2 ? animationShow : animationHide} md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
                                 src={image}
                                 alt="pictureEleven"
                             />
@@ -434,9 +517,9 @@ const Order = () => {
                             </div>
                             <Line className={`transition-all duration-300 ${selected === 2 ? animationLineShow : animationHide} bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
                             <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
-                                <div className="flex flex-row gap-[147px] items-center justify-start w-[93%] md:w-full">
+                                <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
                                     <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl">
+                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
                                         {price.toLocaleString("vi-VN")} VNĐ
                                     </Text>
                                 </div>
@@ -474,7 +557,7 @@ const Order = () => {
                 let quantity = 0;
                 let singlePrice = order.orderDetails[0].price;
                 let price = 0;
-                let deliveryed = order.status === "Confirmed" ? true : false;
+                let deliveryed = order.status === "Delivered" ? true : false;
 
                 for (let index = 0; index < order.orderDetails.length; index++) {
                     if (!name.includes(order.orderDetails[index].cake.name)) {
@@ -487,10 +570,10 @@ const Order = () => {
                 }
 
                 contents.push(
-                    <div className={`transition-all duration-300 ${selected === 3 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
+                    <div key={order.id} className={`transition-all duration-300 ${selected === 3 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
                         <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
                             <Img
-                                className={`transition-all duration-300 ${selected === 3 ? animationShow : animationHide} md:h-auto object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
+                                className={`transition-all duration-300 ${selected === 3 ? animationShow : animationHide} md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
                                 src={image}
                                 alt="pictureEleven"
                             />
@@ -536,9 +619,9 @@ const Order = () => {
                             </div>
                             <Line className={`transition-all duration-300 ${selected === 3 ? animationLineShow : animationHide} bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
                             <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
-                                <div className="flex flex-row gap-[147px] items-center justify-start w-[93%] md:w-full">
+                                <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
                                     <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl">
+                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
                                         {price.toLocaleString("vi-VN")} VNĐ
                                     </Text>
                                 </div>
@@ -605,10 +688,10 @@ const Order = () => {
                 }
 
                 contents.push(
-                    <div className={`transition-all duration-300 ${selected === 4 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
+                    <div key={order.id} className={`transition-all duration-300 ${selected === 4 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
                         <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
                             <Img
-                                className={`transition-all duration-300 ${selected === 4 ? animationShow : animationHide} md:h-auto object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
+                                className={`transition-all duration-300 ${selected === 4 ? animationShow : animationHide} md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
                                 src={image}
                                 alt="pictureEleven"
                             />
@@ -654,9 +737,9 @@ const Order = () => {
                             </div>
                             <Line className={`transition-all duration-300 ${selected === 4 ? animationLineShow : animationHide} bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
                             <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
-                                <div className="flex flex-row gap-[147px] items-center justify-start w-[93%] md:w-full">
+                                <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
                                     <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl">
+                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
                                         {price.toLocaleString("vi-VN")} VNĐ
                                     </Text>
                                 </div>
@@ -719,25 +802,37 @@ const Order = () => {
                 <div className="flex-wrap md:gap-10 gap-[122px] grid sm:grid-cols-1 md:grid-cols-2 grid-cols-4 items-center justify-between max-w-[1298px] mt-[18px] mx-auto md:px-5 w-full">
                     <Button
                         className={`${selected === 1 ? buttonClassSelected : buttonClassDefault} hover:bg-red-500 border hover:border-teal-100 border-solid cursor-pointer flex-1 leading-[normal] min-w-[233px] py-4 rounded-[5px] text-[22px] text-center sm:text-lg hover:text-orange-50 md:text-xl w-full`}
-                        onClick={() => setSelected(1)}
+                        onClick={() => {
+                            setSelected(1);
+                            setPageNumber(1);
+                        }}
                     >
                         Confirm
                     </Button>
                     <Button
                         className={`${selected === 2 ? buttonClassSelected : buttonClassDefault} hover:bg-red-500 border hover:border-teal-100 border-solid cursor-pointer flex-1 leading-[normal] min-w-[233px] py-4 rounded-[5px] text-[22px] text-center sm:text-lg hover:text-orange-50 md:text-xl w-full`}
-                        onClick={() => setSelected(2)}
+                        onClick={() => {
+                            setSelected(2);
+                            setPageNumber(1);
+                        }}
                     >
                         Making CUPCAKE
                     </Button>
                     <Button
                         className={`${selected === 3 ? buttonClassSelected : buttonClassDefault} hover:bg-red-500 border hover:border-teal-100 border-solid cursor-pointer flex-1 leading-[normal] min-w-[233px] py-4 rounded-[5px] text-[22px] text-center sm:text-lg hover:text-orange-50 md:text-xl w-full`}
-                        onClick={() => setSelected(3)}
+                        onClick={() => {
+                            setSelected(3);
+                            setPageNumber(1);
+                        }}
                     >
                         Delivery
                     </Button>
                     <Button
                         className={`${selected === 4 ? buttonClassSelected : buttonClassDefault} hover:bg-red-500 border hover:border-teal-100 border-solid cursor-pointer flex-1 leading-[normal] min-w-[233px] py-4 rounded-[5px] text-[22px] text-center sm:text-lg hover:text-orange-50 md:text-xl w-full`}
-                        onClick={() => setSelected(4)}
+                        onClick={() => {
+                            setSelected(4);
+                            setPageNumber(1);
+                        }}
                     >
                         History
                     </Button>
@@ -745,15 +840,29 @@ const Order = () => {
                 <Input
                     name="group100"
                     placeholder="Search..."
-                    className="italic leading-[normal] p-0 placeholder:text-red-500_87 sm:pr-5 text-left text-red-500_87 text-sm w-full"
-                    wrapClassName="bg-red-500_63 flex mt-5 mb-5 pl-5 pr-[35px] py-1 rounded-[5px] w-[91%]"
-                    prefix={<Img className="h-[51px] mr-5 my-auto" src="images/img_search.svg" alt="search" />}
-                ></Input>
+                    className="placeholder:italic leading-[normal] p-0 focus:bg-orange-50 placeholder:text-red-500_87 sm:pr-5 text-left text-red-500 placeholder:text-red-500_87 text-sm w-full"
+                    wrapClassName={`${searchAnimation} flex mt-5 mb-5 pl-5 pr-[35px] py-1 rounded-[5px] w-[87.2%]`}
+                    prefix={<Img className="h-[51px] mr-5 my-auto" src={searchIcon} alt="search" />}
+                    onFocus={(e) => handleSearchFocus(e)}
+                    onBlur={(e) => handleSearchBlur(e)}
+                    onChange={(value) => handleSearch(value)}
+                />
 
                 {content()}
 
+                <div className="flex flex-row items-center justify-center mt-[50px] w-full">
+                    <Pagination
+                        count={totalPages}
+                        variant="outlined"
+                        shape="rounded"
+                        defaultPage={1}
+                        page={pageNumber}
+                        onChange={(e, page) => handlePageChange(e, page)}
+                    />
+                </div>
+
                 <Chat />
-                <Footer className="bg-orange-50 flex items-center justify-center mt-[100px] md:px-5 w-full" />
+                <Footer className="bg-orange-50 flex items-center justify-center mt-[50px] md:px-5 w-full" />
             </div>
         </div>
     );

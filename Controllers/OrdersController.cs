@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using EZCake.BusinessObjects;
 using EZCake.BusinessObjects.Context;
 using EZCake.Utils;
+using System.ComponentModel;
 
 namespace EZCake.Controllers
 {
@@ -19,7 +20,7 @@ namespace EZCake.Controllers
 
         // GET: api/Orders
         [HttpGet]
-        public async Task<ActionResult<PagedList<Order>>> GetOrders(Guid? accountId, string? status, string? subStatus, int? pageNumber, int? pageSize)
+        public async Task<ActionResult<PagedList<Order>>> GetOrders(Guid? accountId, string? status, string? subStatus, [DefaultValue("")] string? search, int? pageNumber, int? pageSize)
         {
             if (_context.Orders == null)
             {
@@ -28,15 +29,14 @@ namespace EZCake.Controllers
 
             var orders = _context.Orders.AsQueryable();
 
-            if (accountId != null && status != null && subStatus != null)
+            if (accountId != null && status != null)
             {
                 orders = orders.Where(o => o.ShippingInformation!.AccountId == accountId && (o.Status == status || o.Status == subStatus)).OrderBy(o => o.Status == subStatus).ThenByDescending(o => o.OrderDate);
             }
 
-            if (accountId != null && status != null && subStatus == null)
-            {
-                orders = orders.Where(o => o.ShippingInformation!.AccountId == accountId && o.Status == status).OrderBy(o => o.OrderDate);
-            }
+            search ??= string.Empty;
+
+            orders = orders.Where(o => o.OrderDetails.Any(od => od.Cake!.Name!.Contains(search!)));
 
             return await PagedList<Order>.ToPagedListAsync(orders, pageNumber ?? 1, pageSize ?? 6);
         }
