@@ -9,7 +9,7 @@ import MoMo from "apis/momo/MoMo";
 import PaymentApi from "apis/services/Payment";
 
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
-import { Skeleton, Tooltip } from "@mui/material";
+import { Backdrop, Skeleton, Tooltip } from "@mui/material";
 import { Button, Img, Input, Line, Text } from "../../components";
 import SignHeader from "components/SignHeader";
 import Chat from "components/Chat";
@@ -17,6 +17,8 @@ import Footer from "../../components/Footer";
 import QRCodeWithIcon from "components/QrCode";
 
 const Payment = () => {
+    const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState("");
     const [order, setOrder] = useState(null);
     const [image, setImage] = useState("images/img_cake_box.png");
     const [name, setName] = useState([]);
@@ -41,6 +43,7 @@ const Payment = () => {
                     throw new Error("Confirmed");
                 }
 
+                setMessage(order.message);
                 setImage(order.orderDetails[0].cake.image);
 
                 let name = [];
@@ -91,6 +94,7 @@ const Payment = () => {
                         orderDate: order.orderDate,
                         shippedDate: order.shippedDate,
                         shippingInformationId: order.shippingInformationId,
+                        message,
                         status: "Confirmed"
                     });
 
@@ -116,7 +120,54 @@ const Payment = () => {
         }
 
         // eslint-disable-next-line
-    }, [checkPaymentBody]);
+    }, [checkPaymentBody, message]);
+
+    const handleCloseMessage = () => {
+        setOpen(false);
+    }
+
+    const handleOpenMessage = () => {
+        setOpen(true);
+    }
+
+    const handleInputMessage = (e) => {
+        e.preventDefault();
+
+        if (e.target.value.length <= 250) {
+            setMessage(e.target.value);
+        }
+    }
+
+    const messagePopUp = () => {
+        return (
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={open}
+            >
+                <div className="h-[40.05%] bg-orange-50 border border-red-500 rounded-[5px] flex flex-col gap-5 items-center justify-center w-[33.125%] z-10">
+                    <div className="h-[60.2888%] bg-orange-50 border border-red-500 border-solid pb-[1px] pl-5 pt-5 rounded-[5px] w-[80%]">
+                        <textarea
+                            name="message"
+                            placeholder="250 Characters Only"
+                            className="h-full bg-orange-50 border-0 leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 break-works w-full"
+                            autoFocus
+                            type="text"
+                            defaultValue={message}
+                            onChange={(e) => handleInputMessage(e)}
+                        />
+                    </div>
+                    <div className="flex flex-row items-center justify-center w-full">
+                        <Button
+                            className="bg-orange-50 border border-red-500 text-red-500 py-2 px-12 rounded-[5px] text-lg"
+                            onClick={() => handleCloseMessage()}
+                        >
+                            save
+                        </Button>
+                    </div>
+                </div>
+            </Backdrop>
+        )
+    }
 
     const cakeInfo = () => {
         let element = (
@@ -128,7 +179,6 @@ const Payment = () => {
                 </div>
             </>
         )
-
 
         if (name.length === 1) {
             element = (
@@ -221,7 +271,12 @@ const Payment = () => {
                                         defaultValue={order && order.shippingInformation.address}
                                     ></Input>
                                 </div>
-                                <Text className="italic text-red-500 text-sm underline">Review your note</Text>
+                                <Text
+                                    className="italic text-red-500 text-sm underline cursor-pointer"
+                                    onClick={() => handleOpenMessage()}
+                                >
+                                    Review your note
+                                </Text>
                             </div>
                             <Button
                                 className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] md:ml-[0] ml-[268px] mt-6 py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
@@ -258,6 +313,7 @@ const Payment = () => {
                     <Chat />
                     <Footer className="bg-orange-50 flex items-center justify-center md:px-5 w-full" />
                 </div>
+                {messagePopUp()}
             </div>
         </>
     );

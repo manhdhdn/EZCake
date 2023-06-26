@@ -262,8 +262,6 @@ const CuscakeForm = (props) => {
         if (e.target.value.length <= 250) {
             setMessage(e.target.value);
         }
-
-        console.log(e.target.value);
     }
 
     const messagePopUp = () => {
