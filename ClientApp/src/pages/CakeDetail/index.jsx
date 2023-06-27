@@ -44,11 +44,17 @@ const CakeDetail = () => {
     }, []);
 
     const handleInputNumber = (value) => {
-        if (value > 0) {
-            setNumber(value);
-        } else {
-            setNumber(1);
+        if (value < 0) {
+            setNumber(0);
+            return;
         }
+
+        if (value > 6) {
+            setNumber(6);
+            return;
+        }
+
+        setNumber(value);
     }
 
     const handleTabClick = (index) => {
@@ -80,7 +86,7 @@ const CakeDetail = () => {
                     orderId,
                     cakeId: cake.id,
                     price: cake.price,
-                    quantity: number
+                    quantity: number === "" || number === "0" ? 1 : number
                 })
 
                 if (status === 201) {
@@ -159,11 +165,10 @@ const CakeDetail = () => {
                                                 <Text className="text-lg text-red-500">Number</Text>
                                                 {/* Convert upper button to the type Input that I declared */}
                                                 <Input
-                                                    className="leading-[normal] text-center text-lg text-red-500 pt-[6px] h-[30px] w-[79px]"
-                                                    wrapClassName="bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] w-[71px]"
-                                                    defaultValue={number}
+                                                    className="leading-[normal] text-center text-lg text-red-500 h-full w-full"
+                                                    wrapClassName="bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] pl-2 w-[68px]"
+                                                    value={number}
                                                     type="number"
-                                                    min={1}
                                                     onChange={(value) => handleInputNumber(value)}
                                                 />
                                             </div>

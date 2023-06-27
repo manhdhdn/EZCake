@@ -5,11 +5,14 @@ import { useSnackbar } from "notistack";
 import { UserAuth } from "apis/auth/AuthContext";
 
 import { Link } from "react-router-dom";
-import { Button, Img, Line } from "components";
+import { Button, Img, Input, Line, Text } from "components";
 
 const Navbar = (props) => {
   const [userLoggedIn, setUserLoggedIn] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenCart, setIsOpenCart] = useState(false);
+  const [cart, setCart] = useState(null);
+  const [price, setPrice] = useState(0);
   const [userIcon, setUserIcon] = useState("images/img_user.svg");
   const [cartIcon, setCartIcon] = useState("images/img_cart.svg");
 
@@ -31,6 +34,7 @@ const Navbar = (props) => {
     const handleOutsideClick = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
+        setIsOpenCart(false);
       }
     };
 
@@ -40,6 +44,22 @@ const Navbar = (props) => {
       document.removeEventListener("click", handleOutsideClick);
     };
   }, []);
+
+  useEffect(() => {
+    const loadCart = async () => {
+      try {
+        setCart(JSON.parse(localStorage.getItem("cart")));
+      } catch (error) {
+        enqueueSnackbar("Load cart failed", { variant: "error" });
+      }
+    }
+
+    if (isOpenCart) {
+      loadCart();
+    }
+
+    // eslint-disable-next-line
+  }, [isOpenCart])
 
   const handleUserIconEnter = () => {
     setUserIcon("images/img_user_hover.svg");
@@ -67,7 +87,13 @@ const Navbar = (props) => {
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
+    setIsOpenCart(false);
   };
+
+  const toggleDropdownCart = () => {
+    setIsOpen(false);
+    setIsOpenCart(!isOpenCart);
+  }
 
   const handleLogout = async () => {
     try {
@@ -79,6 +105,33 @@ const Navbar = (props) => {
       enqueueSnackbar("Logout failed", { variant: "error" });
     }
   };
+
+  const cakes = () => {
+    let element = [];
+
+    cart.orderDetails.forEach((orderDetail) => {
+      element.push(
+        <div key={orderDetail.id} className="h-[125px] flex flex-row gap-5 items-start justify-start w-full">
+          <Img className="h-[125px] border border-1 border-red-500 px-1 py-3 w-[125px]" src={orderDetail.cake.image} alt="cake" />
+          <div className="flex flex-col gap-4 items-start justify-between w-full">
+            <div className="flex flex-col items-start h-full w-full">
+              <Text className="font-bold text-deep_orange-500 text-lg">{orderDetail.cake.name} Cupcake</Text>
+              <Text className="text-deep_orange-500 text-sm">{orderDetail.price.toLocaleString("vi-VN")} VNĐ</Text>
+            </div>
+            <Input
+              className="leading-[normal] text-center text-lg text-red-500 h-full w-full"
+              wrapClassName="bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] pl-[10px] w-[76px]"
+              value={orderDetail.quantity}
+              type="number"
+              onChange={(value) => { }}
+            />
+          </div>
+        </div>
+      );
+    });
+
+    return element;
+  }
 
   return (
     <div style={{ position: "fixed", zIndex: 100 }} className={props.className}>
@@ -109,11 +162,11 @@ const Navbar = (props) => {
               </Button>
             </>
           ) : (
-            <>
-              <div className="relative" ref={dropdownRef}>
+            <div className="flex flex-row items-center justify-center gap-10" ref={dropdownRef}>
+              <div className="relative">
                 <Img
                   id="user"
-                  className="ml-5 md:ml-[0] ml-[1101px] rounded-full cursor-pointer"
+                  className="ml-5 md:ml-[0] rounded-full cursor-pointer"
                   src={userIcon}
                   alt="user"
                   onClick={toggleDropdown}
@@ -123,8 +176,8 @@ const Navbar = (props) => {
 
                 {isOpen && (
                   <div
-                    id="dropdown"
-                    className="absolute right-0 z-10 bg-orange-50 font-monumentextended items-center justify-start w-auto"
+                    id="user"
+                    className="absolute right-0 z-10 bg-orange-50 font-monumentextended items-center justify-start w-[180px]"
                   >
                     <ul>
                       <Button
@@ -155,17 +208,44 @@ const Navbar = (props) => {
                   </div>
                 )}
               </div>
-
               <div className="relative">
                 <Img
                   className="h-[36px] ml-0 md:ml-[0] w-[38px] cursor-pointer"
                   src={cartIcon}
                   alt="cart"
+                  onClick={toggleDropdownCart}
                   onMouseEnter={handleCartIconEnter}
                   onMouseLeave={handleCartIconLeave}
                 />
+
+                {isOpenCart && (
+                  <div
+                    id="cart"
+                    className="absolute right-0 z-10 bg-orange-50 max-h-[710px] h-auto font-monumentextended border border-red-500 flex flex-col items-center justify-center w-[422px]"
+                  >
+                    <div className="flex flex-col gap-10 items-start justify-start overflow-y-scroll mx-5 my-10 w-[320px]">
+                      <Text className="font-extrabold sm:text-[35px] md:text-[37px] text-[39px] text-left text-deep_orange-500 w-full">Your Cart</Text>
+                      <div className="font-sfmono flex flex-col gap-5 items-start justify-start w-full">
+                        {/* Place cakes here */}
+                        {cart && cakes()}
+                        <Line className="h-[3px] w-full bg-deep_orange-500" />
+                        <div className="flex flex-row items-start justify-between w-full">
+                          <Text className="font-bold text-left text-deep_orange-500 text-[20px]">Total:</Text>
+                          {/* <Text className="text-right text-deep_orange-500 text-[20px]">{cart && price.toLocaleString("vi-VN")} VNĐ</Text> */}
+                        </div>
+                        <div className="flex flex-row items-center justify-center w-full">
+                          <Button
+                            className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                          >
+                            pay now
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -17,6 +17,10 @@ const Shop = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        handleSectionNavigation("shop", -1);
+    }, []);
+
+    useEffect(() => {
         const loadCakes = async () => {
             try {
                 let cakes = await CakeApi.getCakes({ status: "Available" });
@@ -28,10 +32,6 @@ const Shop = () => {
         }
 
         loadCakes();
-    }, []);
-
-    useEffect(() => {
-        handleSectionNavigation("shop", -1);
     }, []);
 
     const handleCakeClick = (id) => {

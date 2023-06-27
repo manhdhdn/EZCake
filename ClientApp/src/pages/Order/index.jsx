@@ -45,7 +45,7 @@ const Order = () => {
     const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
-        handleSectionNavigation("order", 117);
+        handleSectionNavigation("order", -50);
     }, []);
 
     useEffect(() => {
