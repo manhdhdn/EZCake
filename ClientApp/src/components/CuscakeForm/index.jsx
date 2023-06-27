@@ -278,12 +278,13 @@ const CuscakeForm = (props) => {
                             className="h-full bg-orange-50 border-0 leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 break-works w-full"
                             autoFocus
                             type="text"
+                            defaultValue={null}
                             onChange={(e) => handleInputMessage(e)}
                         />
                     </div>
                     <div className="flex flex-row items-center justify-center w-full">
                         <Button
-                            className="bg-orange-50 border border-red-500 text-red-500 py-2 px-12 rounded-[5px] text-lg"
+                            className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 text-red-500 hover:text-orange-50 py-2 px-12 rounded-[5px] text-lg"
                             onClick={() => handleCloseMessage()}
                         >
                             save

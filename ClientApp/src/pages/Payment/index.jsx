@@ -85,7 +85,7 @@ const Payment = () => {
 
     useEffect(() => {
         const intervalId = checkPaymentBody && setInterval(async () => {
-            let status = await MoMo.checkPayment(checkPaymentBody);
+            let status = (await MoMo.checkPayment(checkPaymentBody)).resultCode;
 
             if (status === 0) {
                 try {
@@ -107,6 +107,8 @@ const Payment = () => {
                         lang: checkPaymentBody.lang,
                         orderUni: order.id
                     });
+
+                    enqueueSnackbar("Order successfully payed", { variant: "success" });
 
                     navigate("/order");
                 } catch (error) {
@@ -158,7 +160,7 @@ const Payment = () => {
                     </div>
                     <div className="flex flex-row items-center justify-center w-full">
                         <Button
-                            className="bg-orange-50 border border-red-500 text-red-500 py-2 px-12 rounded-[5px] text-lg"
+                            className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 text-red-500 hover:text-orange-50 py-2 px-12 rounded-[5px] text-lg"
                             onClick={() => handleCloseMessage()}
                         >
                             save

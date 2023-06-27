@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { handleSectionNavigation } from "utils";
 import OrderApi from "apis/services/Order";
+import MoMo from "apis/momo/MoMo";
 
-import { CircularProgress, Pagination } from "@mui/material";
+import { Backdrop, CircularProgress, Pagination } from "@mui/material";
 import { Button, Img, Input, Line, Text } from "components";
 import Navbar from "components/Navbar";
 import Chat from "components/Chat";
@@ -13,6 +14,9 @@ import Footer from "components/Footer";
 
 const Order = () => {
     const [load, setLoad] = useState(true);
+    const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState("");
+    const [cancelOrder, setCancelOrder] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [confirms, setConfirms] = useState(null);
@@ -62,9 +66,9 @@ const Order = () => {
                     });
 
                     setConfirms(orders);
-                    setMakings([]);
-                    setDeliveries([]);
-                    setHistories([]);
+                    setMakings({});
+                    setDeliveries({});
+                    setHistories({});
                     return;
                 }
 
@@ -77,9 +81,9 @@ const Order = () => {
                     })
 
                     setMakings(orders);
-                    setConfirms([]);
-                    setDeliveries([]);
-                    setHistories([]);
+                    setConfirms({});
+                    setDeliveries({});
+                    setHistories({});
                     return;
                 }
 
@@ -93,9 +97,9 @@ const Order = () => {
                     })
 
                     setDeliveries(orders);
-                    setConfirms([]);
-                    setMakings([]);
-                    setHistories([]);
+                    setConfirms({});
+                    setMakings({});
+                    setHistories({});
                     return;
                 }
 
@@ -108,9 +112,9 @@ const Order = () => {
                     })
 
                     setHistories(orders);
-                    setConfirms([]);
-                    setMakings([]);
-                    setDeliveries([]);
+                    setConfirms({});
+                    setMakings({});
+                    setDeliveries({});
                 }
             } catch (error) {
                 enqueueSnackbar("Could not load order", { variant: "error" });
@@ -291,9 +295,6 @@ const Order = () => {
     const handlePageChange = (e, page) => {
         e.preventDefault();
 
-        console.log(page);
-        console.log(pageNumber);
-
         if (parseInt(page) !== pageNumber) {
             setPageNumber(page);
         }
@@ -318,11 +319,97 @@ const Order = () => {
         setSearchIcon("images/img_search.svg");
     }
 
+    const handleCloseMessage = () => {
+        setOpen(false);
+    }
+
+    const handleOpenMessage = (order) => {
+        setOpen(true);
+        setCancelOrder(order);
+    }
+
+    const handleInputMessage = (e) => {
+        e.preventDefault();
+
+        if (e.target.value.length <= 250) {
+            setMessage(e.target.value);
+        }
+    }
+
+    const handleCancelOrder = async () => {
+        try {
+            await OrderApi.updateOrder(cancelOrder.id, {
+                id: cancelOrder.id,
+                orderDate: cancelOrder.orderDate,
+                shippedDate: cancelOrder.shippedDate,
+                shippingInformationId: cancelOrder.shippingInformationId,
+                message: message,
+                status: "Cancelled"
+            });
+
+            let orders = confirmDetails.filter(order => order.id !== cancelOrder.id);
+
+            setConfirmDetails(orders);
+            setMessage("");
+            setOpen(false);
+
+            enqueueSnackbar("Order cancelled, waiting for refund if any", { variant: "success" });
+
+            if (cancelOrder.payment != null) {
+                let status = await MoMo.refund(cancelOrder);
+
+                if (status === 0) {
+                    enqueueSnackbar("Refund sented, check your MoMo", { variant: "success" });
+                }
+            }
+        } catch (error) {
+            enqueueSnackbar("Could not cancel order", { variant: "error" });
+        }
+    }
+
+    const messagePopUp = () => {
+        return (
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={open}
+            >
+                <div className="h-[40.05%] bg-orange-50 border border-red-500 rounded-[5px] flex flex-col gap-5 items-center justify-center w-[33.125%] z-10">
+                    <div className="h-[60.2888%] bg-orange-50 border border-red-500 border-solid pb-[1px] pl-5 pt-5 rounded-[5px] w-[80%]">
+                        <textarea
+                            name="message"
+                            placeholder="Reason for cancel order... (250 Characters Only)"
+                            className="h-full bg-orange-50 border-0 leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 break-works w-full"
+                            autoFocus
+                            type="text"
+                            defaultValue={null}
+                            onChange={(e) => handleInputMessage(e)}
+                        />
+                    </div>
+                    <div className="flex flex-row gap-5 items-center justify-center w-full">
+                        <Button
+                            className={`bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 text-indigo-900 hover:text-orange-50 py-2 px-6 rounded-[5px] text-lg ${message.length <= 0 ? "cursor-not-allowed" : ""}`}
+                            disabled={message.length <= 0}
+                            onClick={() => handleCancelOrder()}
+                        >
+                            cancel order
+                        </Button>
+                        <Button
+                            className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 text-red-500 hover:text-orange-50 py-2 px-12 rounded-[5px] text-lg"
+                            onClick={() => handleCloseMessage()}
+                        >
+                            close
+                        </Button>
+                    </div>
+                </div>
+            </Backdrop>
+        )
+    }
+
     const confirm = () => {
         if (confirmDetails.length !== 0) {
             let contents = [];
 
-            confirmDetails.forEach((order, index) => {
+            confirmDetails.forEach((order) => {
                 let image = order.orderDetails[0].cake.image;
                 let name = [];
                 let numOfOrder = order.orderDetails.length;
@@ -407,6 +494,7 @@ const Order = () => {
                                             </Button>
                                             <Button
                                                 className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
+                                                onClick={() => handleOpenMessage(order)}
                                             >
                                                 cancel order
                                             </Button>
@@ -423,6 +511,7 @@ const Order = () => {
                                             </Button>
                                             <Button
                                                 className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
+                                                onClick={() => handleOpenMessage(order)}
                                             >
                                                 cancel order
                                             </Button>
@@ -438,6 +527,7 @@ const Order = () => {
             return (
                 <div className={`transition-all duration-300 flex flex-col ${selected === 1 ? animationBlockShow : animationBlockHide} w-full`}>
                     {contents}
+                    {messagePopUp()}
                 </div>
             );
         }
@@ -449,7 +539,7 @@ const Order = () => {
         if (makingDetails.length !== 0) {
             let contents = [];
 
-            makingDetails.forEach((order, index) => {
+            makingDetails.forEach((order) => {
                 let image = order.orderDetails[0].cake.image;
                 let name = [];
                 let numOfOrder = order.orderDetails.length;
@@ -550,7 +640,7 @@ const Order = () => {
         if (deliveriyDetails.length !== 0) {
             let contents = [];
 
-            deliveriyDetails.forEach((order, index) => {
+            deliveriyDetails.forEach((order) => {
                 let image = order.orderDetails[0].cake.image;
                 let name = [];
                 let numOfOrder = order.orderDetails.length;
@@ -669,7 +759,7 @@ const Order = () => {
         if (historyDetails.length !== 0) {
             let contents = [];
 
-            historyDetails.forEach((order, index) => {
+            historyDetails.forEach((order) => {
                 let image = order.orderDetails[0].cake.image;
                 let name = [];
                 let numOfOrder = order.orderDetails.length;
