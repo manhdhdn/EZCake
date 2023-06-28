@@ -4,14 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { handleSectionNavigation } from "utils";
 import { v4 } from "uuid";
+import moment from "moment";
 import OrderApi from "apis/services/Order";
 import MoMo from "apis/momo/MoMo";
 import PaymentApi from "apis/services/Payment";
 
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import { Backdrop, Skeleton } from "@mui/material";
-import Tooltip, {tooltipClasses} from "@mui/material/Tooltip";
-import {styled} from "@mui/material/styles";
+import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
+import { styled } from "@mui/material/styles";
 import { Button, Img, Input, Line, Text } from "../../components";
 import SignHeader from "components/SignHeader";
 import Chat from "components/Chat";
@@ -108,7 +109,7 @@ const Payment = () => {
                 try {
                     await OrderApi.updateOrder(order.id, {
                         id: order.id,
-                        orderDate: order.orderDate,
+                        orderDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
                         shippedDate: order.shippedDate,
                         shippingInformationId: order.shippingInformationId,
                         message,
