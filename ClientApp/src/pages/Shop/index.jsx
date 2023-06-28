@@ -17,6 +17,10 @@ const Shop = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        handleSectionNavigation("shop", -1);
+    }, []);
+
+    useEffect(() => {
         const loadCakes = async () => {
             try {
                 let cakes = await CakeApi.getCakes({ status: "Available" });
@@ -30,10 +34,6 @@ const Shop = () => {
         loadCakes();
     }, []);
 
-    useEffect(() => {
-        handleSectionNavigation("shop", -1);
-    }, []);
-
     const handleCakeClick = (id) => {
         navigate(`/cake-detail/${id}`);
     }
@@ -42,10 +42,10 @@ const Shop = () => {
         let element = [];
 
         if (cakes) {
-            cakes.forEach((cake, index) => {
+            cakes.forEach((cake) => {
                 element.push(
                     <div
-                        key={index} className="h-[726px] flex flex-row items-center justify-center w-1/3"
+                        key={cake.id} className="h-[726px] flex flex-row items-center justify-center w-1/3"
                         onClick={() => handleCakeClick(cake.id)}
                     >
                         <div className="h-full flex flex-col items-center justify-center w-full">
@@ -66,7 +66,7 @@ const Shop = () => {
             })
         } else {
             element.push(
-                <div className="h-[726px] flex items-center justify-center w-full">
+                <div key="loading" className="h-[726px] flex items-center justify-center w-full">
                     <CircularProgress color="success" />
                 </div>
             )

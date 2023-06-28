@@ -10,12 +10,14 @@ import CakeIngredientApi from 'apis/services/CakeIngredient';
 import OrderDetailApi from 'apis/services/OrderDetail';
 import OrderApi from 'apis/services/Order';
 
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, Backdrop } from '@mui/material';
 import { Button, Img, Input, Line, Text } from "components";
 import SignHeader from "components/SignHeader";
 
 const CuscakeForm = (props) => {
+    const [open, setOpen] = useState(false);
     const [load, setLoad] = useState(true);
+    const [message, setMessage] = useState("");
     const [flours, setFlours] = useState(null);
     const [flavors, setFlavors] = useState(null);
     const [toppings, setToppings] = useState(null);
@@ -189,6 +191,7 @@ const CuscakeForm = (props) => {
                 id: orderId,
                 orderDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
                 shippingInformationId,
+                message,
                 status: "Pending"
             });
 
@@ -243,6 +246,53 @@ const CuscakeForm = (props) => {
         } catch (error) {
             enqueueSnackbar("Order could not be created", { variant: "error" });
         }
+    }
+
+    const handleCloseMessage = () => {
+        setOpen(false);
+    }
+
+    const handleOpenMessage = () => {
+        setOpen(true);
+    }
+
+    const handleInputMessage = (e) => {
+        e.preventDefault();
+
+        if (e.target.value.length <= 250) {
+            setMessage(e.target.value);
+        }
+    }
+
+    const messagePopUp = () => {
+        return (
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={open}
+            >
+                <div className="h-[40.05%] bg-orange-50 border border-red-500 rounded-[5px] flex flex-col gap-5 items-center justify-center w-[33.125%] z-10">
+                    <div className="h-[60.2888%] bg-orange-50 border border-red-500 border-solid pb-[1px] pl-5 pt-5 rounded-[5px] w-[80%]">
+                        <textarea
+                            name="message"
+                            placeholder="250 Characters Only"
+                            className="h-full bg-orange-50 border-0 leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 break-works w-full"
+                            autoFocus
+                            type="text"
+                            defaultValue={null}
+                            onChange={(e) => handleInputMessage(e)}
+                        />
+                    </div>
+                    <div className="flex flex-row items-center justify-center w-full">
+                        <Button
+                            className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 text-red-500 hover:text-orange-50 py-2 px-12 rounded-[5px] text-lg"
+                            onClick={() => handleCloseMessage()}
+                        >
+                            save
+                        </Button>
+                    </div>
+                </div>
+            </Backdrop>
+        )
     }
 
     const cakeIcon = () => {
@@ -412,8 +462,14 @@ const CuscakeForm = (props) => {
                             >
                                 pay now
                             </Button>
-                            <Text className="italic text-center text-red-500 text-sm underline">Is this a gift?</Text>
+                            <Text
+                                className="italic text-center text-red-500 text-sm underline cursor-pointer"
+                                onClick={() => handleOpenMessage()}
+                            >
+                                Is this a gift?
+                            </Text>
                         </div>
+                        {messagePopUp()}
                     </div>
                 </>
             )

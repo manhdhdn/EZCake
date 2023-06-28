@@ -9,7 +9,9 @@ import MoMo from "apis/momo/MoMo";
 import PaymentApi from "apis/services/Payment";
 
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
-import { Skeleton, Tooltip } from "@mui/material";
+import { Backdrop, Skeleton } from "@mui/material";
+import Tooltip, {tooltipClasses} from "@mui/material/Tooltip";
+import {styled} from "@mui/material/styles";
 import { Button, Img, Input, Line, Text } from "../../components";
 import SignHeader from "components/SignHeader";
 import Chat from "components/Chat";
@@ -17,15 +19,29 @@ import Footer from "../../components/Footer";
 import QRCodeWithIcon from "components/QrCode";
 
 const Payment = () => {
+    const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState("");
     const [order, setOrder] = useState(null);
     const [image, setImage] = useState("images/img_cake_box.png");
-    const [name, setName] = useState([]);
+    const [names, setNames] = useState([]);
+    const [cakeSets, setCakeSets] = useState([]);
     const [price, setPrice] = useState(0);
     const [qrCodeUrl, setQrCodeUrl] = useState(null);
     const [checkPaymentBody, setCheckPaymentBody] = useState(null);
 
     const navigate = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
+
+    const HtmlTooltip = styled(({ className, ...props }) => (
+        <Tooltip {...props} classes={{ popper: className }} />
+    ))(({ theme }) => ({
+        [`& .${tooltipClasses.tooltip}`]: {
+            backgroundColor: '#fcedda',
+            maxWidth: 700,
+            fontSize: theme.typography.pxToRem(12),
+            border: '1px solid #ee4e34',
+        },
+    }));
 
     useEffect(() => {
         handleSectionNavigation("payment", 0);
@@ -37,25 +53,29 @@ const Payment = () => {
                 let orderId = window.location.pathname.split("/").pop();
                 let order = await OrderApi.getOrder(orderId);
 
-                if (order.status === "Confirmed") {
+                if (order.status !== "Pending" && order.status !== "Cart") {
                     throw new Error("Confirmed");
                 }
 
+                setMessage(order.message);
                 setImage(order.orderDetails[0].cake.image);
 
-                let name = [];
+                let names = [];
+                let cakeSets = [];
                 let price = 0;
 
-                order.orderDetails.forEach((element, index) => {
-                    if (!name.includes(order.orderDetails[index].cake.name)) {
-                        name.push(order.orderDetails[index].cake.name);
+                order.orderDetails.forEach((orderDetail) => {
+                    if (!names.includes(orderDetail.cake.name)) {
+                        names.push(orderDetail.cake.name);
                     }
 
-                    price += element.price * element.quantity;
+                    cakeSets.push(JSON.parse(orderDetail.cakeSet));
+                    price += orderDetail.price * orderDetail.quantity;
                 });
 
                 setOrder(order);
-                setName(name);
+                setNames(names);
+                setCakeSets(cakeSets);
                 setPrice(price);
 
                 try {
@@ -82,7 +102,7 @@ const Payment = () => {
 
     useEffect(() => {
         const intervalId = checkPaymentBody && setInterval(async () => {
-            let status = await MoMo.checkPayment(checkPaymentBody);
+            let status = (await MoMo.checkPayment(checkPaymentBody)).resultCode;
 
             if (status === 0) {
                 try {
@@ -91,6 +111,7 @@ const Payment = () => {
                         orderDate: order.orderDate,
                         shippedDate: order.shippedDate,
                         shippingInformationId: order.shippingInformationId,
+                        message,
                         status: "Confirmed"
                     });
 
@@ -104,19 +125,68 @@ const Payment = () => {
                         orderUni: order.id
                     });
 
+                    enqueueSnackbar("Order successfully payed", { variant: "success" });
+
                     navigate("/order");
                 } catch (error) {
                     enqueueSnackbar("Order could not be updated", { variant: "error" });
                 }
             }
-        }, 1000);
+        }, 2000);
 
         return () => {
             clearInterval(intervalId);
         }
 
         // eslint-disable-next-line
-    }, [checkPaymentBody]);
+    }, [checkPaymentBody, message]);
+
+    const handleCloseMessage = () => {
+        setOpen(false);
+    }
+
+    const handleOpenMessage = () => {
+        setOpen(true);
+    }
+
+    const handleInputMessage = (e) => {
+        e.preventDefault();
+
+        if (e.target.value.length <= 250) {
+            setMessage(e.target.value);
+        }
+    }
+
+    const messagePopUp = () => {
+        return (
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={open}
+            >
+                <div className="h-[40.05%] bg-orange-50 border border-red-500 rounded-[5px] flex flex-col gap-5 items-center justify-center w-[33.125%] z-10">
+                    <div className="h-[60.2888%] bg-orange-50 border border-red-500 border-solid pb-[1px] pl-5 pt-5 rounded-[5px] w-[80%]">
+                        <textarea
+                            name="message"
+                            placeholder="250 Characters Only"
+                            className="h-full bg-orange-50 border-0 leading-[normal] p-0 placeholder:text-red-500_87 placeholder:italic sm:px-5 text-left text-lg text-red-500 break-works w-full"
+                            autoFocus
+                            type="text"
+                            defaultValue={message}
+                            onChange={(e) => handleInputMessage(e)}
+                        />
+                    </div>
+                    <div className="flex flex-row items-center justify-center w-full">
+                        <Button
+                            className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 text-red-500 hover:text-orange-50 py-2 px-12 rounded-[5px] text-lg"
+                            onClick={() => handleCloseMessage()}
+                        >
+                            save
+                        </Button>
+                    </div>
+                </div>
+            </Backdrop>
+        )
+    }
 
     const cakeInfo = () => {
         let element = (
@@ -129,44 +199,55 @@ const Payment = () => {
             </>
         )
 
-
-        if (name.length === 1) {
+        if (names.includes("CUSCAKE")) {
             element = (
-                <>
+                <div key="cuscake">
                     <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500">
-                        {name[0]}
+                        {names[0]}
                     </Text>
-                    <Text className="font-sfmono mt-2 text-lg text-red-500">{name.includes("CUSCAKE") ? order.orderDetails.length : order.orderDetails[0].quantity} {order.orderDetails[0].quantity > 1 || order.orderDetails.length > 1 ? "Cakes" : "Cake"}</Text>
+                    <Text className="font-sfmono mt-2 text-lg text-red-500">{names.includes("CUSCAKE") ? order.orderDetails.length : order.orderDetails[0].quantity} {order.orderDetails[0].quantity > 1 || order.orderDetails.length > 1 ? "Cakes" : "Cake"}</Text>
                     <div className="flex flex-row items-center w-full">
                         <Text className="font-sfmono mt-1 text-lg text-red-500 cursor-pointer">Gift Box</Text>
                         <Tooltip disableFocusListener title={<Text className="font-sfmono p-1 text-sm cursor-pointer">Gift box depending on the quantity of your cake</Text>}>
                             <ArrowCircleDownIcon sx={{ marginTop: "5px", marginLeft: "8px", color: "#ee4e34" }} />
                         </Tooltip>
                     </div>
-                </>
+                </div>
             )
-        }
+        } else {
+            let title = [];
 
-        if (name.length > 1) {
-            let title = "";
+            names.forEach((name, index) => {
+                let quantity = 0;
 
-            name.forEach((element, index) => {
-                title += `${name[index]('\n')}`;
+                Object.keys(cakeSets[index]).forEach((key) => {
+                    if (cakeSets[index][key] !== 0) {
+                        quantity += cakeSets[index][key] * parseInt(key.slice(3));
+                    }
+                })
+
+                title.push(<Text key={index} className="font-sfmono mt-2 text-[12px] text-red-500">{`${name} ${cakeSets[index].set1 !== undefined ? `[set 1 cake: ${cakeSets[index].set1}]` : ""}${cakeSets[index].set2 !== undefined ? `[set 2 cakes: ${cakeSets[index].set2}]` : ""}${cakeSets[index].set4 !== undefined ? `[set 4 cakes: ${cakeSets[index].set4}]` : ""}${cakeSets[index].set6 !== undefined ? `[set 6 cakes: ${cakeSets[index].set6}]` : ""} [Total: ${quantity}]`}</Text>);
             })
-
-            title = title.slice(0, -1);
 
             element = (
                 <>
                     <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500 w-full">
-                        {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
+                        {names.length === 1 ? (
+                            <>
+                                {names[0]}
+                            </>
+                        ) : (
+                            <>
+                                {`${names[0]}, ${names[1]} ${names.length > 2 ? "and more" : ""}`}
+                            </>
+                        )}
                     </Text>
-                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-full" >{name.length} types of cake</Text>
-                    <div className="flex flex-row w-full">
+                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-full">{names.length} types of cake</Text>
+                    <div className="flex flex-row items-center w-full">
                         <Text className="italic text-red-500 text-sm underline">Hover for more</Text>
-                        <Tooltip title={title}>
+                        <HtmlTooltip title={title}>
                             <ArrowCircleDownIcon sx={{ marginTop: "5px", marginLeft: "8px", color: "#ee4e34" }} />
-                        </Tooltip>
+                        </HtmlTooltip>
                     </div>
                 </>
             )
@@ -221,7 +302,12 @@ const Payment = () => {
                                         defaultValue={order && order.shippingInformation.address}
                                     ></Input>
                                 </div>
-                                <Text className="italic text-red-500 text-sm underline">Review your note</Text>
+                                <Text
+                                    className="italic text-red-500 text-sm underline cursor-pointer"
+                                    onClick={() => handleOpenMessage()}
+                                >
+                                    Review your note
+                                </Text>
                             </div>
                             <Button
                                 className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer font-sfmono leading-[normal] min-w-[193px] md:ml-[0] ml-[268px] mt-6 py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
@@ -243,7 +329,7 @@ const Payment = () => {
                                 <div className="flex flex-col gap-14 items-start justify-start">
                                     <div className="flex flex-col gap-2 items-start justify-start w-full">
                                         <div className="flex flex-col items-start justify-start w-full">
-                                            {cakeInfo()}
+                                            {names && cakeSets && cakeInfo()}
                                         </div>
                                         <Text className="italic text-red-500 text-sm underline opacity-0">Edit</Text>
                                     </div>
@@ -258,6 +344,7 @@ const Payment = () => {
                     <Chat />
                     <Footer className="bg-orange-50 flex items-center justify-center md:px-5 w-full" />
                 </div>
+                {messagePopUp()}
             </div>
         </>
     );

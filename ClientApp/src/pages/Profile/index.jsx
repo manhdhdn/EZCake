@@ -10,7 +10,7 @@ import ProfileForm from "components/ProfileForm";
 
 const Profile = () => {
     useEffect(() => {
-        handleSectionNavigation("profile", 117);
+        handleSectionNavigation("profile", -50);
     }, []);
 
     return (

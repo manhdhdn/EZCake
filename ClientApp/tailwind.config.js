@@ -18,7 +18,7 @@ module.exports = {
         yellow: { 500: "#f9ea49" },
         white: { A700_02: "#ffffff02", A700: "#ffffff" },
         indigo: { 900: "#00008b" },
-        deep_orange: { 500: "#ff5b27" },
+        deep_orange: { 500: "#ff5b28" },
         pink: { 400: "#e6436d" },
       },
       spacing: {
