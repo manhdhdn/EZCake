@@ -137,7 +137,14 @@ const Navbar = (props) => {
     let orderId = v4();
 
     try {
-      let status = await OrderApi.createOrder({
+      let status = await OrderApi.updateOrder(cart.id, {
+        id: cart.id,
+        orderDate: cart.orderDate,
+        shippingInformationId: cart.shippingInformationId,
+        status: "Pending"
+      })
+
+      status = await OrderApi.createOrder({
         id: orderId,
         orderDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
         shippingInformationId: JSON.parse(localStorage.getItem("userInfo")).shippingInformations[0].id,
