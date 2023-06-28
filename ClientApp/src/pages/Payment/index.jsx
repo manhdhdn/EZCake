@@ -115,7 +115,7 @@ const Payment = () => {
                     enqueueSnackbar("Order could not be updated", { variant: "error" });
                 }
             }
-        }, 1000);
+        }, 2000);
 
         return () => {
             clearInterval(intervalId);
