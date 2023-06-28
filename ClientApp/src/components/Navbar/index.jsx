@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { UserAuth } from "apis/auth/AuthContext";
+import { v4 } from "uuid";
+import moment from "moment";
+import OrderApi from "apis/services/Order";
+import OrderDetailApi from "apis/services/OrderDetail";
 
-import { Link } from "react-router-dom";
-import { Button, Img, Input, Line, Text } from "components";
+import { DeleteForever } from "@mui/icons-material";
+import { Button, Img, Line, Text } from "components";
 
 const Navbar = (props) => {
   const [userLoggedIn, setUserLoggedIn] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenCart, setIsOpenCart] = useState(false);
   const [cart, setCart] = useState(null);
-  const [price, setPrice] = useState(0);
   const [userIcon, setUserIcon] = useState("images/img_user.svg");
   const [cartIcon, setCartIcon] = useState("images/img_cart.svg");
   const [hoverEdit, setHoverEdit] = useState(-1);
@@ -104,6 +107,92 @@ const Navbar = (props) => {
     setHoverEdit(-1);
   }
 
+  const handleDelete = async (id) => {
+    try {
+      let status = await OrderDetailApi.deleteOrderDetail(id);
+
+      if (status === 204) {
+        let removedItemCart = { ...cart, orderDetails: cart.orderDetails.filter((order) => order.id !== id) };
+
+        setCart(removedItemCart);
+        localStorage.setItem("cart", JSON.stringify(removedItemCart));
+      }
+    } catch (error) {
+      enqueueSnackbar("Delete failed", { variant: "error" });
+    }
+  }
+
+  const handlePayNowClick = async () => {
+    let orderId = v4();
+
+    try {
+      let status = await OrderApi.createOrder({
+        id: orderId,
+        orderDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
+        shippingInformationId: JSON.parse(localStorage.getItem("userInfo")).shippingInformations[0].id,
+        status: "Cart"
+      })
+
+      if (status === 201) {
+        const cart = await OrderApi.getOrder(orderId);
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+      }
+    } catch (error) {
+      enqueueSnackbar("Cart could not be created", { variant: "error" });
+    }
+
+    navigate(`/payment/${cart.id}`);
+  }
+
+  const cakes = () => {
+    const element = [];
+
+    if (cart.orderDetails.length === 0) {
+      element.push(
+        <Text key="cart" className="font-sfmono text-center text-lg text-red-500 w-full">• Nothing in cart yet •</Text>
+      );
+    } else {
+      cart.orderDetails.forEach((orderDetail, index) => {
+        element.push(
+          <div key={orderDetail.id} className="h-[125px] flex flex-row gap-5 items-start justify-start w-full">
+            <Img className="h-[125px] border border-1 border-red-500 px-1 py-3 w-[122px]" style={{ objectFit: 'cover', width: '80%', height: '100%' }} src={orderDetail.cake.image} alt="cake" />
+            <div className="flex flex-col gap-max-5 items-start justify-between w-full h-full">
+              <div className="flex flex-col items-start">
+                <Text className="font-bold text-deep_orange-500 text-lg">{orderDetail.cake.name}</Text>
+                <Text className="font-bold text-deep_orange-500 text-lg">Cupcake</Text>
+                <Text className="text-deep_orange-500 text-sm">{orderDetail.price.toLocaleString("vi-VN")} VNĐ</Text>
+              </div>
+              <div className="flex flex-row gap-3 items-end">
+                <div className="flex items-center bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] w-12">
+                  <Text className="text-deep_orange-500 text-center text-lg w-full">{orderDetail.quantity}</Text>
+                </div>
+                <Img
+                  className="cursor-pointer"
+                  src={hoverEdit === index ? "images/icon_edit_hover.svg" : "images/icon_edit.svg"}
+                  alt="edit"
+                  onMouseEnter={() => handleIconEditEnter(index)}
+                  onMouseLeave={() => handleIconEditLeave()}
+                />
+                <DeleteForever
+                  className="cursor-pointer"
+                  sx={{ color: "#ee4e34" }}
+                  onClick={() => handleDelete(orderDetail.id)}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      })
+    }
+
+    return element;
+  }
+
+  const editCake = () => {
+      
+  }
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -114,45 +203,6 @@ const Navbar = (props) => {
       enqueueSnackbar("Logout failed", { variant: "error" });
     }
   };
-
-  const cakes = () => {
-    let element = [];
-
-    cart.orderDetails.forEach((orderDetail, index) => {
-      element.push(
-        <div key={orderDetail.id} className="h-[125px] flex flex-row gap-5 items-start justify-start w-full">
-          <Img className="h-[125px] border border-1 border-red-500 px-1 py-3 w-[125px]" src={orderDetail.cake.image} alt="cake" />
-          <div className="flex flex-col gap-max-5 items-start justify-between w-full h-full">
-            <div className="flex flex-col items-start">
-              <Text className="font-bold text-deep_orange-500 text-lg">{orderDetail.cake.name} Cupcake</Text>
-              <Text className="text-deep_orange-500 text-sm">{orderDetail.price.toLocaleString("vi-VN")} VNĐ</Text>
-            </div>
-            <div className="flex flex-row gap-3 items-end">
-              <div className="flex flex-col items-end">
-                <Input
-                  className="leading-[normal] text-center text-lg text-red-500 w-full"
-                  wrapClassName="flex items-center bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] pl-[10px] w-[76px]"
-                  value={orderDetail.quantity}
-                  type="number"
-                  disabled
-                />
-              </div>
-              <Img
-                className="cursor-pointer"
-                src={hoverEdit === index ? "images/icon_edit_hover.svg" : "images/icon_edit.svg"}
-                alt="edit"
-                onMouseEnter={() => handleIconEditEnter(index)}
-                onMouseLeave={() => handleIconEditLeave()}
-              />
-            </div>
-          </div>
-
-        </div>
-      );
-    });
-
-    return element;
-  }
 
   return (
     <div style={{ position: "fixed", zIndex: 100 }} className={props.className}>
@@ -257,6 +307,8 @@ const Navbar = (props) => {
                         <div className="flex flex-row items-center justify-center w-full">
                           <Button
                             className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                            hidden={cart && cart.orderDetails.length === 0}
+                            onClick={() => handlePayNowClick()}
                           >
                             pay now
                           </Button>

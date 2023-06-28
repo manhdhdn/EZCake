@@ -36,7 +36,7 @@ namespace EZCake.Controllers
 
             search ??= string.Empty;
 
-            orders = orders.Where(o => o.OrderDetails.Any(od => od.Cake!.Name!.Contains(search!)));
+            orders = orders.Where(o => o.OrderDetails.Any(od => od.Cake!.Name!.Contains(search!)) || o.OrderDetails.Count == 0);
 
             return await PagedList<Order>.ToPagedListAsync(orders, pageNumber ?? 1, pageSize ?? 6);
         }

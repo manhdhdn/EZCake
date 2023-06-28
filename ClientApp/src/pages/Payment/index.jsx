@@ -21,7 +21,7 @@ const Payment = () => {
     const [message, setMessage] = useState("");
     const [order, setOrder] = useState(null);
     const [image, setImage] = useState("images/img_cake_box.png");
-    const [name, setName] = useState([]);
+    const [names, setNames] = useState([]);
     const [price, setPrice] = useState(0);
     const [qrCodeUrl, setQrCodeUrl] = useState(null);
     const [checkPaymentBody, setCheckPaymentBody] = useState(null);
@@ -39,26 +39,26 @@ const Payment = () => {
                 let orderId = window.location.pathname.split("/").pop();
                 let order = await OrderApi.getOrder(orderId);
 
-                if (order.status !== "Pending") {
+                if (order.status !== "Pending" && order.status !== "Cart") {
                     throw new Error("Confirmed");
                 }
 
                 setMessage(order.message);
                 setImage(order.orderDetails[0].cake.image);
 
-                let name = [];
+                let names = [];
                 let price = 0;
 
                 order.orderDetails.forEach((element, index) => {
-                    if (!name.includes(order.orderDetails[index].cake.name)) {
-                        name.push(order.orderDetails[index].cake.name);
+                    if (!names.includes(order.orderDetails[index].cake.name)) {
+                        names.push(order.orderDetails[index].cake.name);
                     }
 
                     price += element.price * element.quantity;
                 });
 
                 setOrder(order);
-                setName(name);
+                setNames(names);
                 setPrice(price);
 
                 try {
@@ -182,13 +182,13 @@ const Payment = () => {
             </>
         )
 
-        if (name.length === 1) {
+        if (names.length === 1) {
             element = (
                 <>
                     <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500">
-                        {name[0]}
+                        {names[0]}
                     </Text>
-                    <Text className="font-sfmono mt-2 text-lg text-red-500">{name.includes("CUSCAKE") ? order.orderDetails.length : order.orderDetails[0].quantity} {order.orderDetails[0].quantity > 1 || order.orderDetails.length > 1 ? "Cakes" : "Cake"}</Text>
+                    <Text className="font-sfmono mt-2 text-lg text-red-500">{names.includes("CUSCAKE") ? order.orderDetails.length : order.orderDetails[0].quantity} {order.orderDetails[0].quantity > 1 || order.orderDetails.length > 1 ? "Cakes" : "Cake"}</Text>
                     <div className="flex flex-row items-center w-full">
                         <Text className="font-sfmono mt-1 text-lg text-red-500 cursor-pointer">Gift Box</Text>
                         <Tooltip disableFocusListener title={<Text className="font-sfmono p-1 text-sm cursor-pointer">Gift box depending on the quantity of your cake</Text>}>
@@ -199,24 +199,22 @@ const Payment = () => {
             )
         }
 
-        if (name.length > 1) {
+        if (names.length > 1) {
             let title = "";
 
-            name.forEach((element, index) => {
-                title += `${name[index]('\n')}`;
+            names.forEach((name) => {
+                title += `${name + '<br/>'}`;
             })
-
-            title = title.slice(0, -1);
 
             element = (
                 <>
                     <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500 w-full">
-                        {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
+                        {`${names[0]}, ${names[1]} ${names.length > 2 ? "and" : ""} more`}
                     </Text>
-                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-full" >{name.length} types of cake</Text>
-                    <div className="flex flex-row w-full">
+                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-full" >{names.length} types of cake</Text>
+                    <div className="flex flex-row items-center w-full">
                         <Text className="italic text-red-500 text-sm underline">Hover for more</Text>
-                        <Tooltip title={title}>
+                        <Tooltip title={<div style={{ whiteSpace: 'pre-line' }}>{title}</div>}>
                             <ArrowCircleDownIcon sx={{ marginTop: "5px", marginLeft: "8px", color: "#ee4e34" }} />
                         </Tooltip>
                     </div>

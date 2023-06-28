@@ -133,8 +133,8 @@ const CakeDetail = () => {
 
     const handleAddToCart = async () => {
         try {
-            let orderId = v4();
             let cart = JSON.parse(localStorage.getItem("cart"));
+            let orderId = cart.id;
             let quantity = 0;
             let cakeSet = null;
             let status = 0;
@@ -152,31 +152,6 @@ const CakeDetail = () => {
                 } else {
                     status = await OrderDetailApi.createOrderDetail({
                         id: v4(),
-                        orderId: cart.id,
-                        cakeId: cake.id,
-                        price: cake.price,
-                        quantity,
-                        cakeSet: JSON.stringify(cakeSet)
-                    })
-
-                    if (status === 201) {
-                        enqueueSnackbar("Cake added to cart", { variant: "success" });
-
-                        cart = await OrderApi.getOrder(cart.id);
-                        localStorage.setItem("cart", JSON.stringify(cart));
-                    }
-                }
-            } else {
-                status = await OrderApi.createOrder({
-                    id: orderId,
-                    orderDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
-                    shippingInformationId: JSON.parse(localStorage.getItem("userInfo")).shippingInformations[0].id,
-                    status: "Cart"
-                })
-
-                if (status === 201) {
-                    status = await OrderDetailApi.createOrderDetail({
-                        id: v4(),
                         orderId,
                         cakeId: cake.id,
                         price: cake.price,
@@ -186,6 +161,9 @@ const CakeDetail = () => {
 
                     if (status === 201) {
                         enqueueSnackbar("Cake added to cart", { variant: "success" });
+
+                        cart = await OrderApi.getOrder(orderId);
+                        localStorage.setItem("cart", JSON.stringify(cart));
                     }
                 }
             }
@@ -353,7 +331,7 @@ const CakeDetail = () => {
                                     </Button>
                                     <Text className="font-sfmono text-red-500 text-left">or</Text>
                                     <Button
-                                        className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-red-500 hover:text-orange-50 text-lg"       
+                                        className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-red-500 hover:text-orange-50 text-lg"
                                         onClick={() => navigate("/shop")}
                                     >
                                         back to shop

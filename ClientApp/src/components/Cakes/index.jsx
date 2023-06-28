@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import { v4 } from "uuid";
-import moment from "moment";
 import { enqueueSnackbar } from "notistack";
 import CakeApi from "apis/services/Cake";
 import OrderApi from "apis/services/Order";
@@ -59,8 +58,8 @@ const Cakes = (props) => {
 
   const handleAddToCart = async (cake) => {
     try {
-      let orderId = v4();
       let cart = JSON.parse(localStorage.getItem("cart"));
+      let orderId = cart.id;
       let number = {
         set1: 1
       }
@@ -81,31 +80,6 @@ const Cakes = (props) => {
         } else {
           status = await OrderDetailApi.createOrderDetail({
             id: v4(),
-            orderId: cart.id,
-            cakeId: cake.id,
-            price: cake.price,
-            quantity,
-            cakeSet: JSON.stringify(cakeSet)
-          })
-
-          if (status === 201) {
-            enqueueSnackbar("Cake added to cart", { variant: "success" });
-
-            cart = await OrderApi.getOrder(cart.id);
-            localStorage.setItem("cart", JSON.stringify(cart));
-          }
-        }
-      } else {
-        status = await OrderApi.createOrder({
-          id: orderId,
-          orderDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
-          shippingInformationId: JSON.parse(localStorage.getItem("userInfo")).shippingInformations[0].id,
-          status: "Cart"
-        })
-
-        if (status === 201) {
-          status = await OrderDetailApi.createOrderDetail({
-            id: v4(),
             orderId,
             cakeId: cake.id,
             price: cake.price,
@@ -115,6 +89,9 @@ const Cakes = (props) => {
 
           if (status === 201) {
             enqueueSnackbar("Cake added to cart", { variant: "success" });
+
+            cart = await OrderApi.getOrder(orderId);
+            localStorage.setItem("cart", JSON.stringify(cart));
           }
         }
       }
