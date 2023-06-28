@@ -8,6 +8,7 @@ import CakeApi from "apis/services/Cake";
 import OrderApi from "apis/services/Order";
 import OrderDetailApi from "apis/services/OrderDetail";
 
+import { Checkbox } from "@mui/material";
 import { Button, Img, Input, Line, List, Text } from "components";
 import Navbar from "components/Navbar";
 import Cakes from "components/Cakes";
@@ -16,8 +17,15 @@ import Footer from "components/Footer";
 const CakeDetail = () => {
     const [cake, setCake] = useState(null);
     const [choosed, setChoosed] = useState(0);
-    const [number, setNumber] = useState(1);
+    const [number, setNumber] = useState({
+        set1: 1,
+        set2: 0,
+        set4: 0,
+        set6: 0
+    });
     const [cartIcon, setCartIcon] = useState("images/img_cart.svg");
+
+    const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
     const textAnimation = "font-bold";
     const lineAnimation = "ml-[57%]";
@@ -43,18 +51,32 @@ const CakeDetail = () => {
         loadCakeDetail();
     }, []);
 
-    const handleInputNumber = (value) => {
+    const handleInputNumber = (value, set) => {
         if (value < 0) {
-            setNumber(0);
+            setNumber({ ...number, [set]: 0 });
             return;
         }
 
-        if (value > 6) {
-            setNumber(6);
+        if (value > 10) {
+            setNumber({ ...number, [set]: 10 });
             return;
         }
 
-        setNumber(value);
+        setNumber({ ...number, [set]: value !== '' ? parseInt(value.toString()) : value });
+    }
+
+    const handleInputBlur = (set) => {
+        if (number[set] === '') {
+            setNumber({ ...number, [set]: 0 });
+        }
+    }
+
+    const handleCheckBoxClick = (set) => {
+        if (number[set] === 0) {
+            setNumber({ ...number, [set]: 1 });
+        } else {
+            setNumber({ ...number, [set]: 0 });
+        }
     }
 
     const handleTabClick = (index) => {
@@ -81,12 +103,23 @@ const CakeDetail = () => {
             })
 
             if (status === 201) {
+                let quantity = 0;
+                let cakeSet = null;
+
+                Object.keys(number).forEach((key) => {
+                    if (number[key] !== 0) {
+                        quantity += number[key] * parseInt(key.slice(3));
+                        cakeSet = { ...cakeSet, [key]: number[key] };
+                    }
+                })
+
                 status = await OrderDetailApi.createOrderDetail({
                     id: v4(),
                     orderId,
                     cakeId: cake.id,
                     price: cake.price,
-                    quantity: number === "" || number === "0" ? 1 : number
+                    quantity,
+                    cakeSet: JSON.stringify(cakeSet)
                 })
 
                 if (status === 201) {
@@ -134,7 +167,7 @@ const CakeDetail = () => {
                                                 <Line className="bg-red-500 h-px mx-auto w-full" />
                                                 <Line className={`transition-all duration-300 bg-red-500 h-0.5 mb-auto mt-[-1px] ${choosed === 1 ? lineAnimation : ""} w-[43%] z-[1]`} />
                                             </div>
-                                            <div className="flex flex-col relative mb-[76px] w-full">
+                                            <div className="flex flex-col relative mb-auto w-full">
                                                 <div className={`flex flex-row gap-2 absolute justify-start w-full ${choosed === 0 ? "h-[115px] opacity-1" : "h-0 opacity-0"} transition-all`} >
                                                     <Text className="font-sfmono text-lg text-red-500 text-left ml-[5px]">
                                                         •
@@ -156,24 +189,86 @@ const CakeDetail = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex flex-col font-sfmono gap-[39px] items-center justify-start w-full">
+                            <div className="flex flex-col font-sfmono gap-4 items-center justify-start w-full">
                                 <div className="flex flex-col gap-3.5 items-center justify-start w-full">
                                     <Line className="bg-red-500 h-px w-full" />
                                     <div className="flex flex-row items-center justify-between w-full">
                                         <div className="flex flex-col items-center justify-start">
                                             <div className="flex flex-row gap-[25px] items-center justify-between w-full">
-                                                <Text className="text-lg text-red-500">Number</Text>
-                                                {/* Convert upper button to the type Input that I declared */}
-                                                <Input
-                                                    className="leading-[normal] text-center text-lg text-red-500 h-full w-full"
-                                                    wrapClassName="bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] pl-2 w-[68px]"
-                                                    value={number}
-                                                    type="number"
-                                                    onChange={(value) => handleInputNumber(value)}
-                                                />
+                                                <Text className="text-lg text-red-500">Set:</Text>
+                                                <div className="flex flex-col items-center justify-center">
+                                                    <div className="flex flex-row items-center justify-start w-full">
+                                                        <Checkbox
+                                                            {...label}
+                                                            checked={number["set1"] !== 0}
+                                                            color="success"
+                                                            onChange={() => handleCheckBoxClick("set1")}
+                                                        />
+                                                        <Text className="font-sfmono text-red-500 text-left">Set 1 cake</Text>
+                                                        <Input
+                                                            className={`transition-all duration-300 leading-[normal] text-center text-lg text-red-500 h-full w-full ${number["set1"] === 0 ? "opacity-0" : ""}`}
+                                                            wrapClassName={`transition-all duration-300 bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] pl-2 ml-[22px] w-[68px] ${number["set1"] === 0 ? "opacity-0" : ""}`}
+                                                            value={number["set1"]}
+                                                            type="number"
+                                                            onChange={(value) => handleInputNumber(value, "set1")}
+                                                            onBlur={() => handleInputBlur("set1")}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-row items-center justify-start">
+                                                        <Checkbox
+                                                            {...label}
+                                                            checked={number["set2"] !== 0}
+                                                            color="success"
+                                                            onChange={() => handleCheckBoxClick("set2")}
+                                                        />
+                                                        <Text className="font-sfmono text-red-500 text-left">Set 2 cakes</Text>
+                                                        <Input
+                                                            className={`transition-all duration-300 leading-[normal] text-center text-lg text-red-500 h-full w-full ${number["set2"] === 0 ? "opacity-0" : ""}`}
+                                                            wrapClassName={`transition-all duration-300 bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] pl-2 ml-3 w-[68px] ${number["set2"] === 0 ? "opacity-0" : ""}`}
+                                                            value={number["set2"]}
+                                                            type="number"
+                                                            onChange={(value) => handleInputNumber(value, "set2")}
+                                                            onBlur={() => handleInputBlur("set2")}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-row items-center justify-start">
+                                                        <Checkbox
+                                                            {...label}
+                                                            checked={number["set4"] !== 0}
+                                                            color="success"
+                                                            onChange={() => handleCheckBoxClick("set4")}
+                                                        />
+                                                        <Text className="font-sfmono text-red-500 text-left">Set 4 cakes</Text>
+                                                        <Input
+                                                            className={`transition-all duration-300 leading-[normal] text-center text-lg text-red-500 h-full w-full ${number["set4"] === 0 ? "opacity-0" : ""}`}
+                                                            wrapClassName={`transition-all duration-300 bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] pl-2 ml-3 w-[68px] ${number["set4"] === 0 ? "opacity-0" : ""}`}
+                                                            value={number["set4"]}
+                                                            type="number"
+                                                            onChange={(value) => handleInputNumber(value, "set4")}
+                                                            onBlur={() => handleInputBlur("set4")}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-row items-center justify-start">
+                                                        <Checkbox
+                                                            {...label}
+                                                            checked={number["set6"] !== 0}
+                                                            color="success"
+                                                            onChange={() => handleCheckBoxClick("set6")}
+                                                        />
+                                                        <Text className="font-sfmono text-red-500 text-left">Set 6 cakes</Text>
+                                                        <Input
+                                                            className={`transition-all duration-300 leading-[normal] text-center text-lg text-red-500 h-full w-full ${number["set6"] === 0 ? "opacity-0" : ""}`}
+                                                            wrapClassName={`transition-all duration-300 bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] pl-2 ml-3 w-[68px] ${number["set6"] === 0 ? "opacity-0" : ""}`}
+                                                            value={number["set6"]}
+                                                            type="number"
+                                                            onChange={(value) => handleInputNumber(value, "set6")}
+                                                            onBlur={() => handleInputBlur("set6")}
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <Text className="text-lg text-red-500 text-right">{cake.price.toLocaleString("vi-VN")} VNĐ</Text>
+                                        <Text className="text-lg text-red-500 text-right">{number.set1 + number.set2 * 2 + number.set4 * 4 + number.set6 * 6} x {cake.price.toLocaleString("vi-VN")} VNĐ</Text>
                                     </div>
                                     <Line className="bg-red-500 h-px w-full" />
                                 </div>
@@ -182,11 +277,13 @@ const CakeDetail = () => {
                                         className="h-[36px] w-[38px] cursor-pointer"
                                         src={cartIcon}
                                         alt="cart_One"
+                                        onClick={() => number["set1"] === 0 && number["set2"] === 0 && number["set4"] === 0 && number["set6"] === 0 ? {} : console.log("click")}
                                         onMouseEnter={handleCartIconEnter}
                                         onMouseLeave={handleCartIconLeave}
                                     />
                                     <Button
-                                        className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                        className={`bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg ${number["set1"] === 0 && number["set2"] === 0 && number["set4"] === 0 && number["set6"] === 0 ? "cursor-not-allowed" : ""}`}
+                                        disabled={number["set1"] === 0 && number["set2"] === 0 && number["set4"] === 0 && number["set6"] === 0}
                                         onClick={() => handleBuyNow()}
                                     >
                                         buy now

@@ -359,7 +359,7 @@ const Order = () => {
                 let status = await MoMo.refund(cancelOrder);
 
                 if (status === 0) {
-                    enqueueSnackbar("Refund sented, check your MoMo", { variant: "success" });
+                    enqueueSnackbar("Refund sent, check your MoMo", { variant: "success" });
                 }
             }
         } catch (error) {
