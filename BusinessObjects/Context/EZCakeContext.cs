@@ -111,6 +111,8 @@ namespace EZCake.BusinessObjects.Context
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
+                entity.Property(e => e.Message).HasMaxLength(250);
+
                 entity.Property(e => e.OrderDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ShippedDate).HasColumnType("datetime");
@@ -129,6 +131,8 @@ namespace EZCake.BusinessObjects.Context
             modelBuilder.Entity<OrderDetail>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.CakeSet).IsUnicode(false);
 
                 entity.Property(e => e.OrderId).HasDefaultValueSql("(newid())");
 

@@ -75,7 +75,7 @@ const Footer = (props) => {
                     </Link>
                   </div>
                   <div className="flex md:flex-col flex-row md:gap-5 items-center justify-start mt-3">
-                    <Link to="/" onClick={() => setTimeout(() => handleSectionNavigation("ezzone", 117), 100)}>
+                    <Link to="/" onClick={() => setTimeout(() => handleSectionNavigation("ezzone", -427), 100)}>
                       <Text
                         className="text-base text-red-500"
                         size="txtSFMonoRegular16"

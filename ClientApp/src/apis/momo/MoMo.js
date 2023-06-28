@@ -12,8 +12,8 @@ const MoMo = {
         var partnerCode = "MOMO";
         var accessKey = "F8BBA842ECF85";
         var secretkey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
-        var requestId = partnerCode + new Date().getTime();
-        var orderId = requestId;
+        var orderId = "EzCake" + new Date().getTime();
+        var requestId = orderId;
         var orderInfo = "Pay for Cuscake";
         var redirectUrl = "https://momo.vn/return";
         var ipnUrl = "https://callback.url/notify";
@@ -76,7 +76,7 @@ const MoMo = {
     },
 
     checkPayment: async (params) => {
-        var status = -1;
+        var objectResponse = {};
 
         const requestBody = JSON.stringify({
             partnerCode: params.partnerCode,
@@ -102,9 +102,57 @@ const MoMo = {
         );
 
         const data = (await response.json()).data;
-        status = JSON.parse(data).resultCode;
+        objectResponse = JSON.parse(data);
 
-        return status;
+        return objectResponse;
+    },
+
+    refund: async (order) => {
+        var objectResponse = {};
+
+        var accessKey = "F8BBA842ECF85";
+        var secretkey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+        var orderId = "EzCake" + new Date().getTime();
+        var requestId = orderId;
+        var message = "Hoàn tiền hủy đơn hàng tại EzCake";
+
+        var payment = await MoMo.checkPayment(order.payment);
+
+        var rawSignature = "accessKey=" + accessKey + "&amount=" + payment.amount + "&description=" + message + "&orderId=" + orderId + "&partnerCode=" + payment.partnerCode + "&requestId=" + requestId + "&transId=" + payment.transId;
+        var signature = HmacSHA256(rawSignature, secretkey).toString(enc.Hex);
+
+        const requestBody = JSON.stringify({
+            partnerCode: payment.partnerCode,
+            orderId,
+            requestId,
+            amount: payment.amount,
+            transId: payment.transId,
+            lang: order.payment.lang,
+            description: message,
+            signature: signature
+        })
+
+        const endpoint = "https://test-payment.momo.vn/v2/gateway/api/refund";
+        const postJsonString = requestBody;
+
+        const response = await fetch(
+            `${API_CONFIG.endpoints.momo}`,
+            {
+                method: "POST",
+                headers: API_CONFIG.api.headers,
+                body: JSON.stringify({
+                    endpoint,
+                    postJsonString
+                })
+            }
+        );
+
+        const data = (await response.json()).data;
+        // console.log(JSON.parse(requestBody));
+        // console.log(data);
+        objectResponse = JSON.parse(data);
+
+        return objectResponse.resultCode;
     }
 }
 
