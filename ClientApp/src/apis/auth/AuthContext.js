@@ -74,6 +74,8 @@ export const AuthContextProvider = ({ children }) => {
           const cart = await OrderApi.getOrder(orders.data[0].id);
 
           localStorage.setItem("cart", JSON.stringify(cart));
+        } else {
+          localStorage.setItem("cart", null);
         }
       }
     });

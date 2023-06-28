@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 
+import { v4 } from "uuid";
+import moment from "moment";
 import { enqueueSnackbar } from "notistack";
 import CakeApi from "apis/services/Cake";
+import OrderApi from "apis/services/Order";
+import OrderDetailApi from "apis/services/OrderDetail";
 
 import { Img, Text } from "components";
 
@@ -53,6 +57,72 @@ const Cakes = (props) => {
     setCartIcon("images/img_cart_orange_50.svg");
   }
 
+  const handleAddToCart = async (cake) => {
+    try {
+      let orderId = v4();
+      let cart = JSON.parse(localStorage.getItem("cart"));
+      let number = {
+        set1: 1
+      }
+      let quantity = 0;
+      let cakeSet = null;
+      let status = 0;
+
+      Object.keys(number).forEach((key) => {
+        if (number[key] !== 0) {
+          quantity += number[key] * parseInt(key.slice(3));
+          cakeSet = { ...cakeSet, [key]: number[key] };
+        }
+      })
+
+      if (cart) {
+        if (cart.orderDetails.some((order) => order.cakeId === cake.id)) {
+          enqueueSnackbar("Cake already in cart", { variant: "info" });
+        } else {
+          status = await OrderDetailApi.createOrderDetail({
+            id: v4(),
+            orderId: cart.id,
+            cakeId: cake.id,
+            price: cake.price,
+            quantity,
+            cakeSet: JSON.stringify(cakeSet)
+          })
+
+          if (status === 201) {
+            enqueueSnackbar("Cake added to cart", { variant: "success" });
+
+            cart = await OrderApi.getOrder(cart.id);
+            localStorage.setItem("cart", JSON.stringify(cart));
+          }
+        }
+      } else {
+        status = await OrderApi.createOrder({
+          id: orderId,
+          orderDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
+          shippingInformationId: JSON.parse(localStorage.getItem("userInfo")).shippingInformations[0].id,
+          status: "Cart"
+        })
+
+        if (status === 201) {
+          status = await OrderDetailApi.createOrderDetail({
+            id: v4(),
+            orderId,
+            cakeId: cake.id,
+            price: cake.price,
+            quantity,
+            cakeSet: JSON.stringify(cakeSet)
+          })
+
+          if (status === 201) {
+            enqueueSnackbar("Cake added to cart", { variant: "success" });
+          }
+        }
+      }
+    } catch (error) {
+      enqueueSnackbar("Failed to add cake to cart", { variant: "info" });
+    }
+  }
+
   const contents = () => {
     let element = [];
 
@@ -76,6 +146,7 @@ const Cakes = (props) => {
             <Text className="font-bold font-sfmono mt-2 text-center text-lg text-white-A700">{cake.price.toLocaleString("vi-VN")} VNĐ</Text>
             <Img
               className="h-[30px] mt-[49px] w-[30px] cursor-pointer" src={cartIcon} alt="cart"
+              onClick={() => handleAddToCart(cake)}
               onMouseEnter={handleCartIconEnter}
               onMouseLeave={handleCartIconLeave}
             />

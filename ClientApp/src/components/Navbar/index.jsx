@@ -15,6 +15,7 @@ const Navbar = (props) => {
   const [price, setPrice] = useState(0);
   const [userIcon, setUserIcon] = useState("images/img_user.svg");
   const [cartIcon, setCartIcon] = useState("images/img_cart.svg");
+  const [hoverEdit, setHoverEdit] = useState(-1);
 
   const dropdownRef = useRef();
 
@@ -95,6 +96,14 @@ const Navbar = (props) => {
     setIsOpenCart(!isOpenCart);
   }
 
+  const handleIconEditEnter = (id) => {
+    setHoverEdit(id);
+  }
+
+  const handleIconEditLeave = () => {
+    setHoverEdit(-1);
+  }
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -109,23 +118,35 @@ const Navbar = (props) => {
   const cakes = () => {
     let element = [];
 
-    cart.orderDetails.forEach((orderDetail) => {
+    cart.orderDetails.forEach((orderDetail, index) => {
       element.push(
         <div key={orderDetail.id} className="h-[125px] flex flex-row gap-5 items-start justify-start w-full">
           <Img className="h-[125px] border border-1 border-red-500 px-1 py-3 w-[125px]" src={orderDetail.cake.image} alt="cake" />
-          <div className="flex flex-col gap-4 items-start justify-between w-full">
-            <div className="flex flex-col items-start h-full w-full">
+          <div className="flex flex-col gap-max-5 items-start justify-between w-full h-full">
+            <div className="flex flex-col items-start">
               <Text className="font-bold text-deep_orange-500 text-lg">{orderDetail.cake.name} Cupcake</Text>
               <Text className="text-deep_orange-500 text-sm">{orderDetail.price.toLocaleString("vi-VN")} VNĐ</Text>
             </div>
-            <Input
-              className="leading-[normal] text-center text-lg text-red-500 h-full w-full"
-              wrapClassName="bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] pl-[10px] w-[76px]"
-              value={orderDetail.quantity}
-              type="number"
-              onChange={(value) => { }}
-            />
+            <div className="flex flex-row gap-3 items-end">
+              <div className="flex flex-col items-end">
+                <Input
+                  className="leading-[normal] text-center text-lg text-red-500 w-full"
+                  wrapClassName="flex items-center bg-orange-50 border border-red-500 border-solid h-[30px] rounded-[3px] pl-[10px] w-[76px]"
+                  value={orderDetail.quantity}
+                  type="number"
+                  disabled
+                />
+              </div>
+              <Img
+                className="cursor-pointer"
+                src={hoverEdit === index ? "images/icon_edit_hover.svg" : "images/icon_edit.svg"}
+                alt="edit"
+                onMouseEnter={() => handleIconEditEnter(index)}
+                onMouseLeave={() => handleIconEditLeave()}
+              />
+            </div>
           </div>
+
         </div>
       );
     });
@@ -221,9 +242,9 @@ const Navbar = (props) => {
                 {isOpenCart && (
                   <div
                     id="cart"
-                    className="absolute right-0 z-10 bg-orange-50 max-h-[710px] h-auto font-monumentextended border border-red-500 flex flex-col items-center justify-center w-[422px]"
+                    className="absolute right-0 z-10 bg-orange-50 max-h-[700px] h-auto font-monumentextended border border-red-500 flex flex-col items-center justify-center px-5 py-10 w-[422px]"
                   >
-                    <div className="flex flex-col gap-10 items-start justify-start overflow-y-scroll mx-5 my-10 w-[320px]">
+                    <div className="flex flex-col gap-10 items-start justify-start overflow-y-scroll w-[320px]">
                       <Text className="font-extrabold sm:text-[35px] md:text-[37px] text-[39px] text-left text-deep_orange-500 w-full">Your Cart</Text>
                       <div className="font-sfmono flex flex-col gap-5 items-start justify-start w-full">
                         {/* Place cakes here */}
@@ -231,7 +252,7 @@ const Navbar = (props) => {
                         <Line className="h-[3px] w-full bg-deep_orange-500" />
                         <div className="flex flex-row items-start justify-between w-full">
                           <Text className="font-bold text-left text-deep_orange-500 text-[20px]">Total:</Text>
-                          {/* <Text className="text-right text-deep_orange-500 text-[20px]">{cart && price.toLocaleString("vi-VN")} VNĐ</Text> */}
+                          <Text className="text-right text-deep_orange-500 text-[20px]">{cart && cart.orderDetails.reduce((total, order) => total + order.price * order.quantity, 0).toLocaleString("vi-VN")} VNĐ</Text>
                         </div>
                         <div className="flex flex-row items-center justify-center w-full">
                           <Button

@@ -131,6 +131,69 @@ const CakeDetail = () => {
         }
     }
 
+    const handleAddToCart = async () => {
+        try {
+            let orderId = v4();
+            let cart = JSON.parse(localStorage.getItem("cart"));
+            let quantity = 0;
+            let cakeSet = null;
+            let status = 0;
+
+            Object.keys(number).forEach((key) => {
+                if (number[key] !== 0) {
+                    quantity += number[key] * parseInt(key.slice(3));
+                    cakeSet = { ...cakeSet, [key]: number[key] };
+                }
+            })
+
+            if (cart) {
+                if (cart.orderDetails.some((order) => order.cakeId === cake.id)) {
+                    enqueueSnackbar("Cake already in cart", { variant: "info" });
+                } else {
+                    status = await OrderDetailApi.createOrderDetail({
+                        id: v4(),
+                        orderId: cart.id,
+                        cakeId: cake.id,
+                        price: cake.price,
+                        quantity,
+                        cakeSet: JSON.stringify(cakeSet)
+                    })
+
+                    if (status === 201) {
+                        enqueueSnackbar("Cake added to cart", { variant: "success" });
+
+                        cart = await OrderApi.getOrder(cart.id);
+                        localStorage.setItem("cart", JSON.stringify(cart));
+                    }
+                }
+            } else {
+                status = await OrderApi.createOrder({
+                    id: orderId,
+                    orderDate: moment().format("YYYY-MM-DDTHH:mm:ss"),
+                    shippingInformationId: JSON.parse(localStorage.getItem("userInfo")).shippingInformations[0].id,
+                    status: "Cart"
+                })
+
+                if (status === 201) {
+                    status = await OrderDetailApi.createOrderDetail({
+                        id: v4(),
+                        orderId,
+                        cakeId: cake.id,
+                        price: cake.price,
+                        quantity,
+                        cakeSet: JSON.stringify(cakeSet)
+                    })
+
+                    if (status === 201) {
+                        enqueueSnackbar("Cake added to cart", { variant: "success" });
+                    }
+                }
+            }
+        } catch (error) {
+            enqueueSnackbar("Failed to add cake to cart", { variant: "info" });
+        }
+    }
+
     return (
         <>
             {cake && (
@@ -274,19 +337,26 @@ const CakeDetail = () => {
                                 </div>
                                 <div className="flex flex-row gap-5 items-center justify-center w-[52%] md:w-full">
                                     <Img
-                                        className="h-[36px] w-[38px] cursor-pointer"
+                                        className={`h-[36px] w-[38px] ${number["set1"] === 0 && number["set2"] === 0 && number["set4"] === 0 && number["set6"] === 0 ? "cursor-not-allowed" : "cursor-pointer"}`}
                                         src={cartIcon}
                                         alt="cart_One"
-                                        onClick={() => number["set1"] === 0 && number["set2"] === 0 && number["set4"] === 0 && number["set6"] === 0 ? {} : console.log("click")}
+                                        onClick={() => number["set1"] === 0 && number["set2"] === 0 && number["set4"] === 0 && number["set6"] === 0 ? {} : handleAddToCart()}
                                         onMouseEnter={handleCartIconEnter}
                                         onMouseLeave={handleCartIconLeave}
                                     />
                                     <Button
-                                        className={`bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg ${number["set1"] === 0 && number["set2"] === 0 && number["set4"] === 0 && number["set6"] === 0 ? "cursor-not-allowed" : ""}`}
+                                        className={`bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg ${number["set1"] === 0 && number["set2"] === 0 && number["set4"] === 0 && number["set6"] === 0 ? "cursor-not-allowed" : ""}`}
                                         disabled={number["set1"] === 0 && number["set2"] === 0 && number["set4"] === 0 && number["set6"] === 0}
                                         onClick={() => handleBuyNow()}
                                     >
                                         buy now
+                                    </Button>
+                                    <Text className="font-sfmono text-red-500 text-left">or</Text>
+                                    <Button
+                                        className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-red-500 hover:text-orange-50 text-lg"       
+                                        onClick={() => navigate("/shop")}
+                                    >
+                                        back to shop
                                     </Button>
                                 </div>
                             </div>
