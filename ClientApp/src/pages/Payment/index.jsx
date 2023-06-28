@@ -9,7 +9,9 @@ import MoMo from "apis/momo/MoMo";
 import PaymentApi from "apis/services/Payment";
 
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
-import { Backdrop, Skeleton, Tooltip } from "@mui/material";
+import { Backdrop, Skeleton } from "@mui/material";
+import Tooltip, {tooltipClasses} from "@mui/material/Tooltip";
+import {styled} from "@mui/material/styles";
 import { Button, Img, Input, Line, Text } from "../../components";
 import SignHeader from "components/SignHeader";
 import Chat from "components/Chat";
@@ -22,12 +24,24 @@ const Payment = () => {
     const [order, setOrder] = useState(null);
     const [image, setImage] = useState("images/img_cake_box.png");
     const [names, setNames] = useState([]);
+    const [cakeSets, setCakeSets] = useState([]);
     const [price, setPrice] = useState(0);
     const [qrCodeUrl, setQrCodeUrl] = useState(null);
     const [checkPaymentBody, setCheckPaymentBody] = useState(null);
 
     const navigate = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
+
+    const HtmlTooltip = styled(({ className, ...props }) => (
+        <Tooltip {...props} classes={{ popper: className }} />
+    ))(({ theme }) => ({
+        [`& .${tooltipClasses.tooltip}`]: {
+            backgroundColor: '#fcedda',
+            maxWidth: 700,
+            fontSize: theme.typography.pxToRem(12),
+            border: '1px solid #ee4e34',
+        },
+    }));
 
     useEffect(() => {
         handleSectionNavigation("payment", 0);
@@ -47,18 +61,21 @@ const Payment = () => {
                 setImage(order.orderDetails[0].cake.image);
 
                 let names = [];
+                let cakeSets = [];
                 let price = 0;
 
-                order.orderDetails.forEach((element, index) => {
-                    if (!names.includes(order.orderDetails[index].cake.name)) {
-                        names.push(order.orderDetails[index].cake.name);
+                order.orderDetails.forEach((orderDetail) => {
+                    if (!names.includes(orderDetail.cake.name)) {
+                        names.push(orderDetail.cake.name);
                     }
 
-                    price += element.price * element.quantity;
+                    cakeSets.push(JSON.parse(orderDetail.cakeSet));
+                    price += orderDetail.price * orderDetail.quantity;
                 });
 
                 setOrder(order);
                 setNames(names);
+                setCakeSets(cakeSets);
                 setPrice(price);
 
                 try {
@@ -182,9 +199,9 @@ const Payment = () => {
             </>
         )
 
-        if (names.length === 1) {
+        if (names.includes("CUSCAKE")) {
             element = (
-                <>
+                <div key="cuscake">
                     <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500">
                         {names[0]}
                     </Text>
@@ -195,28 +212,42 @@ const Payment = () => {
                             <ArrowCircleDownIcon sx={{ marginTop: "5px", marginLeft: "8px", color: "#ee4e34" }} />
                         </Tooltip>
                     </div>
-                </>
+                </div>
             )
-        }
+        } else {
+            let title = [];
 
-        if (names.length > 1) {
-            let title = "";
+            names.forEach((name, index) => {
+                let quantity = 0;
 
-            names.forEach((name) => {
-                title += `${name + '<br/>'}`;
+                Object.keys(cakeSets[index]).forEach((key) => {
+                    if (cakeSets[index][key] !== 0) {
+                        quantity += cakeSets[index][key] * parseInt(key.slice(3));
+                    }
+                })
+
+                title.push(<Text key={index} className="font-sfmono mt-2 text-[12px] text-red-500">{`${name} ${cakeSets[index].set1 !== undefined ? `[set 1 cake: ${cakeSets[index].set1}]` : ""}${cakeSets[index].set2 !== undefined ? `[set 2 cakes: ${cakeSets[index].set2}]` : ""}${cakeSets[index].set4 !== undefined ? `[set 4 cakes: ${cakeSets[index].set4}]` : ""}${cakeSets[index].set6 !== undefined ? `[set 6 cakes: ${cakeSets[index].set6}]` : ""} [Total: ${quantity}]`}</Text>);
             })
 
             element = (
                 <>
                     <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500 w-full">
-                        {`${names[0]}, ${names[1]} ${names.length > 2 ? "and" : ""} more`}
+                        {names.length === 1 ? (
+                            <>
+                                {names[0]}
+                            </>
+                        ) : (
+                            <>
+                                {`${names[0]}, ${names[1]} ${names.length > 2 ? "and more" : ""}`}
+                            </>
+                        )}
                     </Text>
-                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-full" >{names.length} types of cake</Text>
+                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-full">{names.length} types of cake</Text>
                     <div className="flex flex-row items-center w-full">
                         <Text className="italic text-red-500 text-sm underline">Hover for more</Text>
-                        <Tooltip title={<div style={{ whiteSpace: 'pre-line' }}>{title}</div>}>
+                        <HtmlTooltip title={title}>
                             <ArrowCircleDownIcon sx={{ marginTop: "5px", marginLeft: "8px", color: "#ee4e34" }} />
-                        </Tooltip>
+                        </HtmlTooltip>
                     </div>
                 </>
             )
@@ -298,7 +329,7 @@ const Payment = () => {
                                 <div className="flex flex-col gap-14 items-start justify-start">
                                     <div className="flex flex-col gap-2 items-start justify-start w-full">
                                         <div className="flex flex-col items-start justify-start w-full">
-                                            {cakeInfo()}
+                                            {names && cakeSets && cakeInfo()}
                                         </div>
                                         <Text className="italic text-red-500 text-sm underline opacity-0">Edit</Text>
                                     </div>

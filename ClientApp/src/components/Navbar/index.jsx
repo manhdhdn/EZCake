@@ -229,7 +229,8 @@ const Navbar = (props) => {
           let cart = await OrderApi.getOrder(orderId);
           localStorage.setItem("cart", JSON.stringify(cart));
 
-          handleCloseEditPopup();
+          setOpen(false);
+          setIsOpenCart(true);
         }
       }
     } catch (error) {

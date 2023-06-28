@@ -6,7 +6,9 @@ import { handleSectionNavigation } from "utils";
 import OrderApi from "apis/services/Order";
 import MoMo from "apis/momo/MoMo";
 
-import { Backdrop, CircularProgress, Pagination } from "@mui/material";
+import { Backdrop, Box, CircularProgress, Pagination } from "@mui/material";
+import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
+import { styled } from "@mui/material/styles";
 import { Button, Img, Input, Line, Text } from "components";
 import Navbar from "components/Navbar";
 import Chat from "components/Chat";
@@ -37,12 +39,22 @@ const Order = () => {
     const animationBlockHide = "gap-0";
     const animationBlockShow = "gap-5";
     const animationHide = "opacity-0 h-0";
-    const animationShow = "opacity-1 h-[235px]";
-    const animationLineShow = "opacity-1 h-[234px]";
     const animationTextShow = "opacity-1";
 
     const navigate = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
+
+    const HtmlTooltip = styled(({ className, ...props }) => (
+        <Tooltip {...props} classes={{ popper: className }} />
+    ))(({ theme }) => ({
+        [`& .${tooltipClasses.tooltip}`]: {
+            backgroundColor: '#fcedda',
+            maxWidth: 700,
+            fontSize: theme.typography.pxToRem(12),
+            border: '1px solid #ee4e34',
+
+        },
+    }));
 
     useEffect(() => {
         handleSectionNavigation("order", -50);
@@ -412,115 +424,142 @@ const Order = () => {
             confirmDetails.forEach((order) => {
                 let image = order.orderDetails[0].cake.image;
                 let name = [];
+                let cakeSets = [];
+                let title = [];
                 let numOfOrder = order.orderDetails.length;
                 let quantity = 0;
                 let singlePrice = order.orderDetails[0].price;
+                let date = order.orderDate.slice(0, 10);
+                let time = order.orderDate.slice(11, 16);
                 let price = 0;
                 let payed = order.status === "Confirmed" ? true : false;
 
-                for (let index = 0; index < order.orderDetails.length; index++) {
-                    if (!name.includes(order.orderDetails[index].cake.name)) {
-                        name.push(order.orderDetails[index].cake.name);
+                order.orderDetails.forEach((orderDetail) => {
+                    if (!name.includes(orderDetail.cake.name)) {
+                        name.push(orderDetail.cake.name);
                     }
 
-                    price += order.orderDetails[index].price * order.orderDetails[index].quantity;
+                    cakeSets.push(JSON.parse(orderDetail.cakeSet));
+                    price += orderDetail.price * orderDetail.quantity;
 
-                    quantity += order.orderDetails[index].quantity;
+                    quantity += orderDetail.quantity;
+                });
+
+                if (!name.includes("CUSCAKE")) {
+                    name.forEach((name, index) => {
+                        let quantity = 0;
+
+                        Object.keys(cakeSets[index]).forEach((key) => {
+                            if (cakeSets[index][key] !== 0) {
+                                quantity += cakeSets[index][key] * parseInt(key.slice(3));
+                            }
+                        })
+
+                        title.push(<Text key={index} className="font-sfmono mt-2 text-[12px] text-red-500">{`${name} ${cakeSets[index].set1 !== undefined ? `[set 1 cake: ${cakeSets[index].set1}]` : ""}${cakeSets[index].set2 !== undefined ? `[set 2 cakes: ${cakeSets[index].set2}]` : ""}${cakeSets[index].set4 !== undefined ? `[set 4 cakes: ${cakeSets[index].set4}]` : ""}${cakeSets[index].set6 !== undefined ? `[set 6 cakes: ${cakeSets[index].set6}]` : ""} [Total: ${quantity}]`}</Text>);
+                    });
                 }
 
                 contents.push(
-                    <div key={order.id} className={`transition-all duration-300 ${selected === 1 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
-                        <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
-                            <Img
-                                className={`transition-all duration-300 ${selected === 1 ? animationShow : animationHide} md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
-                                src={image}
-                                alt="pictureEleven"
-                            />
-                            <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
-                                <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
-                                    {name.length === 1 ? (
-                                        <>
-                                            {name[0]}
-                                        </>
-                                    ) : (
-                                        <>
-                                            {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
-                                        </>
-                                    )}
-                                </Text>
-                                <Text className="font-sfmono mt-4 text-lg text-red-500">
-                                    {name.includes("CUSCAKE") ? (
-                                        <>
-                                            {name.join(", ")} Gift Box, {numOfOrder}
-                                        </>
-                                    ) : (
-                                        <>
-                                            {name.join(", ")} Cupcake, Gift Box
-                                        </>
-                                    )}
-                                </Text>
-                                <Text className="font-sfmono h-[22px] mt-[13px] text-lg text-red-500">
-                                    x{name.includes("CUSCAKE") ? 1 : quantity}
-                                </Text>
-                            </div>
-                            <div className="md:ml-[0] md:mt-0 mt-[181px] w-[9.5%]">
-                                <Text className="text-lg text-red-500 text-right">
-                                    {name.includes("CUSCAKE") ? (
-                                        <>
-                                            {price.toLocaleString("vi-VN")} VNĐ
-                                        </>
-                                    ) : (
-                                        <>
-                                            {singlePrice.toLocaleString("vi-VN")} VNĐ
-                                        </>
-                                    )}
-                                </Text>
-                            </div>
-                            <Line className={`transition-all duration-300 ${selected === 1 ? animationLineShow : animationHide} bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
-                            <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
-                                <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
-                                        {price.toLocaleString("vi-VN")} VNĐ
-                                    </Text>
+                    <HtmlTooltip key={order.id} title={title} placement="top">
+                        <Box>
+                            <div className={`transition-all duration-300 h-[235px] ${selected === 1 ? "" : "hidden"} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
+                                <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
+                                    <Img
+                                        className={`transition-all duration-300 h-[234px] md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
+                                        src={image}
+                                        alt="pictureEleven"
+                                    />
+                                    <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
+                                        <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
+                                            {name.length === 1 ? (
+                                                <>
+                                                    {name[0]}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {`${name[0]}, ${name[1]} ${name.length > 2 ? "and more" : ""}`}
+                                                </>
+                                            )}
+                                        </Text>
+                                        <Text className="font-sfmono mt-4 text-lg text-red-500">
+                                            {name.includes("CUSCAKE") ? (
+                                                <>
+                                                    {name[0]} Gift Box, {numOfOrder}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {name.join(", ")} Cupcake, Gift Box
+                                                </>
+                                            )}
+                                        </Text>
+                                        <Text className="font-sfmono h-[22px] mt-[13px] text-lg text-red-500">
+                                            x{name.includes("CUSCAKE") ? 1 : quantity}
+                                        </Text>
+                                    </div>
+                                    <div className="h-full flex flex-col gap-[100px] items-right justify-center w-[9.5%]">
+                                        <div className="flex flex-col gap-1 items-right">
+                                            <Text className="text-lg text-red-500 text-right">{date}</Text>
+                                            <Text className="text-lg text-red-500 text-right">{time}</Text>
+                                        </div>
+                                        <Text className="text-lg text-red-500 text-right">
+                                            {name.includes("CUSCAKE") ? (
+                                                <>
+                                                    {price.toLocaleString("vi-VN")} VNĐ
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {singlePrice.toLocaleString("vi-VN")} VNĐ
+                                                </>
+                                            )}
+                                        </Text>
+                                    </div>
+                                    <Line className={`transition-all duration-300 h-[234px] bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
+                                    <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
+                                        <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
+                                            <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
+                                            <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
+                                                {price.toLocaleString("vi-VN")} VNĐ
+                                            </Text>
+                                        </div>
+                                        {payed ? (
+                                            <>
+                                                <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
+                                                    <Button
+                                                        className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                    >
+                                                        contact
+                                                    </Button>
+                                                    <Button
+                                                        className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
+                                                        onClick={() => handleOpenMessage(order)}
+                                                    >
+                                                        cancel order
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
+                                                    <Button
+                                                        className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                        onClick={() => handlePayBtxClick(order.id)}
+                                                    >
+                                                        pay
+                                                    </Button>
+                                                    <Button
+                                                        className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
+                                                        onClick={() => handleOpenMessage(order)}
+                                                    >
+                                                        cancel order
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
-                                {payed ? (
-                                    <>
-                                        <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
-                                            <Button
-                                                className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
-                                            >
-                                                contact
-                                            </Button>
-                                            <Button
-                                                className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
-                                                onClick={() => handleOpenMessage(order)}
-                                            >
-                                                cancel order
-                                            </Button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
-                                            <Button
-                                                className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
-                                                onClick={() => handlePayBtxClick(order.id)}
-                                            >
-                                                pay
-                                            </Button>
-                                            <Button
-                                                className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
-                                                onClick={() => handleOpenMessage(order)}
-                                            >
-                                                cancel order
-                                            </Button>
-                                        </div>
-                                    </>
-                                )}
                             </div>
-                        </div>
-                    </div>
+                        </Box>
+                    </HtmlTooltip>
                 );
             });
 
@@ -542,87 +581,114 @@ const Order = () => {
             makingDetails.forEach((order) => {
                 let image = order.orderDetails[0].cake.image;
                 let name = [];
+                let cakeSets = [];
+                let title = [];
                 let numOfOrder = order.orderDetails.length;
                 let quantity = 0;
                 let singlePrice = order.orderDetails[0].price;
+                let date = order.orderDate.slice(0, 10);
+                let time = order.orderDate.slice(11, 16);
                 let price = 0;
 
-                for (let index = 0; index < order.orderDetails.length; index++) {
-                    if (!name.includes(order.orderDetails[index].cake.name)) {
-                        name.push(order.orderDetails[index].cake.name);
+                order.orderDetails.forEach((orderDetail) => {
+                    if (!name.includes(orderDetail.cake.name)) {
+                        name.push(orderDetail.cake.name);
                     }
 
-                    price += order.orderDetails[index].price * order.orderDetails[index].quantity;
+                    cakeSets.push(JSON.parse(orderDetail.cakeSet));
+                    price += orderDetail.price * orderDetail.quantity;
 
-                    quantity += order.orderDetails[index].quantity;
+                    quantity += orderDetail.quantity;
+                });
+
+                if (!name.includes("CUSCAKE")) {
+                    name.forEach((name, index) => {
+                        let quantity = 0;
+
+                        Object.keys(cakeSets[index]).forEach((key) => {
+                            if (cakeSets[index][key] !== 0) {
+                                quantity += cakeSets[index][key] * parseInt(key.slice(3));
+                            }
+                        })
+
+                        title.push(<Text key={index} className="font-sfmono mt-2 text-[12px] text-red-500">{`${name} ${cakeSets[index].set1 !== undefined ? `[set 1 cake: ${cakeSets[index].set1}]` : ""}${cakeSets[index].set2 !== undefined ? `[set 2 cakes: ${cakeSets[index].set2}]` : ""}${cakeSets[index].set4 !== undefined ? `[set 4 cakes: ${cakeSets[index].set4}]` : ""}${cakeSets[index].set6 !== undefined ? `[set 6 cakes: ${cakeSets[index].set6}]` : ""} [Total: ${quantity}]`}</Text>);
+                    });
                 }
 
                 contents.push(
-                    <div key={order.id} className={`transition-all duration-300 ${selected === 2 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
-                        <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
-                            <Img
-                                className={`transition-all duration-300 ${selected === 2 ? animationShow : animationHide} md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
-                                src={image}
-                                alt="pictureEleven"
-                            />
-                            <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
-                                <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
-                                    {name.length === 1 ? (
-                                        <>
-                                            {name[0]}
-                                        </>
-                                    ) : (
-                                        <>
-                                            {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
-                                        </>
-                                    )}
-                                </Text>
-                                <Text className="font-sfmono mt-4 text-lg text-red-500">
-                                    {name.includes("CUSCAKE") ? (
-                                        <>
-                                            {name.join(", ")} Gift Box, {numOfOrder}
-                                        </>
-                                    ) : (
-                                        <>
-                                            {name.join(", ")} Cupcake, Gift Box
-                                        </>
-                                    )}
-                                </Text>
-                                <Text className="font-sfmono h-[22px] mt-[13px] text-lg text-red-500">
-                                    x{name.includes("CUSCAKE") ? 1 : quantity}
-                                </Text>
-                            </div>
-                            <div className="md:ml-[0] md:mt-0 mt-[181px] w-[9.5%]">
-                                <Text className="text-lg text-red-500 text-right">
-                                    {name.includes("CUSCAKE") ? (
-                                        <>
-                                            {price.toLocaleString("vi-VN")} VNĐ
-                                        </>
-                                    ) : (
-                                        <>
-                                            {singlePrice.toLocaleString("vi-VN")} VNĐ
-                                        </>
-                                    )}
-                                </Text>
-                            </div>
-                            <Line className={`transition-all duration-300 ${selected === 2 ? animationLineShow : animationHide} bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
-                            <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
-                                <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
-                                        {price.toLocaleString("vi-VN")} VNĐ
-                                    </Text>
+                    <HtmlTooltip key={order.id} title={title} placement="top">
+                        <Box>
+                            <div className={`transition-all duration-300 h-[235px] ${selected === 2 ? "" : "hidden"} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
+                                <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
+                                    <Img
+                                        className={`transition-all duration-300 h-[234px] md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
+                                        src={image}
+                                        alt="pictureEleven"
+                                    />
+                                    <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
+                                        <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
+                                            {name.length === 1 ? (
+                                                <>
+                                                    {name[0]}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {`${name[0]}, ${name[1]} ${name.length > 2 ? "and more" : ""}`}
+                                                </>
+                                            )}
+                                        </Text>
+                                        <Text className="font-sfmono mt-4 text-lg text-red-500">
+                                            {name.includes("CUSCAKE") ? (
+                                                <>
+                                                    {name[0]} Gift Box, {numOfOrder}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {name.join(", ")} Cupcake, Gift Box
+                                                </>
+                                            )}
+                                        </Text>
+                                        <Text className="font-sfmono h-[22px] mt-[13px] text-lg text-red-500">
+                                            x{name.includes("CUSCAKE") ? 1 : quantity}
+                                        </Text>
+                                    </div>
+                                    <div className="h-full flex flex-col gap-[100px] items-right justify-center w-[9.5%]">
+                                        <div className="flex flex-col gap-1 items-right">
+                                            <Text className="text-lg text-red-500 text-right">{date}</Text>
+                                            <Text className="text-lg text-red-500 text-right">{time}</Text>
+                                        </div>
+                                        <Text className="text-lg text-red-500 text-right">
+                                            {name.includes("CUSCAKE") ? (
+                                                <>
+                                                    {price.toLocaleString("vi-VN")} VNĐ
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {singlePrice.toLocaleString("vi-VN")} VNĐ
+                                                </>
+                                            )}
+                                        </Text>
+                                    </div>
+                                    <Line className={`transition-all duration-300 h-[234px] bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
+                                    <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
+                                        <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
+                                            <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
+                                            <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
+                                                {price.toLocaleString("vi-VN")} VNĐ
+                                            </Text>
+                                        </div>
+                                        <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
+                                            <Button
+                                                className="z-10 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[406px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                            >
+                                                contact
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
-                                    <Button
-                                        className="z-10 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[406px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
-                                    >
-                                        contact
-                                    </Button>
-                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </Box>
+                    </HtmlTooltip>
                 );
             });
 
@@ -643,105 +709,132 @@ const Order = () => {
             deliveriyDetails.forEach((order) => {
                 let image = order.orderDetails[0].cake.image;
                 let name = [];
+                let cakeSets = [];
+                let title = [];
                 let numOfOrder = order.orderDetails.length;
                 let quantity = 0;
                 let singlePrice = order.orderDetails[0].price;
+                let date = order.orderDate.slice(0, 10);
+                let time = order.orderDate.slice(11, 16);
                 let price = 0;
                 let deliveryed = order.status === "Delivered" ? true : false;
 
-                for (let index = 0; index < order.orderDetails.length; index++) {
-                    if (!name.includes(order.orderDetails[index].cake.name)) {
-                        name.push(order.orderDetails[index].cake.name);
+                order.orderDetails.forEach((orderDetail) => {
+                    if (!name.includes(orderDetail.cake.name)) {
+                        name.push(orderDetail.cake.name);
                     }
 
-                    price += order.orderDetails[index].price * order.orderDetails[index].quantity;
+                    cakeSets.push(JSON.parse(orderDetail.cakeSet));
+                    price += orderDetail.price * orderDetail.quantity;
 
-                    quantity += order.orderDetails[index].quantity;
+                    quantity += orderDetail.quantity;
+                });
+
+                if (!name.includes("CUSCAKE")) {
+                    name.forEach((name, index) => {
+                        let quantity = 0;
+
+                        Object.keys(cakeSets[index]).forEach((key) => {
+                            if (cakeSets[index][key] !== 0) {
+                                quantity += cakeSets[index][key] * parseInt(key.slice(3));
+                            }
+                        })
+
+                        title.push(<Text key={index} className="font-sfmono mt-2 text-[12px] text-red-500">{`${name} ${cakeSets[index].set1 !== undefined ? `[set 1 cake: ${cakeSets[index].set1}]` : ""}${cakeSets[index].set2 !== undefined ? `[set 2 cakes: ${cakeSets[index].set2}]` : ""}${cakeSets[index].set4 !== undefined ? `[set 4 cakes: ${cakeSets[index].set4}]` : ""}${cakeSets[index].set6 !== undefined ? `[set 6 cakes: ${cakeSets[index].set6}]` : ""} [Total: ${quantity}]`}</Text>);
+                    });
                 }
 
                 contents.push(
-                    <div key={order.id} className={`transition-all duration-300 ${selected === 3 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
-                        <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
-                            <Img
-                                className={`transition-all duration-300 ${selected === 3 ? animationShow : animationHide} md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
-                                src={image}
-                                alt="pictureEleven"
-                            />
-                            <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
-                                <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
-                                    {name.length === 1 ? (
-                                        <>
-                                            {name[0]}
-                                        </>
-                                    ) : (
-                                        <>
-                                            {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
-                                        </>
-                                    )}
-                                </Text>
-                                <Text className="font-sfmono mt-4 text-lg text-red-500">
-                                    {name.includes("CUSCAKE") ? (
-                                        <>
-                                            {name.join(", ")} Gift Box, {numOfOrder}
-                                        </>
-                                    ) : (
-                                        <>
-                                            {name.join(", ")} Cupcake, Gift Box
-                                        </>
-                                    )}
-                                </Text>
-                                <Text className="font-sfmono h-[22px] mt-[13px] text-lg text-red-500">
-                                    x{name.includes("CUSCAKE") ? 1 : quantity}
-                                </Text>
-                            </div>
-                            <div className="md:ml-[0] md:mt-0 mt-[181px] w-[9.5%]">
-                                <Text className="text-lg text-red-500 text-right">
-                                    {name.includes("CUSCAKE") ? (
-                                        <>
-                                            {price.toLocaleString("vi-VN")} VNĐ
-                                        </>
-                                    ) : (
-                                        <>
-                                            {singlePrice.toLocaleString("vi-VN")} VNĐ
-                                        </>
-                                    )}
-                                </Text>
-                            </div>
-                            <Line className={`transition-all duration-300 ${selected === 3 ? animationLineShow : animationHide} bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
-                            <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
-                                <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
-                                        {price.toLocaleString("vi-VN")} VNĐ
-                                    </Text>
-                                </div>
-                                {deliveryed ? (
-                                    <>
-                                        <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
-                                            <Button
-                                                className="z-20 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
-                                            >
-                                                review
-                                            </Button>
-                                            <Button
-                                                className="z-20 bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
-                                            >
-                                                repurchase
-                                            </Button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
-                                        <Button
-                                            className="z-20 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] w-full py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
-                                        >
-                                            contact
-                                        </Button>
+                    <HtmlTooltip key={order.id} title={title} placement="top">
+                        <Box>
+                            <div className={`transition-all duration-300 h-[235px] ${selected === 3 ? "" : "hidden"} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
+                                <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
+                                    <Img
+                                        className={`transition-all duration-300 h-[234px] md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
+                                        src={image}
+                                        alt="pictureEleven"
+                                    />
+                                    <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
+                                        <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
+                                            {name.length === 1 ? (
+                                                <>
+                                                    {name[0]}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {`${name[0]}, ${name[1]} ${name.length > 2 ? "and more" : ""}`}
+                                                </>
+                                            )}
+                                        </Text>
+                                        <Text className="font-sfmono mt-4 text-lg text-red-500">
+                                            {name.includes("CUSCAKE") ? (
+                                                <>
+                                                    {name[0]} Gift Box, {numOfOrder}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {name.join(", ")} Cupcake, Gift Box
+                                                </>
+                                            )}
+                                        </Text>
+                                        <Text className="font-sfmono h-[22px] mt-[13px] text-lg text-red-500">
+                                            x{name.includes("CUSCAKE") ? 1 : quantity}
+                                        </Text>
                                     </div>
-                                )}
+                                    <div className="h-full flex flex-col gap-[100px] items-right justify-center w-[9.5%]">
+                                        <div className="flex flex-col gap-1 items-right">
+                                            <Text className="text-lg text-red-500 text-right">{date}</Text>
+                                            <Text className="text-lg text-red-500 text-right">{time}</Text>
+                                        </div>
+                                        <Text className="text-lg text-red-500 text-right">
+                                            {name.includes("CUSCAKE") ? (
+                                                <>
+                                                    {price.toLocaleString("vi-VN")} VNĐ
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {singlePrice.toLocaleString("vi-VN")} VNĐ
+                                                </>
+                                            )}
+                                        </Text>
+                                    </div>
+                                    <Line className={`transition-all duration-300 h-[234px] bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
+                                    <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
+                                        <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
+                                            <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
+                                            <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
+                                                {price.toLocaleString("vi-VN")} VNĐ
+                                            </Text>
+                                        </div>
+                                        {deliveryed ? (
+                                            <>
+                                                <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
+                                                    <Button
+                                                        className="z-20 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                    >
+                                                        review
+                                                    </Button>
+                                                    <Button
+                                                        className="z-20 bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
+                                                    >
+                                                        repurchase
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
+                                                <Button
+                                                    className="z-20 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] w-full py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                >
+                                                    contact
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </Box>
+                    </HtmlTooltip>
                 );
             });
 
@@ -762,87 +855,114 @@ const Order = () => {
             historyDetails.forEach((order) => {
                 let image = order.orderDetails[0].cake.image;
                 let name = [];
+                let cakeSets = [];
+                let title = [];
                 let numOfOrder = order.orderDetails.length;
                 let quantity = 0;
                 let singlePrice = order.orderDetails[0].price;
+                let date = order.orderDate.slice(0, 10);
+                let time = order.orderDate.slice(11, 16);
                 let price = 0;
 
-                for (let index = 0; index < order.orderDetails.length; index++) {
-                    if (!name.includes(order.orderDetails[index].cake.name)) {
-                        name.push(order.orderDetails[index].cake.name);
+                order.orderDetails.forEach((orderDetail) => {
+                    if (!name.includes(orderDetail.cake.name)) {
+                        name.push(orderDetail.cake.name);
                     }
 
-                    price += order.orderDetails[index].price * order.orderDetails[index].quantity;
+                    cakeSets.push(JSON.parse(orderDetail.cakeSet));
+                    price += orderDetail.price * orderDetail.quantity;
 
-                    quantity += order.orderDetails[index].quantity;
+                    quantity += orderDetail.quantity;
+                });
+
+                if (!name.includes("CUSCAKE")) {
+                    name.forEach((name, index) => {
+                        let quantity = 0;
+
+                        Object.keys(cakeSets[index]).forEach((key) => {
+                            if (cakeSets[index][key] !== 0) {
+                                quantity += cakeSets[index][key] * parseInt(key.slice(3));
+                            }
+                        })
+
+                        title.push(<Text key={index} className="font-sfmono mt-2 text-[12px] text-red-500">{`${name} ${cakeSets[index].set1 !== undefined ? `[set 1 cake: ${cakeSets[index].set1}]` : ""}${cakeSets[index].set2 !== undefined ? `[set 2 cakes: ${cakeSets[index].set2}]` : ""}${cakeSets[index].set4 !== undefined ? `[set 4 cakes: ${cakeSets[index].set4}]` : ""}${cakeSets[index].set6 !== undefined ? `[set 6 cakes: ${cakeSets[index].set6}]` : ""} [Total: ${quantity}]`}</Text>);
+                    });
                 }
 
                 contents.push(
-                    <div key={order.id} className={`transition-all duration-300 ${selected === 4 ? animationShow : animationHide} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
-                        <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
-                            <Img
-                                className={`transition-all duration-300 ${selected === 4 ? animationShow : animationHide} md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
-                                src={image}
-                                alt="pictureEleven"
-                            />
-                            <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
-                                <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
-                                    {name.length === 1 ? (
-                                        <>
-                                            {name[0]}
-                                        </>
-                                    ) : (
-                                        <>
-                                            {`${name[0]}, ${name[1]} ${name.length > 2 ? "and" : ""} more`}
-                                        </>
-                                    )}
-                                </Text>
-                                <Text className="font-sfmono mt-4 text-lg text-red-500">
-                                    {name.includes("CUSCAKE") ? (
-                                        <>
-                                            {name.join(", ")} Gift Box, {numOfOrder}
-                                        </>
-                                    ) : (
-                                        <>
-                                            {name.join(", ")} Cupcake, Gift Box
-                                        </>
-                                    )}
-                                </Text>
-                                <Text className="font-sfmono h-[22px] mt-[13px] text-lg text-red-500">
-                                    x{name.includes("CUSCAKE") ? 1 : quantity}
-                                </Text>
-                            </div>
-                            <div className="md:ml-[0] md:mt-0 mt-[181px] w-[9.5%]">
-                                <Text className="text-lg text-red-500 text-right">
-                                    {name.includes("CUSCAKE") ? (
-                                        <>
-                                            {price.toLocaleString("vi-VN")} VNĐ
-                                        </>
-                                    ) : (
-                                        <>
-                                            {singlePrice.toLocaleString("vi-VN")} VNĐ
-                                        </>
-                                    )}
-                                </Text>
-                            </div>
-                            <Line className={`transition-all duration-300 ${selected === 4 ? animationLineShow : animationHide} bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
-                            <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
-                                <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
-                                    <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
-                                        {price.toLocaleString("vi-VN")} VNĐ
-                                    </Text>
+                    <HtmlTooltip key={order.id} title={title} placement="top">
+                        <Box>
+                            <div className={`transition-all duration-300 h-[235px] ${selected === 4 ? "" : "hidden"} bg-orange-50 border border-red-500 border-solid flex flex-col items-center justify-start max-w-[1298px] mx-auto md:px-5 rounded-[5px] w-full`}>
+                                <div className="flex md:flex-col flex-row md:gap-5 items-start justify-end w-full">
+                                    <Img
+                                        className={`transition-all duration-300 h-[234px] md:h-auto border border-solid border-r border-red-500 border-0 object-cover rounded-bl-[5px] rounded-tl-[5px] w-[235px]`}
+                                        src={image}
+                                        alt="pictureEleven"
+                                    />
+                                    <div className="flex flex-col items-start justify-start md:ml-[0] ml-[49px] md:mt-0 mt-[30px] w-[30.5%]">
+                                        <Text className="font-monumentextended sm:text-[27px] md:text-[29px] text-[31px] text-red-500">
+                                            {name.length === 1 ? (
+                                                <>
+                                                    {name[0]}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {`${name[0]}, ${name[1]} ${name.length > 2 ? "and more" : ""}`}
+                                                </>
+                                            )}
+                                        </Text>
+                                        <Text className="font-sfmono mt-4 text-lg text-red-500">
+                                            {name.includes("CUSCAKE") ? (
+                                                <>
+                                                    {name[0]} Gift Box, {numOfOrder}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {name.join(", ")} Cupcake, Gift Box
+                                                </>
+                                            )}
+                                        </Text>
+                                        <Text className="font-sfmono h-[22px] mt-[13px] text-lg text-red-500">
+                                            x{name.includes("CUSCAKE") ? 1 : quantity}
+                                        </Text>
+                                    </div>
+                                    <div className="h-full flex flex-col gap-[100px] items-right justify-center w-[9.5%]">
+                                        <div className="flex flex-col gap-1 items-right">
+                                            <Text className="text-lg text-red-500 text-right">{date}</Text>
+                                            <Text className="text-lg text-red-500 text-right">{time}</Text>
+                                        </div>
+                                        <Text className="text-lg text-red-500 text-right">
+                                            {name.includes("CUSCAKE") ? (
+                                                <>
+                                                    {price.toLocaleString("vi-VN")} VNĐ
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {singlePrice.toLocaleString("vi-VN")} VNĐ
+                                                </>
+                                            )}
+                                        </Text>
+                                    </div>
+                                    <Line className={`transition-all duration-300 h-[234px] bg-red-500 md:h-px md:ml-[0] ml-[51px] md:w-full w-px`} />
+                                    <div className="flex flex-col md:gap-10 gap-[82px] items-start justify-start m-auto md:mt-0 mt-[42px] w-[31.5%] md:w-full">
+                                        <div className="flex flex-row items-center justify-start w-[93%] md:w-full">
+                                            <Text className="font-bold text-[22px] sm:text-lg text-red-500 md:text-xl">Total:</Text>
+                                            <Text className="font-bold text-[22px] sm:text-lg text-red-500 text-right md:text-xl w-full">
+                                                {price.toLocaleString("vi-VN")} VNĐ
+                                            </Text>
+                                        </div>
+                                        <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
+                                            <Button
+                                                className="z-30 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[406px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                            >
+                                                repurchase
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
-                                    <Button
-                                        className="z-30 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[406px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
-                                    >
-                                        repurchase
-                                    </Button>
-                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </Box>
+                    </HtmlTooltip>
                 );
             });
 
