@@ -331,7 +331,7 @@ const Navbar = (props) => {
                     </div>
                   </div>
                 </div>
-                <Text className="text-lg text-red-500 text-right">{number.set1 + number.set2 * 2 + number.set4 * 4 + number.set6 * 6} x {orderDetail.cake.price.toLocaleString("vi-VN")} VNĐ</Text>
+                <Text className="text-lg text-red-500 text-right">{number.set1 * 1 + number.set2 * 2 + number.set4 * 4 + number.set6 * 6} x {orderDetail.cake.price.toLocaleString("vi-VN")} VNĐ</Text>
               </div>
               <Line className="bg-red-500 h-px w-full" />
             </div>
