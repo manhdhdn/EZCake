@@ -8,7 +8,6 @@ import moment from "moment";
 import OrderApi from "apis/services/Order";
 import OrderDetailApi from "apis/services/OrderDetail";
 
-import { DeleteForever } from "@mui/icons-material";
 import { Backdrop, Checkbox } from "@mui/material";
 import { Button, Img, Input, Line, Text } from "components";
 
@@ -29,7 +28,8 @@ const Navbar = (props) => {
   const [cartIcon, setCartIcon] = useState("images/img_cart.svg");
   const [hoverEdit, setHoverEdit] = useState(-1);
 
-  const dropdownRef = useRef();
+  const dropdownRef = useRef(null);
+  const editBtxRef = useRef(null);
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -47,7 +47,9 @@ const Navbar = (props) => {
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      const except = event.target.id === "delete";
+
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && !except && (!editBtxRef.current || (editBtxRef.current && !editBtxRef.current.contains(event.target)))) {
         setIsOpen(false);
         setIsOpenCart(false);
       }
@@ -118,16 +120,16 @@ const Navbar = (props) => {
     setHoverEdit(-1);
   }
 
-  const handleDelete = async (id) => {
+  const handleDeleteCart = async (id) => {
     try {
-      let status = await OrderDetailApi.deleteOrderDetail(id);
+      let removedItemCart = { ...cart, orderDetails: cart.orderDetails.filter((order) => order.id !== id) };
 
-      if (status === 204) {
-        let removedItemCart = { ...cart, orderDetails: cart.orderDetails.filter((order) => order.id !== id) };
+      setCart(removedItemCart);
+      localStorage.setItem("cart", JSON.stringify(removedItemCart));
 
-        setCart(removedItemCart);
-        localStorage.setItem("cart", JSON.stringify(removedItemCart));
-      }
+      enqueueSnackbar("Deleted cake", { variant: "success" });
+
+      await OrderDetailApi.deleteOrderDetail(id);
     } catch (error) {
       enqueueSnackbar("Delete failed", { variant: "error" });
     }
@@ -135,6 +137,8 @@ const Navbar = (props) => {
 
   const handlePayNowClick = async () => {
     let orderId = v4();
+
+    navigate(`/payment/${cart.id}`);
 
     try {
       let status = await OrderApi.updateOrder(cart.id, {
@@ -157,15 +161,12 @@ const Navbar = (props) => {
         localStorage.setItem("cart", JSON.stringify(cart));
       }
     } catch (error) {
-      enqueueSnackbar("Cart could not be created", { variant: "error" });
+      enqueueSnackbar("Something went wrong", { variant: "error" });
     }
-
-    navigate(`/payment/${cart.id}`);
   }
 
   const handleOpenEditPopup = (orderDetail) => {
     setOpen(true);
-    setIsOpenCart(false);
     setOrderDetail(orderDetail);
 
     let cakeSet = JSON.parse(orderDetail.cakeSet);
@@ -175,6 +176,7 @@ const Navbar = (props) => {
 
   const handleCloseEditPopup = () => {
     setOpen(false);
+    setIsOpenCart(true);
   }
 
   const handleInputNumber = (value, set) => {
@@ -206,12 +208,12 @@ const Navbar = (props) => {
   }
 
   const handleUpdateCart = async () => {
+    let orderId = cart.id;
+
     try {
-      let orderId = cart.id;
       let cake = orderDetail.cake;
       let quantity = 0;
       let cakeSet = null;
-      let status = 0;
 
       Object.keys(number).forEach((key) => {
         if (number[key] !== 0) {
@@ -221,7 +223,24 @@ const Navbar = (props) => {
       })
 
       if (cart) {
-        status = await OrderDetailApi.updateOrderDetail(orderDetail.id, {
+        let updatedCart = {
+          ...cart, orderDetails: cart.orderDetails.map((oldOrderDetail) => {
+            if (oldOrderDetail.id === orderDetail.id) {
+              return { ...orderDetail, quantity, cakeSet: JSON.stringify(cakeSet) }
+            }
+
+            return { ...oldOrderDetail }
+          })
+        }
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+        setCart(updatedCart);
+
+        enqueueSnackbar("Updated cart", { variant: "success" });
+
+        setOpen(false);
+
+        await OrderDetailApi.updateOrderDetail(orderDetail.id, {
           id: orderDetail.id,
           orderId,
           cakeId: cake.id,
@@ -229,18 +248,11 @@ const Navbar = (props) => {
           quantity,
           cakeSet: JSON.stringify(cakeSet)
         })
-
-        if (status === 204) {
-          enqueueSnackbar("Updated cart", { variant: "success" });
-
-          let cart = await OrderApi.getOrder(orderId);
-          localStorage.setItem("cart", JSON.stringify(cart));
-
-          setOpen(false);
-          setIsOpenCart(true);
-        }
       }
     } catch (error) {
+      let oldCart = await OrderApi.getOrder(orderId);
+      localStorage.setItem("cart", JSON.stringify(oldCart));
+
       enqueueSnackbar("Update cart failed", { variant: "info" });
     }
   }
@@ -251,7 +263,7 @@ const Navbar = (props) => {
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
       >
-        <div className="h-[45%] bg-orange-50 border border-red-500 flex flex-col items-center justify-center rounded-[5px] p-12 w-[40%]">
+        <div ref={editBtxRef} className="h-[45%] bg-orange-50 border border-red-500 flex flex-col items-center justify-center rounded-[5px] p-12 w-[40%]">
           <div className="flex flex-col font-sfmono gap-4 items-center justify-start w-full">
             <div className="flex flex-col gap-3.5 items-center justify-start w-full">
               <Line className="bg-red-500 h-px w-full" />
@@ -387,10 +399,12 @@ const Navbar = (props) => {
                   onMouseEnter={() => handleIconEditEnter(index)}
                   onMouseLeave={() => handleIconEditLeave()}
                 />
-                <DeleteForever
+                <Img
+                  id="delete"
                   className="cursor-pointer"
-                  sx={{ color: "#ee4e34" }}
-                  onClick={() => handleDelete(orderDetail.id)}
+                  src="images/icon_delete.svg"
+                  alt="delete"
+                  onClick={() => handleDeleteCart(orderDetail.id)}
                 />
               </div>
             </div>
@@ -442,11 +456,14 @@ const Navbar = (props) => {
               </Button>
             </>
           ) : (
-            <div className="flex flex-row items-center justify-center gap-10" ref={dropdownRef}>
+            <div
+              id="dropdown"
+              ref={dropdownRef}
+              className="flex flex-row items-center justify-center gap-10">
               <div className="relative">
                 <Img
-                  id="user"
-                  className="ml-5 md:ml-[0] rounded-full cursor-pointer"
+                  id="userBtx"
+                  className="rounded-full cursor-pointer"
                   src={userIcon}
                   alt="user"
                   onClick={toggleDropdown}
@@ -456,7 +473,7 @@ const Navbar = (props) => {
 
                 {isOpen && (
                   <div
-                    id="user"
+                    id="userDropdown"
                     className="absolute right-0 z-10 bg-orange-50 font-monumentextended items-center justify-start w-[180px]"
                   >
                     <ul>
@@ -490,7 +507,8 @@ const Navbar = (props) => {
               </div>
               <div className="relative">
                 <Img
-                  className="h-[36px] ml-0 md:ml-[0] w-[38px] cursor-pointer"
+                  id="cartBtx"
+                  className="h-[36px] w-[38px] cursor-pointer"
                   src={cartIcon}
                   alt="cart"
                   onClick={toggleDropdownCart}
@@ -500,7 +518,7 @@ const Navbar = (props) => {
 
                 {isOpenCart && (
                   <div
-                    id="cart"
+                    id="cartDropdown"
                     className="absolute right-0 z-10 bg-orange-50 max-h-[700px] h-auto font-monumentextended border border-red-500 flex flex-col items-center justify-center px-5 py-10 w-[422px]"
                   >
                     <div className="flex flex-col gap-10 items-start justify-start overflow-y-scroll w-[320px]">

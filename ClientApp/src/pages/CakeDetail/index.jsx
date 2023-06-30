@@ -132,8 +132,9 @@ const CakeDetail = () => {
     }
 
     const handleAddToCart = async () => {
+        let cart = JSON.parse(localStorage.getItem("cart"));
+
         try {
-            let cart = JSON.parse(localStorage.getItem("cart"));
             let orderId = cart.id;
             let quantity = 0;
             let cakeSet = null;
@@ -150,6 +151,13 @@ const CakeDetail = () => {
                 if (cart.orderDetails.some((order) => order.cakeId === cake.id)) {
                     enqueueSnackbar("Cake already in cart", { variant: "info" });
                 } else {
+                    cart.orderDetails.push({
+                        cakeId: cake.id,
+                    });
+                    localStorage.setItem("cart", JSON.stringify(cart));
+
+                    enqueueSnackbar("Cake added to cart", { variant: "success" });
+
                     status = await OrderDetailApi.createOrderDetail({
                         id: v4(),
                         orderId,
@@ -160,14 +168,15 @@ const CakeDetail = () => {
                     })
 
                     if (status === 201) {
-                        enqueueSnackbar("Cake added to cart", { variant: "success" });
-
                         cart = await OrderApi.getOrder(orderId);
                         localStorage.setItem("cart", JSON.stringify(cart));
                     }
                 }
             }
         } catch (error) {
+            cart.orderDetails.pop();
+            localStorage.setItem("cart", JSON.stringify(cart));
+
             enqueueSnackbar("Failed to add cake to cart", { variant: "info" });
         }
     }
