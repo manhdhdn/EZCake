@@ -16,4 +16,5 @@ const Img = ({
     />
   );
 };
+
 export { Img };
