@@ -3,7 +3,6 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button, Img, Line, Text } from "components";
-import Chat from "components/Chat";
 
 const Header = (props) => {
   const navigate = useNavigate();

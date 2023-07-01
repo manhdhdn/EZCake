@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 
 import CuscakeForm from "components/CuscakeForm";
 import Footer from "components/Footer";
-import Chat from "components/Chat";
 
 const Cuscake = () => {
     useEffect(() => {

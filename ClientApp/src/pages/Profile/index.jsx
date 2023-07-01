@@ -5,7 +5,6 @@ import { handleSectionNavigation } from "utils";
 import { Img, Line } from "components";
 import Navbar from "components/Navbar";
 import Footer from "components/Footer";
-import Chat from "components/Chat";
 import ProfileForm from "components/ProfileForm";
 
 const Profile = () => {

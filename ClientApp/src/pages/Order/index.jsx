@@ -11,7 +11,6 @@ import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
 import { Button, Img, Input, Line, Text } from "components";
 import Navbar from "components/Navbar";
-import Chat from "components/Chat";
 import Footer from "components/Footer";
 
 const Order = () => {

@@ -15,7 +15,6 @@ import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
 import { Button, Img, Input, Line, Text } from "../../components";
 import SignHeader from "components/SignHeader";
-import Chat from "components/Chat";
 import Footer from "../../components/Footer";
 import QRCodeWithIcon from "components/QrCode";
 
