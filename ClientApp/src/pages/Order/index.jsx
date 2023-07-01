@@ -410,6 +410,16 @@ const Order = () => {
         )
     }
 
+    const handleContact = () => {
+        const target = document.getElementById("fb-root");
+
+        console.log(target);
+
+        if (target) {
+            target.click();
+        }
+    }
+
     const confirm = () => {
         if (confirmDetails.length !== 0) {
             let contents = [];
@@ -519,6 +529,7 @@ const Order = () => {
                                                 <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
                                                     <Button
                                                         className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                        onClick={() => handleContact()}
                                                     >
                                                         contact
                                                     </Button>
@@ -673,6 +684,7 @@ const Order = () => {
                                         <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
                                             <Button
                                                 className="z-10 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[406px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                onClick={() => handleContact()}
                                             >
                                                 contact
                                             </Button>
@@ -818,6 +830,7 @@ const Order = () => {
                                             <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
                                                 <Button
                                                     className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] w-full py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                    onClick={() => handleContact()}
                                                 >
                                                     contact
                                                 </Button>
