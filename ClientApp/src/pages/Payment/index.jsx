@@ -133,7 +133,7 @@ const Payment = () => {
                     enqueueSnackbar("Order could not be updated", { variant: "error" });
                 }
             }
-        }, 2000);
+        }, 2500);
 
         return () => {
             clearInterval(intervalId);
