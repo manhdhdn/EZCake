@@ -9,7 +9,6 @@ import { CircularProgress } from "@mui/material";
 import { Img, Line, Text } from "components";
 import Navbar from "components/Navbar";
 import Footer from "components/Footer";
-import Chat from "components/Chat";
 
 const Shop = () => {
     const [cakes, setCakes] = useState(null);

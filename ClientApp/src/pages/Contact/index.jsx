@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { Button, Img, Line, Text } from "components";
 import Footer from "components/Footer";
 import Navbar from "components/Navbar";
-import Chat from "components/Chat";
 
 const Contact = () => {
     const [first, setFirst] = useState(false);

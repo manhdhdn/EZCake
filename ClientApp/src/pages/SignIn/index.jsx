@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import { Img, Line } from "components";
 import SignHeader from "components/SignHeader";
 import SignInForm from "components/SignInForm";
-import Chat from "components/Chat";
 import Footer from "components/Footer";
 
 const SignIn = () => {
