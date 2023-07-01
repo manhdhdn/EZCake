@@ -119,6 +119,7 @@ const Order = () => {
                     orders = await OrderApi.getOrders({
                         accountId,
                         status: "Completed",
+                        subStatus: "Cancelled",
                         pageNumber,
                         search
                     })
@@ -189,13 +190,6 @@ const Order = () => {
                 }));
 
                 orderDetails = [...orderDetails].sort((a, b) => {
-                    if (a.status === 'Pending' && b.status !== 'Pending') {
-                        return -1;
-                    }
-                    if (a.status !== 'Pending' && b.status === 'Pending') {
-                        return 1;
-                    }
-
                     return new Date(b.orderDate) - new Date(a.orderDate);
                 })
 
@@ -228,10 +222,10 @@ const Order = () => {
                 }));
 
                 orderDetails = [...orderDetails].sort((a, b) => {
-                    if (a.status === 'Pending' && b.status !== 'Pending') {
+                    if (a.status === 'Delivering' && b.status !== 'Delivering') {
                         return -1;
                     }
-                    if (a.status !== 'Pending' && b.status === 'Pending') {
+                    if (a.status !== 'Delivering' && b.status === 'Delivering') {
                         return 1;
                     }
 
@@ -267,10 +261,10 @@ const Order = () => {
                 }));
 
                 orderDetails = [...orderDetails].sort((a, b) => {
-                    if (a.status === 'Pending' && b.status !== 'Pending') {
+                    if (a.status === 'Completed' && b.status !== 'Completed') {
                         return -1;
                     }
-                    if (a.status !== 'Pending' && b.status === 'Pending') {
+                    if (a.status !== 'Completed' && b.status === 'Completed') {
                         return 1;
                     }
 
@@ -350,18 +344,9 @@ const Order = () => {
 
     const handleCancelOrder = async () => {
         try {
-            await OrderApi.updateOrder(cancelOrder.id, {
-                id: cancelOrder.id,
-                orderDate: cancelOrder.orderDate,
-                shippedDate: cancelOrder.shippedDate,
-                shippingInformationId: cancelOrder.shippingInformationId,
-                message: message,
-                status: "Cancelled"
-            });
-
             let orders = confirmDetails.filter(order => order.id !== cancelOrder.id);
-
             setConfirmDetails(orders);
+
             setMessage("");
             setOpen(false);
 
@@ -374,6 +359,15 @@ const Order = () => {
                     enqueueSnackbar("Refund sent, check your MoMo", { variant: "success" });
                 }
             }
+
+            await OrderApi.updateOrder(cancelOrder.id, {
+                id: cancelOrder.id,
+                orderDate: cancelOrder.orderDate,
+                shippedDate: cancelOrder.shippedDate,
+                shippingInformationId: cancelOrder.shippingInformationId,
+                message: message,
+                status: "Cancelled"
+            });
         } catch (error) {
             enqueueSnackbar("Could not cancel order", { variant: "error" });
         }
@@ -863,6 +857,7 @@ const Order = () => {
                 let date = order.orderDate.slice(0, 10);
                 let time = order.orderDate.slice(11, 16);
                 let price = 0;
+                let completed = order.status === "Completed" ? true : false;
 
                 order.orderDetails.forEach((orderDetail) => {
                     if (!name.includes(orderDetail.cake.name)) {
@@ -951,13 +946,17 @@ const Order = () => {
                                                 {price.toLocaleString("vi-VN")} VNĐ
                                             </Text>
                                         </div>
-                                        <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
-                                            <Button
-                                                className="z-30 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[406px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
-                                            >
-                                                repurchase
-                                            </Button>
-                                        </div>
+                                        {completed ? (
+                                            <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
+                                                <Button
+                                                    className="z-30 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[406px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                >
+                                                    repurchase
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <Text className="italic underline text-center text-lg text-red-500 w-full">Canceled</Text>
+                                        )}
                                     </div>
                                 </div>
                             </div>
