@@ -20,7 +20,6 @@ const Profile = () => {
                 <div className="h-[665px] md:px-5 relative w-full mt-navbar">
                     <Img className="h-[665px] m-auto object-cover w-full" src="images/img_header.png" alt="pictureOne" />
                     <Line className="absolute bg-red-500 h-px inset-x-[0] mx-auto top-[0] w-full" />
-                    <Chat />
                 </div>
                 <Line id="profile" className="bg-red-500 h-px w-full" />
                 <ProfileForm className="flex flex-col items-center justify-start max-w-[1014px] mt-14 mx-auto md:px-5 w-full" />

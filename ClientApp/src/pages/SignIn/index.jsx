@@ -34,7 +34,6 @@ const SignIn = () => {
             </div>
             <Line className="bg-red-500 h-px w-full" />
           </div>
-          <Chat />
         </div>
         <Footer className="bg-orange-50 flex font-sfmono items-center justify-center mt-[3px] md:px-5 w-full" />
       </div>

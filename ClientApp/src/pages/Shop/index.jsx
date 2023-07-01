@@ -130,7 +130,6 @@ const Shop = () => {
                 <div id="shop" className="flex flex-wrap items-start justify-start mt-navbar w-full">
                     {content()}
                 </div>
-                <Chat />
                 <Footer className="bg-orange-50 flex font-sfmono items-center justify-center md:px-5 w-full" />
             </div>
         </>
