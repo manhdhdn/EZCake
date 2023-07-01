@@ -65,7 +65,14 @@ const Navbar = (props) => {
   useEffect(() => {
     const loadCart = async () => {
       try {
-        setCart(JSON.parse(localStorage.getItem("cart")));
+        let cart = JSON.parse(localStorage.getItem("cart"))
+        let isCartNotLoaded = cart.orderDetails.some((orderDetail) => orderDetail.cake === undefined);
+
+        if (isCartNotLoaded){
+          cart = await OrderApi.getOrder(cart.id);
+        }
+
+        setCart(cart);
       } catch (error) {
         enqueueSnackbar("Load cart failed", { variant: "error" });
       }
