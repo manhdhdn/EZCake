@@ -435,7 +435,7 @@ const Navbar = (props) => {
   };
 
   return (
-    <div style={{ position: "fixed", zIndex: 100 }} className={props.className}>
+    <div style={{ position: "fixed", zIndex: 20 }} className={props.className}>
       <div className="flex sm:flex-col flex-row md:gap-10 items-center justify-between mb-0.5 ml-[43px] w-[94%]">
         <Link to="/">
           <Img

@@ -56,7 +56,6 @@ const PrivacyPolicy = () => {
                 Device Information and Ordering Information.
               </>
             </Text>
-            <Chat />
           </div>
           <Text className="font-bold font-sfmono md:ml-[0] ml-[162px] mt-[39px] text-[22px] sm:text-lg text-red-500 md:text-xl">
             USE OF YOUR PERSONAL INFORMATION

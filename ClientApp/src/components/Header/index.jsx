@@ -42,7 +42,6 @@ const Header = (props) => {
           </div>
         </div>
       </div>
-      <Chat />
     </div>
   );
 };
