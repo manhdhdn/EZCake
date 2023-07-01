@@ -89,7 +89,7 @@ const BestSeller = (props) => {
               {cakeInfo.name.toUpperCase()}
             </>
           ) : (
-            <Skeleton variant="text" animation="wave" width={200} height={45} />
+            <Skeleton variant="text" width={200} height={45} />
           )}
         </Text>
         <Text
@@ -184,7 +184,7 @@ const BestSeller = (props) => {
           </>
         ) : (
           <div className="absolute inset-[0] justify-center m-auto object-cover w-[92%]">
-            <Skeleton variant="rounded" animation="wave" width={783} height={677} />
+            <Skeleton variant="rounded" width={783} height={677} />
           </div>
         )}
       </div>

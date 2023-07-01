@@ -193,9 +193,9 @@ const Payment = () => {
         let element = (
             <>
                 <div className="flex flex-col items-start justify-start w-full">
-                    <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500 w-[233px]"><Skeleton animation="wave" /></Text>
-                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-[233px]" ><Skeleton animation="wave" /></Text>
-                    <Text className="font-sfmono mt-1 text-lg text-red-500 w-[233px]" ><Skeleton animation="wave" /></Text>
+                    <Text className="font-monumentextended sm:text-[21px] md:text-[23px] text-[25px] text-red-500 w-[233px]"><Skeleton /></Text>
+                    <Text className="font-sfmono mt-2 text-lg text-red-500 w-[233px]" ><Skeleton /></Text>
+                    <Text className="font-sfmono mt-1 text-lg text-red-500 w-[233px]" ><Skeleton /></Text>
                 </div>
             </>
         )
