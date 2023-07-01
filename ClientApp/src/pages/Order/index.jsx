@@ -804,12 +804,12 @@ const Order = () => {
                                             <>
                                                 <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
                                                     <Button
-                                                        className="z-20 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                        className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
                                                     >
                                                         review
                                                     </Button>
                                                     <Button
-                                                        className="z-20 bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
+                                                        className="bg-orange-50 hover:bg-red-500 border border-red-500 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[193px] py-3.5 rounded-[5px] text-center text-lg text-red-500 hover:text-orange-50"
                                                     >
                                                         repurchase
                                                     </Button>
@@ -818,7 +818,7 @@ const Order = () => {
                                         ) : (
                                             <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
                                                 <Button
-                                                    className="z-20 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] w-full py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                    className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] w-full py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
                                                 >
                                                     contact
                                                 </Button>
@@ -949,7 +949,7 @@ const Order = () => {
                                         {completed ? (
                                             <div className="flex sm:flex-col flex-row gap-5 items-center justify-between w-full">
                                                 <Button
-                                                    className="z-30 bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[406px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
+                                                    className="bg-orange-50 hover:bg-indigo-900 border border-indigo-900 hover:border-teal-100 border-solid cursor-pointer leading-[normal] min-w-[406px] py-3.5 rounded-[5px] text-center text-indigo-900 hover:text-orange-50 text-lg"
                                                 >
                                                     repurchase
                                                 </Button>
@@ -1070,7 +1070,6 @@ const Order = () => {
                     />
                 </div>
 
-                <Chat />
                 <Footer className="bg-orange-50 flex items-center justify-center mt-[50px] md:px-5 w-full" />
             </div>
         </div>

@@ -151,7 +151,6 @@ const Contact = () => {
                     </div>
                     <Line className="absolute bg-red-500 h-[667px] inset-y-[0] my-auto right-[55%] w-px" />
                 </div>
-                <Chat />
                 <Footer className="bg-orange-50 flex items-center justify-center md:px-5 w-full" />
             </div>
         </>

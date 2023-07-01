@@ -342,7 +342,6 @@ const Payment = () => {
                             </div>
                         </div>
                     </div>
-                    <Chat />
                     <Footer className="bg-orange-50 flex items-center justify-center md:px-5 w-full" />
                 </div>
                 {messagePopUp()}

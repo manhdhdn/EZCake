@@ -48,7 +48,6 @@ const TermsOfService = () => {
                             the website after posting updates and/or changes constitutes your acceptance of such changes.
                         </>
                     </Text>
-                    <Chat />
                 </div>
                 <Text className="font-bold font-sfmono md:ml-[0] ml-[162px] mt-[38px] text-[22px] sm:text-lg text-red-500 md:text-xl">
                     PART 1 - ONLINE STORE TERMS
