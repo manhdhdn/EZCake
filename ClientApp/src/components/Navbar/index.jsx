@@ -68,7 +68,7 @@ const Navbar = (props) => {
         let cart = JSON.parse(localStorage.getItem("cart"))
         let isCartNotLoaded = cart.orderDetails.some((orderDetail) => orderDetail.cake === undefined);
 
-        if (isCartNotLoaded){
+        if (isCartNotLoaded) {
           cart = await OrderApi.getOrder(cart.id);
         }
 
