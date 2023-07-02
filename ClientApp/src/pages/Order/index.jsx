@@ -413,8 +413,6 @@ const Order = () => {
     const handleContact = () => {
         const target = document.getElementById("fb-root");
 
-        console.log(target);
-
         if (target) {
             target.click();
         }

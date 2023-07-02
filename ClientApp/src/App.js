@@ -6,7 +6,23 @@ import { SnackbarProvider } from "notistack";
 
 const App = () => {
   useEffect(() => {
-    document.body.style.zoom = '125%';
+    const handleResize = () => {
+      const originalScale = window.devicePixelRatio;
+      const element = document.getElementById("fb-root");
+      const body = 1.25 / originalScale;
+      const fb = 1 / body;
+
+      document.body.style.zoom = `${body * 100}%`;
+      element.style.zoom = `${fb * 100}%`;
+    }
+
+    window.addEventListener("resize", handleResize);
+
+    handleResize();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    }
   }, []);
 
   return (
