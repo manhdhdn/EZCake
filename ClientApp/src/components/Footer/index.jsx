@@ -6,6 +6,14 @@ import { Link } from "react-router-dom";
 import { Button, Img, Line, Text } from "components";
 
 const Footer = (props) => {
+  const handleTiktokClick = () => {
+    window.open("https://www.tiktok.com/@cakeez07", "_blank");
+  }
+
+  const handleFacebookClick = () => {
+    window.open("https://www.facebook.com/EzCakecop", "_blank");
+  }
+
   return (
     <>
       <footer className={props.className}>
@@ -116,10 +124,18 @@ const Footer = (props) => {
                   </div>
                   <div className="flex flex-row gap-5 items-center justify-start md:ml-[0] ml-[370px] mt-[13px]">
                     <Button className="flex h-9 items-center justify-center p-[3x] w-9">
-                      <Img src="images/img_facebook.svg" alt="facebook" />
+                      <Img
+                        src="images/img_facebook.svg"
+                        alt="facebook"
+                        onClick={handleFacebookClick}
+                      />
                     </Button>
                     <Button className="bg-gray-900 flex h-9 items-center justify-center p-[7px] rounded-lg w-9">
-                      <Img src="images/img_tiktok.svg" alt="tiktok" />
+                      <Img
+                        src="images/img_tiktok.svg"
+                        alt="tiktok"
+                        onClick={handleTiktokClick}
+                      />
                     </Button>
                   </div>
                 </ul>
