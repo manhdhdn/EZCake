@@ -332,8 +332,18 @@ const CuscakeForm = (props) => {
                     <div className="absolute bottom-[0] flex md:flex-col flex-row md:gap-[54px] inset-x-[0] items-start justify-between mx-auto w-[97%]">
                         <div className="h-[666px] relative w-[42%] md:w-full">
                             <Img
-                                className="absolute bottom-[0] h-[556px] inset-x-[0] mx-auto object-cover w-full"
-                                src="images/img_bvdt1.png"
+                                className="absolute bottom-[0] h-[590px] inset-x-[0] mx-auto object-cover w-full"
+                                src={flours.ingredients.find(e => e.id === flour).image}
+                                alt="bvdtOne"
+                            />
+                            <Img
+                                className="absolute bottom-[0] h-[590px] inset-x-[0] mx-auto object-cover w-full"
+                                src={flavors.ingredients.find(e => e.id === flavor).image}
+                                alt="bvdtOne"
+                            />
+                            <Img
+                                className="absolute bottom-[0] h-[590px] inset-x-[0] mx-auto object-cover w-full"
+                                src={toppings.ingredients.find(e => e.id === topping).image}
                                 alt="bvdtOne"
                             />
                             <Line className="absolute bg-red-500 h-[666px] inset-y-[0] my-auto right-[0] w-[0.5px]" />
